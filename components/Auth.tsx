@@ -1,16 +1,16 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { useWallet, useWalletList } from '@meshsdk/react'
-import Modal from './Modal'
-import TextFrown from './TextFrown'
+import { toast } from 'react-hot-toast'
 import { PhotoIcon, UserIcon, WalletIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
-import LinkList from './LinkList'
-import { LS_KEYS } from '@/constants'
-import ProfilePicture from './ProfilePicture'
-import TokenExplorer from './TokenExplorer'
-import { toast } from 'react-hot-toast'
 import setUser from '@/functions/storage/users/setUser'
+import Modal from './Modal'
+import LinkList from './LinkList'
+import TokenExplorer from './TokenExplorer'
+import ProfilePicture from './ProfilePicture'
+import TextFrown from './TextFrown'
 import { Address, StakeKey } from '@/@types'
+import { LS_KEYS } from '@/constants'
 
 const Auth = () => {
   const installedWallets = useWalletList()
