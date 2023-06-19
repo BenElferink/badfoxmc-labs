@@ -2,22 +2,25 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { useWallet, useWalletList } from '@meshsdk/react'
 import Modal from './Modal'
 import TextFrown from './TextFrown'
-import { UserIcon, WalletIcon } from '@heroicons/react/24/solid'
+import { PhotoIcon, UserIcon, WalletIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
 import LinkList from './LinkList'
 import { LS_KEYS } from '@/constants'
 import ProfilePicture from './ProfilePicture'
+import TokenExplorer from './TokenExplorer'
+import { toast } from 'react-hot-toast'
+import setUser from '@/functions/storage/users/setUser'
+import { Address, StakeKey } from '@/@types'
 
 const Auth = () => {
   const installedWallets = useWalletList()
-  const { connect, disconnect, connecting, connected, name, error } = useWallet()
-  const { user } = useAuth()
+  const { connect, disconnect, connecting, connected, name, error, wallet } = useWallet()
+  const { user, getAndSetUser } = useAuth()
 
-  const [openModal, setOpenModal] = useState(false)
+  const [openConnectModal, setOpenConnectModal] = useState(false)
+  const toggleConnectModal = (bool?: boolean) => setOpenConnectModal((prev) => bool ?? !prev)
+
   const mountRef = useRef(false)
-
-  const handleOpen = () => setOpenModal(true)
-  const handleClose = () => setOpenModal(false)
 
   useEffect(() => {
     if (!mountRef.current) {
@@ -28,12 +31,49 @@ const Auth = () => {
     } else {
       if (connected) {
         localStorage.setItem(LS_KEYS['WALLET_PROVIDER'], name)
-        handleClose()
+        toggleConnectModal(false)
       } else {
         localStorage.removeItem(LS_KEYS['WALLET_PROVIDER'])
       }
     }
   }, [connected, name])
+
+  const [openProfileModal, setOpenProfileModal] = useState(false)
+  const toggleProfileModal = (bool?: boolean) => setOpenProfileModal((prev) => bool ?? !prev)
+
+  const [openProfilePictureModal, setOpenProfilePictureModal] = useState(false)
+  const toggleProfilePictureModal = (bool?: boolean) => setOpenProfilePictureModal((prev) => bool ?? !prev)
+
+  const [username, setUsername] = useState('')
+  const [profilePicture, setProfilePicture] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username || '')
+      setProfilePicture(user.profilePicture || '')
+    }
+  }, [user, openProfileModal])
+
+  const handleSaveUser = async () => {
+    toast.loading('Saving Profile')
+    setLoading(true)
+
+    await setUser({
+      stakeKey: user?.stakeKey as StakeKey,
+      addresses: user?.addresses as Address[],
+      username,
+      profilePicture,
+    })
+
+    toast.dismiss()
+    toast.success('Profile Saved')
+
+    await getAndSetUser()
+
+    setLoading(false)
+    toggleProfileModal(false)
+  }
 
   return (
     <Fragment>
@@ -55,13 +95,12 @@ const Auth = () => {
                     {
                       label: 'Profile',
                       Icon: (props) => <UserIcon {...props} />,
-                      path: '/profile',
-                      tags: ['Soon'],
+                      onClick: () => toggleProfileModal(true),
                     },
                     {
                       label: 'Switch Wallet',
                       Icon: (props) => <WalletIcon {...props} />,
-                      onClick: () => handleOpen(),
+                      onClick: () => toggleConnectModal(true),
                     },
                   ]}
                 />
@@ -72,8 +111,8 @@ const Auth = () => {
       ) : (
         <div className='p-0.5 rounded-xl bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
           <button
-            onClick={handleOpen}
-            disabled={openModal}
+            onClick={() => toggleConnectModal(true)}
+            disabled={openConnectModal}
             className='py-2 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700'
           >
             Connect
@@ -81,7 +120,7 @@ const Auth = () => {
         </div>
       )}
 
-      <Modal open={openModal} onClose={handleClose}>
+      <Modal open={openConnectModal} onClose={() => toggleConnectModal(false)}>
         {!installedWallets.length ? (
           <TextFrown text='No wallets installed...' className='mt-[50%]' />
         ) : (
@@ -114,6 +153,54 @@ const Auth = () => {
             ) : null}
           </div>
         )}
+      </Modal>
+
+      <Modal open={openProfileModal} onClose={() => toggleProfileModal(false)}>
+        <div className='h-[95vh] sm:h-[70vh] max-w-[350px] mx-auto flex flex-col justify-between'>
+          <div className='flex flex-col items-center'>
+            <button
+              onClick={() => toggleProfilePictureModal(true)}
+              disabled={loading}
+              className='w-64 h-64 text-sm text-gray-400 hover:text-white rounded-full bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70'
+            >
+              {profilePicture ? (
+                <img src={profilePicture} alt='' className='w-full rounded-full' />
+              ) : (
+                <Fragment>
+                  <PhotoIcon className='w-12 h-12 mx-auto' />
+                  <p>Profile Picture</p>
+                </Fragment>
+              )}
+            </button>
+
+            <input
+              placeholder='Username'
+              value={username}
+              onChange={(e) => setUsername(e.target.value.replaceAll(' ', ''))}
+              disabled={loading}
+              className='w-full mt-2 p-4 flex items-center text-center placeholder:text-gray-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:bg-zinc-800 outline-none'
+            />
+          </div>
+
+          <div className='w-full rounded-lg bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
+            <button
+              onClick={handleSaveUser}
+              disabled={loading || (username === user?.username && profilePicture === user?.profilePicture)}
+              className='w-full p-4 flex items-center justify-center rounded-lg bg-opacity-50 hover:bg-opacity-50 bg-zinc-700 hover:bg-zinc-500 disabled:bg-zinc-800 disabled:text-zinc-600'
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal open={openProfilePictureModal} onClose={() => toggleProfilePictureModal(false)}>
+        <TokenExplorer
+          callback={(payload) => {
+            setProfilePicture(payload.image.url)
+            toggleProfilePictureModal(false)
+          }}
+        />
       </Modal>
     </Fragment>
   )

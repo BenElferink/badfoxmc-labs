@@ -117,7 +117,7 @@ export interface BadApiWallet {
 
 export interface User extends BadApiWallet {
   tokens?: BadApiPopulatedToken[]
-  isTokenGateHolder: boolean
-  username: string
-  profilePicture: string
+  username?: string
+  profilePicture?: string
+  isTokenGateHolder?: boolean
 }
