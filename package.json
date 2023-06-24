@@ -2,6 +2,8 @@
   "name": "bad-labs",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://labs.badfoxmc.com",
+  "author": "Ben Elferink <ben.elferink@icloud.com> (https://www.linkedin.com/in/ben-elferink-37ba251b9)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,11 +11,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@blockfrost/blockfrost-js": "^5.3.1",
     "@heroicons/react": "^2.0.18",
     "@meshsdk/core": "^1.5.4",
     "@meshsdk/react": "^1.1.7",
-    "firebase": "^9.22.2",
-    "next": "13.4.5",
+    "firebase": "^9.23.0",
+    "next": "13.4.7",
     "postcss": "8.4.24",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -21,12 +24,12 @@
     "tailwindcss": "3.3.2"
   },
   "devDependencies": {
-    "@types/node": "^20.3.0",
-    "@types/react": "^18.2.12",
-    "@types/react-dom": "^18.2.5",
+    "@types/node": "^20.3.1",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
     "autoprefixer": "^10.4.14",
-    "eslint": "^8.42.0",
-    "eslint-config-next": "^13.4.5",
+    "eslint": "^8.43.0",
+    "eslint-config-next": "^13.4.7",
     "typescript": "^5.1.3"
   }
 }

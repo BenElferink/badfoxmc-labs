@@ -58,7 +58,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
               <footer
                 id='footer'
-                className='sticky bottom-0 p-1 flex items-center justify-center drop-shadow-[0_0_2px_rgba(0,0,0,1)]'
+                className='p-1 flex items-center justify-center drop-shadow-[0_0_2px_rgba(0,0,0,1)]'
               >
                 <Link
                   href='https://badfoxmc.com'

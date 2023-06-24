@@ -7,14 +7,13 @@ import setUser from '@/functions/storage/users/setUser'
 import Modal from './Modal'
 import LinkList from './LinkList'
 import TokenExplorer from './TokenExplorer'
-import ProfilePicture from './ProfilePicture'
 import TextFrown from './TextFrown'
 import { Address, StakeKey } from '@/@types'
 import { LS_KEYS } from '@/constants'
 
 const Auth = () => {
   const installedWallets = useWalletList()
-  const { connect, disconnect, connecting, connected, name, error, wallet } = useWallet()
+  const { connect, disconnect, connecting, connected, name, error } = useWallet()
   const { user, getAndSetUser } = useAuth()
 
   const [openConnectModal, setOpenConnectModal] = useState(false)
@@ -59,20 +58,27 @@ const Auth = () => {
     toast.loading('Saving Profile')
     setLoading(true)
 
-    await setUser({
-      stakeKey: user?.stakeKey as StakeKey,
-      addresses: user?.addresses as Address[],
-      username,
-      profilePicture,
-    })
+    try {
+      await setUser({
+        stakeKey: user?.stakeKey as StakeKey,
+        addresses: user?.addresses as Address[],
+        username,
+        profilePicture,
+      })
 
-    toast.dismiss()
-    toast.success('Profile Saved')
+      toast.dismiss()
+      toast.success('Profile Saved')
 
-    await getAndSetUser()
+      await getAndSetUser()
 
-    setLoading(false)
-    toggleProfileModal(false)
+      setLoading(false)
+      toggleProfileModal(false)
+    } catch (error: any) {
+      toast.dismiss()
+      toast.error(error.message)
+
+      setLoading(false)
+    }
   }
 
   return (
@@ -80,7 +86,7 @@ const Auth = () => {
       {connected ? (
         <div className='group relative p-1 flex items-center cursor-pointer'>
           {user?.profilePicture ? (
-            <ProfilePicture src={user.profilePicture} size={50} />
+            <img src={user.profilePicture} alt='' width={50} height={50} className='rounded-full' />
           ) : (
             <div className='p-2 rounded-full bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
               <UserIcon className='w-8 h-8' />
@@ -109,11 +115,11 @@ const Auth = () => {
           ) : null}
         </div>
       ) : (
-        <div className='p-0.5 rounded-xl bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
+        <div className='p-0.5 rounded-lg bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
           <button
             onClick={() => toggleConnectModal(true)}
             disabled={openConnectModal}
-            className='py-2 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700'
+            className='py-2 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700'
           >
             Connect
           </button>
@@ -144,7 +150,10 @@ const Auth = () => {
 
             {connected ? (
               <button
-                onClick={() => disconnect()}
+                onClick={() => {
+                  disconnect()
+                  toast.success('Disconnected')
+                }}
                 disabled={!connected || connecting}
                 className='w-full max-w-[420px] my-2 mx-auto p-4 flex items-center justify-center rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:opacity-40'
               >

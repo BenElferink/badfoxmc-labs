@@ -32,7 +32,6 @@ const Sidebar = (props: { open: boolean }) => {
               label: 'Airdrops',
               Icon: (props) => <BanknotesIcon {...props} />,
               path: '/airdrops',
-              tags: ['Soon'],
             },
             {
               label: 'Governance',

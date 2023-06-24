@@ -3,6 +3,7 @@ import { BadApiPopulatedToken } from '@/@types'
 import { useAuth } from '@/contexts/AuthContext'
 import MediaViewer from './MediaViewer'
 import TextFrown from './TextFrown'
+import Loader from './Loader'
 
 type Collection = {
   policyId: string
@@ -67,7 +68,7 @@ const TokenExplorer = (props: {
       <div className='flex flex-wrap items-start justify-center text-center'>
         {!collections.length ? (
           loading ? (
-            'Loading...'
+            <Loader />
           ) : (
             <TextFrown text='You have no tokens...' />
           )

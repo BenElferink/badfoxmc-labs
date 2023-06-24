@@ -15,19 +15,23 @@ export type ListingType = 'SINGLE' | 'BUNDLE' | 'UNKNOWN'
 
 export type MediaType = 'IMAGE' | 'GIF' | 'VIDEO' | '360_VIDEO' | 'AUDIO'
 
+type TokenAmount = {
+  onChain: number
+  decimals: number
+  display: number
+}
+
+type TokenName = {
+  onChain: string
+  ticker: string
+  display: string
+}
+
 export interface BadApiBaseToken {
   tokenId: TokenId
   isFungible: boolean
-  tokenAmount: {
-    onChain: number
-    decimals: number
-    display: number
-  }
-  tokenName?: {
-    onChain: string
-    ticker: string
-    display: string
-  }
+  tokenAmount: TokenAmount
+  tokenName?: TokenName
 }
 
 export interface BadApiMarketToken {
@@ -120,4 +124,13 @@ export interface User extends BadApiWallet {
   username?: string
   profilePicture?: string
   isTokenGateHolder?: boolean
+}
+
+export interface Airdrop {
+  id?: string
+  stakeKey: string
+  timestamp: number
+  thumb: string
+  tokenName: TokenName
+  tokenAmount: TokenAmount
 }
