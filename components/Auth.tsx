@@ -14,10 +14,7 @@ import { LS_KEYS } from '@/constants'
 const Auth = () => {
   const installedWallets = useWalletList()
   const { connect, disconnect, connecting, connected, name, error } = useWallet()
-  const { user, getAndSetUser } = useAuth()
-
-  const [openConnectModal, setOpenConnectModal] = useState(false)
-  const toggleConnectModal = (bool?: boolean) => setOpenConnectModal((prev) => bool ?? !prev)
+  const { user, getAndSetUser, openConnectModal, toggleConnectModal } = useAuth()
 
   const mountRef = useRef(false)
 
@@ -52,7 +49,7 @@ const Auth = () => {
       setUsername(user.username || '')
       setProfilePicture(user.profilePicture || '')
     }
-  }, [user, openProfileModal])
+  }, [user])
 
   const handleSaveUser = async () => {
     toast.loading('Saving Profile')
@@ -168,7 +165,10 @@ const Auth = () => {
         <div className='h-[95vh] sm:h-[70vh] max-w-[350px] mx-auto flex flex-col justify-between'>
           <div className='flex flex-col items-center'>
             <button
-              onClick={() => toggleProfilePictureModal(true)}
+              onClick={() => {
+                toggleProfilePictureModal(true)
+                toggleProfileModal(false)
+              }}
               disabled={loading}
               className='w-64 h-64 text-sm text-gray-400 hover:text-white rounded-full bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70'
             >
@@ -183,7 +183,7 @@ const Auth = () => {
             </button>
 
             <input
-              placeholder='Username'
+              placeholder='Username:'
               value={username}
               onChange={(e) => setUsername(e.target.value.replaceAll(' ', ''))}
               disabled={loading}
@@ -205,9 +205,11 @@ const Auth = () => {
 
       <Modal open={openProfilePictureModal} onClose={() => toggleProfilePictureModal(false)}>
         <TokenExplorer
+          onlyNonFungible
           callback={(payload) => {
             setProfilePicture(payload.image.url)
             toggleProfilePictureModal(false)
+            toggleProfileModal(true)
           }}
         />
       </Modal>

@@ -29,30 +29,30 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       <MeshProvider>
         <AuthProvider>
-          <header id='header' className='sticky top-0 z-50 h-20 px-4 flex items-center justify-between'>
-            <div className='flex items-center'>
-              <BeakerIcon className='w-10 h-10' />
-              <h1 className='ml-1.5 text-xl whitespace-nowrap'>Bad Labs</h1>
-            </div>
-
-            <div className='flex items-center'>
-              <button
-                type='button'
-                onClick={() => setOpenSidebar((prev) => !prev)}
-                className='p-1.5 text-sm rounded-lg sm:hidden text-zinc-400 focus:ring-2 focus:ring-zinc-600'
-              >
-                <Bars3Icon className='w-6 h-6' />
-              </button>
-
-              <Auth />
-            </div>
-          </header>
-
-          <div className='w-screen min-h-screen flex'>
+          <div className='w-screen min-h-screen'>
             <Sidebar open={openSidebar} />
 
+            <header id='header' className='sticky top-0 h-20 px-4 flex items-center justify-between'>
+              <div className='flex items-center'>
+                <BeakerIcon className='w-10 h-10' />
+                <h1 className='ml-1.5 text-xl whitespace-nowrap'>Bad Labs</h1>
+              </div>
+
+              <div className='flex items-center'>
+                <button
+                  type='button'
+                  onClick={() => setOpenSidebar((prev) => !prev)}
+                  className='p-1.5 text-sm rounded-lg sm:hidden text-zinc-400 focus:ring-2 focus:ring-zinc-600'
+                >
+                  <Bars3Icon className='w-6 h-6' />
+                </button>
+
+                <Auth />
+              </div>
+            </header>
+
             <div className='w-full sm:w-[calc(100vw-15rem)] sm:ml-auto'>
-              <main className='w-full min-h-screen p-2'>
+              <main className='w-full min-h-screen px-4'>
                 <Component {...pageProps} />
               </main>
 

@@ -1,9 +1,11 @@
-const Loader = () => {
+const Loader = (props: { withLabel?: boolean; label?: string }) => {
+  const { withLabel = false, label = 'Loading' } = props
+
   return (
-    <div role='status'>
+    <div role='status' className='flex flex-col items-center justify-center'>
       <svg
         aria-hidden='true'
-        className='w-10 h-10 m-1 animate-spin text-zinc-600 fill-zinc-200'
+        className='w-10 h-10 m-2 animate-spin text-zinc-600 fill-zinc-200'
         viewBox='0 0 100 101'
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
@@ -17,7 +19,7 @@ const Loader = () => {
           fill='currentFill'
         />
       </svg>
-      <span className='sr-only'>Loading...</span>
+      <span className={withLabel ? '' : 'sr-only'}>{label}</span>
     </div>
   )
 }

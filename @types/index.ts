@@ -120,17 +120,71 @@ export interface BadApiWallet {
 }
 
 export interface User extends BadApiWallet {
-  tokens?: BadApiPopulatedToken[]
+  lovelaces?: number
   username?: string
   profilePicture?: string
   isTokenGateHolder?: boolean
+  tokens?: BadApiPopulatedToken[]
+}
+
+export interface Settings {
+  tokenId: TokenId
+  tokenName: TokenName
+  tokenAmount: TokenAmount
+  thumb: string
+
+  useCustomList: boolean
+  holderPolicies: {
+    policyId: PolicyId
+    weight: number
+
+    withTraits: boolean
+    traitOptions: {
+      category: string
+      trait: string
+      amount: number
+    }[]
+
+    withRanks: boolean
+    rankOptions: {
+      minRange: number
+      maxRange: number
+      amount: number
+    }[]
+  }[]
+
+  withBlacklist: boolean
+  blacklist: StakeKey[]
+
+  withDelegators: boolean
+  stakePools: PoolId[]
 }
 
 export interface Airdrop {
   id?: string
   stakeKey: string
   timestamp: number
-  thumb: string
+
+  tokenId: TokenId
   tokenName: TokenName
   tokenAmount: TokenAmount
+  thumb: string
+}
+
+export interface SnapshotHolder {
+  stakeKey: string
+  addresses: string[]
+  assets: {
+    [policyId: string]: {
+      tokenId: string
+      amount: number
+    }[]
+  }
+}
+
+export interface PayoutHolder {
+  stakeKey: string
+  address: string
+  payout: number
+  txHash?: string
 }

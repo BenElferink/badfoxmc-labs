@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { BadApiPopulatedToken } from '@/@types'
 import { useAuth } from '@/contexts/AuthContext'
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from './MediaViewer'
 import TextFrown from './TextFrown'
 import Loader from './Loader'
+import type { BadApiPopulatedToken } from '@/@types'
 
 type Collection = {
   policyId: string
@@ -12,9 +13,13 @@ type Collection = {
 
 const TokenExplorer = (props: {
   callback: (_payload: BadApiPopulatedToken) => void
+  selectedTokenId?: string
   showTokenAmounts?: boolean
+  withAda?: boolean
+  onlyFungible?: boolean
+  onlyNonFungible?: boolean
 }) => {
-  const { callback, showTokenAmounts } = props
+  const { callback, selectedTokenId, showTokenAmounts, withAda, onlyFungible, onlyNonFungible } = props
   const { user } = useAuth()
 
   const [loading, setLoading] = useState(false)
@@ -26,6 +31,39 @@ const TokenExplorer = (props: {
 
     try {
       const payload: Collection = []
+
+      if (withAda) {
+        const lovelaces = user.lovelaces || 0
+        const lovelaceDecimals = 6
+
+        const adaBalance = {
+          tokenId: 'lovelace',
+          fingerprint: 'lovelace',
+          policyId: 'lovelace',
+          isFungible: true,
+          tokenName: {
+            onChain: 'lovelace',
+            ticker: 'ADA',
+            display: 'ADA',
+          },
+          tokenAmount: {
+            onChain: lovelaces,
+            display: formatTokenAmount.fromChain(lovelaces, lovelaceDecimals),
+            decimals: lovelaceDecimals,
+          },
+          image: {
+            ipfs: '',
+            url: 'https://labs.badfoxmc.com/media/ada.png',
+          },
+          files: [],
+          attributes: {},
+        }
+
+        payload.push({
+          policyId: adaBalance.policyId,
+          tokens: [adaBalance],
+        })
+      }
 
       user.tokens?.forEach((t) => {
         const idx = payload.findIndex((item) => item.policyId === t.policyId)
@@ -40,13 +78,16 @@ const TokenExplorer = (props: {
         }
       })
 
-      setCollections(payload)
-    } catch (error) {
+      setCollections(
+        payload.sort((a, b) => (b.policyId === 'lovelace' ? 1 : a.policyId.localeCompare(b.policyId)))
+      )
+    } catch (error: any) {
       console.error(error)
+      // const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, withAda])
 
   useEffect(() => {
     if (!collections.length) getCollections()
@@ -61,7 +102,7 @@ const TokenExplorer = (props: {
           placeholder='Search:'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className='w-[220px] my-2 p-3 text-gray-200 placeholder:text-gray-200 bg-gray-700 rounded-lg border border-gray-500 hover:text-white hover:placeholder:text-white hover:bg-gray-500 hover:border-gray-300'
+          className='w-full m-2 p-4 flex items-center text-center placeholder:text-gray-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:bg-zinc-800 outline-none'
         />
       ) : null}
 
@@ -75,6 +116,15 @@ const TokenExplorer = (props: {
         ) : (
           collections.map((coll) =>
             coll.tokens.map((t) => {
+              // if (onlyFungible && (!t.isFungible || t.tokenAmount.onChain <= 1)) {
+              if (onlyFungible && !t.isFungible) {
+                return null
+              }
+
+              if (onlyNonFungible && t.isFungible) {
+                return null
+              }
+
               const s = search.toLowerCase()
               const thisTokenIsInSearch =
                 coll.policyId.indexOf(s) !== -1 ||
@@ -91,18 +141,32 @@ const TokenExplorer = (props: {
                 <button
                   key={`policy-${coll.policyId}-token-${t.tokenId}`}
                   type='button'
+                  disabled={loading}
                   onClick={() => callback(t)}
-                  className='group w-[170px] m-1.5'
+                  className={
+                    'group w-[160px] m-2 flex flex-col items-center ' +
+                    (selectedTokenId === t.tokenId ? 'border rounded-lg' : '')
+                  }
                 >
-                  <MediaViewer mediaType='IMAGE' src={t.image.url} size='w-[170px] h-[170px]' />
+                  <MediaViewer mediaType='IMAGE' src={t.image.url} size='w-[150px] h-[150px] m-[5px]' />
 
                   {showTokenAmounts ? (
-                    <p className='m-0 p-0 px-2 text-xs text-zinc-400 group-hover:text-white truncate'>
+                    <p
+                      className={
+                        'm-0 p-0 px-2 text-xs ' +
+                        (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')
+                      }
+                    >
                       {t.tokenAmount.display.toLocaleString('en-US')}
                     </p>
                   ) : null}
 
-                  <p className='m-0 p-0 px-2 text-xs text-zinc-400 group-hover:text-white truncate'>
+                  <p
+                    className={
+                      'm-0 p-0 px-2 text-sm ' +
+                      (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')
+                    }
+                  >
                     {t.tokenName?.ticker ? '$' : ''}
                     {t.tokenName?.ticker || t.tokenName?.display || t.tokenName?.onChain}
                   </p>

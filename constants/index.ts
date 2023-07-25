@@ -17,3 +17,5 @@ export const POLICY_IDS = {
 export const LS_KEYS = {
   WALLET_PROVIDER: 'WALLET_PROVIDER',
 }
+
+export const ONE_MILLION = 1000000

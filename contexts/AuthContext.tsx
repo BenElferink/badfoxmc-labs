@@ -9,11 +9,15 @@ import type { User } from '@/@types'
 interface AuthContext {
   user: User | null
   getAndSetUser: () => Promise<void>
+  openConnectModal: boolean
+  toggleConnectModal: (bool?: boolean) => void
 }
 
 const initContext: AuthContext = {
   user: null,
   getAndSetUser: async () => {},
+  openConnectModal: false,
+  toggleConnectModal: () => {},
 }
 
 const AuthContext = createContext(initContext)
@@ -24,6 +28,9 @@ export const AuthProvider = (props: PropsWithChildren) => {
   const { children } = props
   const { connecting, connected, name, wallet, disconnect } = useWallet()
 
+  const [openConnectModal, setOpenConnectModal] = useState(false)
+  const toggleConnectModal = (bool?: boolean) => setOpenConnectModal((prev) => bool ?? !prev)
+
   const [user, setUser] = useState<AuthContext['user']>(null)
 
   const getAndSetUser = useCallback(async (): Promise<void> => {
@@ -33,6 +40,7 @@ export const AuthProvider = (props: PropsWithChildren) => {
     try {
       const stakeKeys = await wallet.getRewardAddresses()
       const stakeKey = stakeKeys[0]
+      const lovelaces = Number(await wallet.getLovelace())
 
       const { addresses, poolId, tokens } = await badApi.wallet.getData(stakeKey, {
         withStakePool: true,
@@ -56,10 +64,11 @@ export const AuthProvider = (props: PropsWithChildren) => {
       setUser({
         stakeKey,
         addresses,
+        lovelaces,
         username: user?.username || '',
         profilePicture: user?.profilePicture || '',
-        isTokenGateHolder,
         poolId,
+        isTokenGateHolder,
         tokens: populatedTokens,
       })
 
@@ -89,5 +98,16 @@ export const AuthProvider = (props: PropsWithChildren) => {
     }
   }, [connecting, connected, getAndSetUser])
 
-  return <AuthContext.Provider value={{ user, getAndSetUser }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        getAndSetUser,
+        openConnectModal,
+        toggleConnectModal,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
 }
