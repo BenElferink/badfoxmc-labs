@@ -306,7 +306,7 @@ const SnapshotForAirdrop = (props: {
     >
       <h6 className='text-xl text-center'>Run a Snapshot</h6>
       <p className='my-6 text-xs text-center'>
-        Snapshot does not include "script" wallets
+        Snapshot does not include &ldquo;script&rdquo; wallets
         <br />
         (For example:{' '}
         <Link

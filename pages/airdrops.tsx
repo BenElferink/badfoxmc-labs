@@ -6,8 +6,8 @@ import resolveMonthName from '@/functions/formatters/resolveMonthName'
 import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle'
 import MediaViewer from '@/components/MediaViewer'
 import Loader from '@/components/Loader'
-import type { Airdrop } from '@/@types'
 import AirdropJourney from '@/components/journeys/AirdropJourney'
+import type { Airdrop } from '@/@types'
 
 interface AirdropTimeline {
   [year: string]: {
