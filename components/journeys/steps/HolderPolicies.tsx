@@ -104,7 +104,7 @@ const HolderPolicies = (props: {
       back={back}
     >
       <h6 className='text-xl text-center'>Who are the holders?</h6>
-      <p className='my-6 text-xs text-start'>
+      <p className='my-6 text-xs text-center'>
         * Weight is the multiplier of that Policy ID (default 1)
         <br />
         (For example: you may want to give pass holders 2x the amount than PFP holders)

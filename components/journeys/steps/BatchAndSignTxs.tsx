@@ -238,6 +238,10 @@ const BatchAndSignTxs = (props: {
 
       <div className='w-2/3 h-0.5 my-8 mx-auto rounded-full bg-zinc-400' />
 
+      <p className='w-full my-2 text-center'>
+        {payoutHolders.length} Receiving Wallet{payoutHolders.length > 1 ? 's' : ''}
+      </p>
+
       {payoutHolders.map((item) => (
         <div
           key={`wallet-${item.stakeKey || item.address}`}

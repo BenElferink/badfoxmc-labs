@@ -109,7 +109,7 @@ const FungibleTokenAmount = (props: {
   return (
     <JourneyStepWrapper disableNext={!data.tokenAmount?.onChain} next={next} back={back}>
       <h6 className='text-xl text-center'>How many tokens?</h6>
-      <p className='mb-2 text-xs text-center'>The amount is equally devided amongst all policy holders</p>
+      <p className='my-6 text-xs text-center'>The amount is equally devided amongst all policy holders</p>
 
       <MediaViewer mediaType='IMAGE' src={data.thumb || ''} size='w-[150px] h-[150px] my-8 mx-auto' />
 
