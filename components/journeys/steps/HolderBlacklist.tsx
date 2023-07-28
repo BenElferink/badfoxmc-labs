@@ -5,7 +5,7 @@ import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { Settings, StakeKey } from '@/@types'
 
-const Blacklist = (props: {
+const HolderBlacklist = (props: {
   defaultData: Partial<Settings>
   callback: (payload: Partial<Settings>) => void
   next?: () => void
@@ -199,4 +199,4 @@ const Blacklist = (props: {
   )
 }
 
-export default Blacklist
+export default HolderBlacklist

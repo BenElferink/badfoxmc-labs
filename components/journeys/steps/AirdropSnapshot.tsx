@@ -17,7 +17,7 @@ import type {
   SnapshotHolder,
 } from '@/@types'
 
-const SnapshotForAirdrop = (props: {
+const AirdropSnapshot = (props: {
   payoutHolders: PayoutHolder[]
   settings: Settings
   callback: (payload: PayoutHolder[]) => void
@@ -355,4 +355,4 @@ const SnapshotForAirdrop = (props: {
   )
 }
 
-export default SnapshotForAirdrop
+export default AirdropSnapshot

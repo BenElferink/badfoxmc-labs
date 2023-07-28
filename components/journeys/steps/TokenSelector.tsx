@@ -2,12 +2,13 @@ import { ChangeEventHandler, useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from '@/components/MediaViewer'
+import TokenExplorer from '@/components/TokenExplorer'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { Settings } from '@/@types'
 
 type AmountType = 'FIXED' | 'PERCENT'
 
-const FungibleTokenAmount = (props: {
+const TokenAmount = (props: {
   defaultData: Partial<Settings>
   callback: (payload: Partial<Settings>) => void
   next?: () => void
@@ -197,4 +198,70 @@ const FungibleTokenAmount = (props: {
   )
 }
 
-export default FungibleTokenAmount
+const TokenSelector = (props: {
+  defaultData: Partial<Settings>
+  callback: (payload: Partial<Settings>) => void
+  next?: () => void
+  back?: () => void
+  withAmount?: boolean
+  onlyFungible?: boolean
+  onlyNonFungible?: boolean
+}) => {
+  const { defaultData, callback, next, back, withAmount, onlyFungible, onlyNonFungible } = props
+  const [data, setData] = useState(defaultData)
+
+  useEffect(() => {
+    if (Object.keys(data).length) callback(data)
+  }, [data])
+
+  const [selectAmount, setSelectAmount] = useState(false)
+
+  if (selectAmount) {
+    return (
+      <TokenAmount
+        defaultData={data}
+        callback={(payload) => setData((prev) => ({ ...prev, ...payload }))}
+        next={next}
+        back={back}
+      />
+    )
+  }
+
+  return (
+    <JourneyStepWrapper
+      disableNext={!data.tokenId}
+      next={() => {
+        if (withAmount) setTimeout(() => setSelectAmount(true), 0)
+        else if (next) setTimeout(() => next(), 0)
+      }}
+      back={back}
+    >
+      <h6 className='text-xl text-center'>Select a Token</h6>
+
+      <TokenExplorer
+        selectedTokenId={data.tokenId}
+        onlyFungible={onlyFungible}
+        onlyNonFungible={onlyNonFungible}
+        withAda
+        showTokenAmounts
+        callback={(payload) => {
+          setData({
+            thumb: payload['image']['url'],
+            tokenId: payload['tokenId'],
+            tokenName: payload['tokenName'],
+            tokenAmount: {
+              onChain: withAmount ? 0 : payload['tokenAmount']['onChain'],
+              display: withAmount ? 0 : payload['tokenAmount']['display'],
+              decimals: payload['tokenAmount']['decimals'],
+            },
+          })
+
+          if (withAmount) setTimeout(() => setSelectAmount(true), 0)
+          else if (next) setTimeout(() => next(), 0)
+        }}
+      />
+    </JourneyStepWrapper>
+  )
+}
+
+export default TokenSelector

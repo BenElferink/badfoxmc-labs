@@ -5,7 +5,7 @@ import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { Settings } from '@/@types'
 
-const StakePools = (props: {
+const HolderStakePools = (props: {
   defaultData: Partial<Settings>
   callback: (payload: Partial<Settings>) => void
   next?: () => void
@@ -185,4 +185,4 @@ const StakePools = (props: {
   )
 }
 
-export default StakePools
+export default HolderStakePools

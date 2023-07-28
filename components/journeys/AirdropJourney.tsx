@@ -3,15 +3,14 @@ import { useAuth } from '@/contexts/AuthContext'
 import Modal from '../Modal'
 import ErrorNotConnected from './steps/ErrorNotConnected'
 import ErrorNotTokenGateHolder from './steps/ErrorNotTokenGateHolder'
-import SnapshotOrFile from './steps/SnapshotOrFile'
-import FungibleTokenSelector from './steps/FungibleTokenSelector'
-import FungibleTokenAmount from './steps/FungibleTokenAmount'
+import AirdropSnapshotOrFile from './steps/AirdropSnapshotOrFile'
+import AirdropSnapshot from './steps/AirdropSnapshot'
+import AirdropCustomList from './steps/AirdropCustomList'
+import AirdropPayout from './steps/AirdropPayout'
+import TokenSelector from './steps/TokenSelector'
 import HolderPolicies from './steps/HolderPolicies'
-import StakePools from './steps/StakePools'
-import Blacklist from './steps/Blacklist'
-import SnapshotForAirdrop from './steps/SnapshotForAirdrop'
-import CustomList from './steps/CustomList'
-import BatchAndSignTxs from './steps/BatchAndSignTxs'
+import HolderStakePools from './steps/HolderStakePools'
+import HolderBlacklist from './steps/HolderBlacklist'
 import type { PayoutHolder, Settings } from '@/@types'
 
 const defaultSettings: Partial<Settings> = {
@@ -75,7 +74,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
   return (
     <Modal open={open} onClose={onClose}>
       {step === 1 ? (
-        <SnapshotOrFile
+        <AirdropSnapshotOrFile
           defaultData={{
             useCustomList: settings['useCustomList'],
           }}
@@ -84,7 +83,9 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
         />
       ) : settings.useCustomList ? (
         step === 2 ? (
-          <FungibleTokenSelector
+          <TokenSelector
+            onlyFungible
+            withAmount
             defaultData={{
               thumb: settings['thumb'],
               tokenId: settings['tokenId'],
@@ -96,27 +97,15 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
             back={decrement}
           />
         ) : step === 3 ? (
-          <FungibleTokenAmount
-            defaultData={{
-              thumb: settings['thumb'],
-              tokenId: settings['tokenId'],
-              tokenName: settings['tokenName'],
-              tokenAmount: settings['tokenAmount'],
-            }}
-            callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))}
-            next={increment}
-            back={decrement}
-          />
-        ) : step === 4 ? (
-          <CustomList
+          <AirdropCustomList
             payoutHolders={payoutHolders}
             settings={settings as Settings}
             callback={(payload) => setPayoutHolders(payload)}
             next={increment}
             back={decrement}
           />
-        ) : step === 5 ? (
-          <BatchAndSignTxs
+        ) : step === 4 ? (
+          <AirdropPayout
             payoutHolders={payoutHolders}
             settings={settings as Settings}
             callback={(payload) => setPayoutHolders(payload)}
@@ -125,7 +114,9 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
           />
         ) : null
       ) : step === 2 ? (
-        <FungibleTokenSelector
+        <TokenSelector
+          onlyFungible
+          withAmount
           defaultData={{
             thumb: settings['thumb'],
             tokenId: settings['tokenId'],
@@ -137,18 +128,6 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
           back={decrement}
         />
       ) : step === 3 ? (
-        <FungibleTokenAmount
-          defaultData={{
-            thumb: settings['thumb'],
-            tokenId: settings['tokenId'],
-            tokenName: settings['tokenName'],
-            tokenAmount: settings['tokenAmount'],
-          }}
-          callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))}
-          next={increment}
-          back={decrement}
-        />
-      ) : step === 4 ? (
         <HolderPolicies
           defaultData={{
             holderPolicies: settings['holderPolicies'],
@@ -157,8 +136,8 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
           next={increment}
           back={decrement}
         />
-      ) : step === 5 ? (
-        <StakePools
+      ) : step === 4 ? (
+        <HolderStakePools
           defaultData={{
             withDelegators: settings['withDelegators'],
             stakePools: settings['stakePools'],
@@ -167,8 +146,8 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
           next={increment}
           back={decrement}
         />
-      ) : step === 6 ? (
-        <Blacklist
+      ) : step === 5 ? (
+        <HolderBlacklist
           defaultData={{
             withBlacklist: settings['withBlacklist'],
             blacklist: settings['blacklist'],
@@ -177,16 +156,16 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
           next={increment}
           back={decrement}
         />
-      ) : step === 7 ? (
-        <SnapshotForAirdrop
+      ) : step === 6 ? (
+        <AirdropSnapshot
           payoutHolders={payoutHolders}
           settings={settings as Settings}
           callback={(payload) => setPayoutHolders(payload)}
           next={increment}
           back={decrement}
         />
-      ) : step === 8 ? (
-        <BatchAndSignTxs
+      ) : step === 7 ? (
+        <AirdropPayout
           payoutHolders={payoutHolders}
           settings={settings as Settings}
           callback={(payload) => setPayoutHolders(payload)}

@@ -9,7 +9,7 @@ import ProgressBar from '@/components/ProgressBar'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { PayoutHolder, Settings } from '@/@types'
 
-const CustomList = (props: {
+const AirdropCustomList = (props: {
   payoutHolders: PayoutHolder[]
   settings: Settings
   callback: (payload: PayoutHolder[]) => void
@@ -211,4 +211,4 @@ const CustomList = (props: {
   )
 }
 
-export default CustomList
+export default AirdropCustomList

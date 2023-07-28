@@ -1,20 +1,20 @@
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
+import { utils, writeFileXLSX } from 'xlsx'
 import { useWallet } from '@meshsdk/react'
 import { Transaction } from '@meshsdk/core'
 import { ArrowTopRightOnSquareIcon, CheckBadgeIcon } from '@heroicons/react/24/solid'
-import { utils, writeFileXLSX } from 'xlsx'
+import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
+import setAirdrop from '@/functions/storage/airdrops/setAirdrop'
+import txConfirmation from '@/functions/txConfirmation'
 import Loader from '@/components/Loader'
 import ProgressBar from '@/components/ProgressBar'
-import txConfirmation from '@/functions/txConfirmation'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { Airdrop, PayoutHolder, Settings } from '@/@types'
 import { ONE_MILLION } from '@/constants'
-import setAirdrop from '@/functions/storage/airdrops/setAirdrop'
-import { useAuth } from '@/contexts/AuthContext'
 
-const BatchAndSignTxs = (props: {
+const AirdropPayout = (props: {
   payoutHolders: PayoutHolder[]
   settings: Settings
   callback: (payload: PayoutHolder[]) => void
@@ -286,4 +286,4 @@ const BatchAndSignTxs = (props: {
   )
 }
 
-export default BatchAndSignTxs
+export default AirdropPayout
