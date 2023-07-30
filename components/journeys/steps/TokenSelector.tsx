@@ -245,13 +245,15 @@ const TokenSelector = (props: {
         withAda
         showTokenAmounts
         callback={(payload) => {
+          const { isFungible } = payload
+
           setData({
             thumb: payload['image']['url'],
             tokenId: payload['tokenId'],
             tokenName: payload['tokenName'],
             tokenAmount: {
-              onChain: withAmount ? 0 : payload['tokenAmount']['onChain'],
-              display: withAmount ? 0 : payload['tokenAmount']['display'],
+              onChain: withAmount && isFungible ? 0 : payload['tokenAmount']['onChain'],
+              display: withAmount && isFungible ? 0 : payload['tokenAmount']['display'],
               decimals: payload['tokenAmount']['decimals'],
             },
           })
