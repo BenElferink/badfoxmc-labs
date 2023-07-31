@@ -6,12 +6,12 @@ import { badApi } from '@/utils/badApi'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { HolderSettings } from '@/@types'
 
-const INIT_TRAIT_REWARDS = {
+const INIT_TRAIT_POINTS = {
   category: '',
   trait: '',
   amount: 0,
 }
-const INIT_RANK_REWARDS = {
+const INIT_RANK_POINTS = {
   minRange: 0,
   maxRange: 0,
   amount: 0,
@@ -20,9 +20,9 @@ const INIT_HOLDER_SETTINGS = {
   policyId: '',
   weight: 1,
   withTraits: false,
-  traitOptions: [{ ...INIT_TRAIT_REWARDS }],
+  traitOptions: [{ ...INIT_TRAIT_POINTS }],
   withRanks: false,
-  rankOptions: [{ ...INIT_RANK_REWARDS }],
+  rankOptions: [{ ...INIT_RANK_POINTS }],
 }
 
 const HolderPolicies = (props: {
@@ -107,10 +107,10 @@ const HolderPolicies = (props: {
       <p className='my-6 text-xs text-center'>
         * Weight is the multiplier of that Policy ID (default 1)
         <br />
-        (For example: you may want to give pass holders 2x the amount than PFP holders)
+        (For example: you may want to give pass holders 2x the points than PFP holders)
         <br />
         <br />
-        * Trait & Rank rewards are non-inclusive (additional to the amount previously selected)
+        * Trait & Rank points are non-inclusive (additional to the amount previously selected)
         <br />
         <br />* Ranks are obtained from
         <Link href='https://cnft.tools' target='_blank' rel='noopener noreferrer' className='group'>
@@ -218,7 +218,7 @@ const HolderPolicies = (props: {
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
                             withTraits: !withTraits,
-                            traitOptions: [{ ...INIT_TRAIT_REWARDS }],
+                            traitOptions: [{ ...INIT_TRAIT_POINTS }],
                           }
 
                           return payload
@@ -226,7 +226,7 @@ const HolderPolicies = (props: {
                       }
                       className='disabled:opacity-50'
                     />
-                    <span className='ml-2 text-sm'>Trait Rewards</span>
+                    <span className='ml-2 text-sm'>Trait Points</span>
                   </label>
 
                   <label
@@ -248,7 +248,7 @@ const HolderPolicies = (props: {
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
                             withRanks: !withRanks,
-                            rankOptions: [{ ...INIT_RANK_REWARDS }],
+                            rankOptions: [{ ...INIT_RANK_POINTS }],
                           }
 
                           return payload
@@ -256,7 +256,7 @@ const HolderPolicies = (props: {
                       }
                       className='disabled:opacity-50'
                     />
-                    <span className='ml-2 text-sm'>Rank Rewards</span>
+                    <span className='ml-2 text-sm'>Rank Points</span>
                   </label>
                 </div>
               </div>
@@ -315,7 +315,7 @@ const HolderPolicies = (props: {
                       />
 
                       <input
-                        placeholder='Tokens: (ex. 10)'
+                        placeholder='Amount: (ex. 10)'
                         disabled={!policyId || !withTraits}
                         value={String(amount || '')}
                         onChange={(e) =>
@@ -373,7 +373,7 @@ const HolderPolicies = (props: {
                     setFormData((prev) => {
                       const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
-                      payload['holderPolicies'][policyIdx].traitOptions.push({ ...INIT_TRAIT_REWARDS })
+                      payload['holderPolicies'][policyIdx].traitOptions.push({ ...INIT_TRAIT_POINTS })
 
                       return payload
                     })
@@ -445,7 +445,7 @@ const HolderPolicies = (props: {
                       />
 
                       <input
-                        placeholder='Tokens: (ex. 10)'
+                        placeholder='Amount: (ex. 10)'
                         disabled={!policyId || !withRanks}
                         value={String(amount || '')}
                         onChange={(e) =>
@@ -503,7 +503,7 @@ const HolderPolicies = (props: {
                     setFormData((prev) => {
                       const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
-                      payload['holderPolicies'][policyIdx].rankOptions.push({ ...INIT_RANK_REWARDS })
+                      payload['holderPolicies'][policyIdx].rankOptions.push({ ...INIT_RANK_POINTS })
 
                       return payload
                     })
