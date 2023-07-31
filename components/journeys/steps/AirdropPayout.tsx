@@ -11,12 +11,12 @@ import txConfirmation from '@/functions/txConfirmation'
 import Loader from '@/components/Loader'
 import ProgressBar from '@/components/ProgressBar'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { Airdrop, PayoutHolder, Settings } from '@/@types'
+import type { Airdrop, PayoutHolder, AirdropSettings } from '@/@types'
 import { ONE_MILLION } from '@/constants'
 
 const AirdropPayout = (props: {
   payoutHolders: PayoutHolder[]
-  settings: Settings
+  settings: AirdropSettings
   callback: (payload: PayoutHolder[]) => void
   next?: () => void
   back?: () => void

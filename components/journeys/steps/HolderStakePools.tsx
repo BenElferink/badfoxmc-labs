@@ -3,11 +3,11 @@ import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { Settings } from '@/@types'
+import type { HolderSettings } from '@/@types'
 
 const HolderStakePools = (props: {
-  defaultData: Partial<Settings>
-  callback: (payload: Partial<Settings>) => void
+  defaultData: Partial<HolderSettings>
+  callback: (payload: Partial<HolderSettings>) => void
   next?: () => void
   back?: () => void
 }) => {
@@ -111,7 +111,7 @@ const HolderStakePools = (props: {
                   value={str}
                   onChange={(e) =>
                     setFormData((prev) => {
-                      const payload: Settings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                       const v = e.target.value
 
                       if (!payload['stakePools']) {
@@ -133,7 +133,7 @@ const HolderStakePools = (props: {
                   <button
                     onClick={() => {
                       setFormData((prev) => {
-                        const payload: Settings = JSON.parse(JSON.stringify(prev))
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                         if (!payload['stakePools']) {
                           payload['stakePools'] = []
@@ -164,7 +164,7 @@ const HolderStakePools = (props: {
           disabled={!!(formData['stakePools'] || []).filter((str) => !str).length}
           onClick={() =>
             setFormData((prev) => {
-              const payload: Settings = JSON.parse(JSON.stringify(prev))
+              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
               if (!payload['stakePools']) {
                 payload['stakePools'] = []

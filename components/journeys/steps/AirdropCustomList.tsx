@@ -7,11 +7,11 @@ import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import Loader from '@/components/Loader'
 import ProgressBar from '@/components/ProgressBar'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { PayoutHolder, Settings } from '@/@types'
+import type { PayoutHolder, AirdropSettings } from '@/@types'
 
 const AirdropCustomList = (props: {
   payoutHolders: PayoutHolder[]
-  settings: Settings
+  settings: AirdropSettings
   callback: (payload: PayoutHolder[]) => void
   next?: () => void
   back?: () => void

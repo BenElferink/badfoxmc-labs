@@ -11,9 +11,9 @@ import TokenSelector from './steps/TokenSelector'
 import HolderPolicies from './steps/HolderPolicies'
 import HolderStakePools from './steps/HolderStakePools'
 import HolderBlacklist from './steps/HolderBlacklist'
-import type { PayoutHolder, Settings } from '@/@types'
+import type { PayoutHolder, AirdropSettings } from '@/@types'
 
-const defaultSettings: Partial<Settings> = {
+const defaultSettings: AirdropSettings = {
   tokenId: '',
   tokenName: {
     onChain: '',
@@ -42,7 +42,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
   const { user } = useAuth()
 
   const [step, setStep] = useState(1)
-  const [settings, setSettings] = useState<Partial<Settings>>(defaultSettings)
+  const [settings, setSettings] = useState<Partial<AirdropSettings>>(defaultSettings)
   const [payoutHolders, setPayoutHolders] = useState<PayoutHolder[]>([])
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
         ) : step === 3 ? (
           <AirdropCustomList
             payoutHolders={payoutHolders}
-            settings={settings as Settings}
+            settings={settings as AirdropSettings}
             callback={(payload) => setPayoutHolders(payload)}
             next={increment}
             back={decrement}
@@ -107,7 +107,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
         ) : step === 4 ? (
           <AirdropPayout
             payoutHolders={payoutHolders}
-            settings={settings as Settings}
+            settings={settings as AirdropSettings}
             callback={(payload) => setPayoutHolders(payload)}
             // next={increment}
             back={decrement}
@@ -159,7 +159,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
       ) : step === 6 ? (
         <AirdropSnapshot
           payoutHolders={payoutHolders}
-          settings={settings as Settings}
+          settings={settings as AirdropSettings}
           callback={(payload) => setPayoutHolders(payload)}
           next={increment}
           back={decrement}
@@ -167,7 +167,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
       ) : step === 7 ? (
         <AirdropPayout
           payoutHolders={payoutHolders}
-          settings={settings as Settings}
+          settings={settings as AirdropSettings}
           callback={(payload) => setPayoutHolders(payload)}
           // next={increment}
           back={decrement}

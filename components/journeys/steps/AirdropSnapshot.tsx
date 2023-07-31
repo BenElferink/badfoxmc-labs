@@ -13,13 +13,13 @@ import type {
   BadApiTokenOwners,
   BadApiWallet,
   PayoutHolder,
-  Settings,
+  AirdropSettings,
   SnapshotHolder,
 } from '@/@types'
 
 const AirdropSnapshot = (props: {
   payoutHolders: PayoutHolder[]
-  settings: Settings
+  settings: AirdropSettings
   callback: (payload: PayoutHolder[]) => void
   next?: () => void
   back?: () => void

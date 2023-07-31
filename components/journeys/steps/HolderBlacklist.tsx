@@ -3,11 +3,11 @@ import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { Settings, StakeKey } from '@/@types'
+import type { HolderSettings, StakeKey } from '@/@types'
 
 const HolderBlacklist = (props: {
-  defaultData: Partial<Settings>
-  callback: (payload: Partial<Settings>) => void
+  defaultData: Partial<HolderSettings>
+  callback: (payload: Partial<HolderSettings>) => void
   next?: () => void
   back?: () => void
 }) => {
@@ -125,7 +125,7 @@ const HolderBlacklist = (props: {
                   value={str}
                   onChange={(e) =>
                     setFormData((prev) => {
-                      const payload: Settings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                       const v = e.target.value
 
                       if (!payload['blacklist']) {
@@ -147,7 +147,7 @@ const HolderBlacklist = (props: {
                   <button
                     onClick={() => {
                       setFormData((prev) => {
-                        const payload: Settings = JSON.parse(JSON.stringify(prev))
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                         if (!payload['blacklist']) {
                           payload['blacklist'] = []
@@ -178,7 +178,7 @@ const HolderBlacklist = (props: {
           disabled={!!(formData['blacklist'] || []).filter((str) => !str).length}
           onClick={() =>
             setFormData((prev) => {
-              const payload: Settings = JSON.parse(JSON.stringify(prev))
+              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
               if (!payload['blacklist']) {
                 payload['blacklist'] = []

@@ -127,13 +127,7 @@ export interface User extends BadApiWallet {
   tokens?: BadApiPopulatedToken[]
 }
 
-export interface Settings {
-  tokenId: TokenId
-  tokenName: TokenName
-  tokenAmount: TokenAmount
-  thumb: string
-
-  useCustomList: boolean
+export interface HolderSettings {
   holderPolicies: {
     policyId: PolicyId
     weight: number
@@ -160,15 +154,49 @@ export interface Settings {
   stakePools: PoolId[]
 }
 
-export interface Airdrop {
-  id?: string
-  stakeKey: string
-  timestamp: number
-
+export interface TokenSelectionSettings {
   tokenId: TokenId
   tokenName: TokenName
   tokenAmount: TokenAmount
   thumb: string
+}
+
+export interface AirdropSettings extends HolderSettings, TokenSelectionSettings {
+  useCustomList: boolean
+}
+
+export interface GiveawaySettings extends HolderSettings, TokenSelectionSettings {
+  isToken: boolean
+  otherTitle: string
+  otherDescription: string
+  otherAmount: number
+  numOfWinners: number
+}
+
+export interface Airdrop extends TokenSelectionSettings {
+  id?: string
+  stakeKey: string
+  timestamp: number
+}
+
+export interface Giveaway extends GiveawaySettings {
+  id?: string
+  stakeKey: string
+  endAt: number
+  active: boolean
+
+  txDeposit?: string
+  txsWithdrawn?: string[]
+
+  entries: {
+    stakeKey: string
+    points: number
+  }[]
+  winners: {
+    stakeKey: string
+    address: string
+    amount: number
+  }[]
 }
 
 export interface SnapshotHolder {

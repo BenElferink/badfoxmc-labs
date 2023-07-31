@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import { badApi } from '@/utils/badApi'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { Settings } from '@/@types'
+import type { HolderSettings } from '@/@types'
 
 const INIT_TRAIT_REWARDS = {
   category: '',
@@ -26,8 +26,8 @@ const INIT_HOLDER_SETTINGS = {
 }
 
 const HolderPolicies = (props: {
-  defaultData: Partial<Settings>
-  callback: (payload: Partial<Settings>) => void
+  defaultData: Partial<HolderSettings>
+  callback: (payload: Partial<HolderSettings>) => void
   next?: () => void
   back?: () => void
 }) => {
@@ -135,7 +135,7 @@ const HolderPolicies = (props: {
                   value={policyId}
                   onChange={(e) =>
                     setFormData((prev) => {
-                      const payload: Settings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                       // @ts-ignore
                       payload['holderPolicies'][policyIdx] = {
@@ -157,7 +157,7 @@ const HolderPolicies = (props: {
                   <button
                     onClick={() => {
                       setFormData((prev) => {
-                        const payload: Settings = JSON.parse(JSON.stringify(prev))
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                         payload['holderPolicies'].splice(policyIdx, 1)
 
@@ -179,7 +179,7 @@ const HolderPolicies = (props: {
                     value={String(weight)}
                     onChange={(e) =>
                       setFormData((prev) => {
-                        const payload: Settings = JSON.parse(JSON.stringify(prev))
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                         const v = Number(e.target.value)
 
                         if (isNaN(v) || v < 0) return payload
@@ -213,7 +213,7 @@ const HolderPolicies = (props: {
                       checked={withTraits}
                       onChange={(e) =>
                         setFormData((prev) => {
-                          const payload: Settings = JSON.parse(JSON.stringify(prev))
+                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
@@ -243,7 +243,7 @@ const HolderPolicies = (props: {
                       checked={withRanks}
                       onChange={(e) =>
                         setFormData((prev) => {
-                          const payload: Settings = JSON.parse(JSON.stringify(prev))
+                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
@@ -276,7 +276,7 @@ const HolderPolicies = (props: {
                         value={category}
                         onChange={(e) =>
                           setFormData((prev) => {
-                            const payload: Settings = JSON.parse(JSON.stringify(prev))
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                             const arr = [...traitOptions]
 
                             arr[rewardingTraitsIdx].category = e.target.value
@@ -298,7 +298,7 @@ const HolderPolicies = (props: {
                         value={trait}
                         onChange={(e) =>
                           setFormData((prev) => {
-                            const payload: Settings = JSON.parse(JSON.stringify(prev))
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                             const arr = [...traitOptions]
 
                             arr[rewardingTraitsIdx].trait = e.target.value
@@ -320,7 +320,7 @@ const HolderPolicies = (props: {
                         value={String(amount || '')}
                         onChange={(e) =>
                           setFormData((prev) => {
-                            const payload: Settings = JSON.parse(JSON.stringify(prev))
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                             const arr = [...traitOptions]
 
                             const v = Number(e.target.value)
@@ -343,7 +343,7 @@ const HolderPolicies = (props: {
                         <button
                           onClick={() =>
                             setFormData((prev) => {
-                              const payload: Settings = JSON.parse(JSON.stringify(prev))
+                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                               payload['holderPolicies'][policyIdx] = {
                                 ...payload['holderPolicies'][policyIdx],
@@ -371,7 +371,7 @@ const HolderPolicies = (props: {
                   }
                   onClick={() =>
                     setFormData((prev) => {
-                      const payload: Settings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                       payload['holderPolicies'][policyIdx].traitOptions.push({ ...INIT_TRAIT_REWARDS })
 
@@ -400,7 +400,7 @@ const HolderPolicies = (props: {
                         value={minRange || ''}
                         onChange={(e) =>
                           setFormData((prev) => {
-                            const payload: Settings = JSON.parse(JSON.stringify(prev))
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                             const arr = [...rankOptions]
 
                             const v = Number(e.target.value)
@@ -425,7 +425,7 @@ const HolderPolicies = (props: {
                         value={maxRange || ''}
                         onChange={(e) =>
                           setFormData((prev) => {
-                            const payload: Settings = JSON.parse(JSON.stringify(prev))
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                             const arr = [...rankOptions]
 
                             const v = Number(e.target.value)
@@ -450,7 +450,7 @@ const HolderPolicies = (props: {
                         value={String(amount || '')}
                         onChange={(e) =>
                           setFormData((prev) => {
-                            const payload: Settings = JSON.parse(JSON.stringify(prev))
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                             const arr = [...rankOptions]
 
                             const v = Number(e.target.value)
@@ -473,7 +473,7 @@ const HolderPolicies = (props: {
                         <button
                           onClick={() =>
                             setFormData((prev) => {
-                              const payload: Settings = JSON.parse(JSON.stringify(prev))
+                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                               payload['holderPolicies'][policyIdx] = {
                                 ...payload['holderPolicies'][policyIdx],
@@ -501,7 +501,7 @@ const HolderPolicies = (props: {
                   }
                   onClick={() =>
                     setFormData((prev) => {
-                      const payload: Settings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
                       payload['holderPolicies'][policyIdx].rankOptions.push({ ...INIT_RANK_REWARDS })
 
@@ -526,7 +526,7 @@ const HolderPolicies = (props: {
         disabled={!formData.holderPolicies?.filter((obj) => !!obj.policyId).length}
         onClick={() =>
           setFormData((prev) => {
-            const payload: Settings = JSON.parse(JSON.stringify(prev))
+            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
             payload['holderPolicies'].push({ ...INIT_HOLDER_SETTINGS })
 

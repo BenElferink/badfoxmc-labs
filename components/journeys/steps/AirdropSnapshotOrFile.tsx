@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { Settings } from '@/@types'
+import type { AirdropSettings } from '@/@types'
 
 const AirdropSnapshotOrFile = (props: {
-  defaultData: Partial<Settings>
-  callback: (payload: Partial<Settings>) => void
+  defaultData: Partial<AirdropSettings>
+  callback: (payload: Partial<AirdropSettings>) => void
   next?: () => void
   back?: () => void
 }) => {

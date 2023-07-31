@@ -4,13 +4,13 @@ import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from '@/components/MediaViewer'
 import TokenExplorer from '@/components/TokenExplorer'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { Settings } from '@/@types'
+import type { TokenSelectionSettings } from '@/@types'
 
 type AmountType = 'FIXED' | 'PERCENT'
 
 const TokenAmount = (props: {
-  defaultData: Partial<Settings>
-  callback: (payload: Partial<Settings>) => void
+  defaultData: Partial<TokenSelectionSettings>
+  callback: (payload: Partial<TokenSelectionSettings>) => void
   next?: () => void
   back?: () => void
 }) => {
@@ -199,8 +199,8 @@ const TokenAmount = (props: {
 }
 
 const TokenSelector = (props: {
-  defaultData: Partial<Settings>
-  callback: (payload: Partial<Settings>) => void
+  defaultData: Partial<TokenSelectionSettings>
+  callback: (payload: Partial<TokenSelectionSettings>) => void
   next?: () => void
   back?: () => void
   withAmount?: boolean
