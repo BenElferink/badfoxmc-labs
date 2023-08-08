@@ -230,8 +230,8 @@ const TokenSelector = (props: {
     <JourneyStepWrapper
       disableNext={!data.tokenId}
       next={() => {
-        if (withAmount) setTimeout(() => setSelectAmount(true), 0)
-        else if (next) setTimeout(() => next(), 0)
+        if (withAmount) setSelectAmount(true)
+        else if (next) next()
       }}
       back={back}
     >

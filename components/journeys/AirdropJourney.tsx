@@ -129,6 +129,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
         />
       ) : step === 3 ? (
         <HolderPolicies
+          isAirdrop
           defaultData={{
             holderPolicies: settings['holderPolicies'],
           }}

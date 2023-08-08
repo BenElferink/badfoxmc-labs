@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import { badApi } from '@/utils/badApi'
@@ -30,8 +30,9 @@ const HolderPolicies = (props: {
   callback: (payload: Partial<HolderSettings>) => void
   next?: () => void
   back?: () => void
+  isAirdrop?: boolean
 }) => {
-  const { defaultData, callback, next, back } = props
+  const { defaultData, callback, next, back, isAirdrop } = props
   const [formData, setFormData] = useState({
     holderPolicies: defaultData['holderPolicies']?.length
       ? defaultData['holderPolicies']
@@ -107,10 +108,13 @@ const HolderPolicies = (props: {
       <p className='my-6 text-xs text-center'>
         * Weight is the multiplier of that Policy ID (default 1)
         <br />
-        (For example: you may want to give pass holders 2x the points than PFP holders)
-        <br />
-        <br />
-        * Trait & Rank points are non-inclusive (additional to the amount previously selected)
+        (For example: you may want to give pass holders 2x points than pfp holders)
+        {isAirdrop ? (
+          <Fragment>
+            <br />
+            <br />* Trait & Rank points are non-inclusive (additional to the amount previously selected)
+          </Fragment>
+        ) : null}
         <br />
         <br />* Ranks are obtained from
         <Link href='https://cnft.tools' target='_blank' rel='noopener noreferrer' className='group'>

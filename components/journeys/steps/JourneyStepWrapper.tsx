@@ -13,7 +13,7 @@ const JourneyStepWrapper = (
       onClick: () => void
       type?: 'file'
       acceptFile?: string
-      callbackFile?: (_buffer: ArrayBuffer) => void
+      callbackFile?: (_buffer: File) => void
     }[]
   }>
 ) => {
@@ -49,10 +49,10 @@ const JourneyStepWrapper = (
                     accept={acceptFile || '*'}
                     multiple={false}
                     disabled={disabled}
-                    onChange={async (e) => {
+                    onChange={(e) => {
                       // @ts-ignore
-                      const buffer = await e.target?.files[0].arrayBuffer()
-                      if (callbackFile) callbackFile(buffer)
+                      const file = (e.target.files as FileList)[0]
+                      if (callbackFile) callbackFile(file)
                     }}
                     className='absolute w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed'
                   />

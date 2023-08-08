@@ -13,7 +13,7 @@ export type Marketplace = 'jpg.store'
 export type ActivityType = 'LIST' | 'DELIST' | 'BUY' | 'SELL' | 'UPDATE'
 export type ListingType = 'SINGLE' | 'BUNDLE' | 'UNKNOWN'
 
-export type MediaType = 'IMAGE' | 'GIF' | 'VIDEO' | '360_VIDEO' | 'AUDIO'
+export type MediaType = 'IMAGE' | 'VIDEO' | '360_VIDEO' | 'AUDIO'
 
 type TokenAmount = {
   onChain: number
@@ -167,10 +167,13 @@ export interface AirdropSettings extends HolderSettings, TokenSelectionSettings 
 
 export interface GiveawaySettings extends HolderSettings, TokenSelectionSettings {
   isToken: boolean
+
   otherTitle: string
   otherDescription: string
   otherAmount: number
+
   numOfWinners: number
+  endAt: number
 }
 
 export interface Airdrop extends TokenSelectionSettings {
@@ -182,7 +185,6 @@ export interface Airdrop extends TokenSelectionSettings {
 export interface Giveaway extends GiveawaySettings {
   id?: string
   stakeKey: string
-  endAt: number
   active: boolean
 
   txDeposit?: string

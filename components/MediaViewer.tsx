@@ -1,3 +1,4 @@
+import { MEDIA_TYPES } from '@/constants'
 import type { MediaType } from '@/@types'
 
 const MediaViewer = (props: { mediaType: MediaType; src: string; size?: string; withBorder?: boolean }) => {
@@ -8,11 +9,11 @@ const MediaViewer = (props: { mediaType: MediaType; src: string; size?: string; 
     ' object-contain rounded-lg ' +
     (withBorder ? 'm-1 border border-zinc-600' : '')
 
-  return mediaType === 'IMAGE' || mediaType === 'GIF' ? (
+  return mediaType === MEDIA_TYPES['IMAGE'] ? (
     <img src={src} alt='' className={className} />
-  ) : mediaType === 'VIDEO' ? (
+  ) : mediaType === MEDIA_TYPES['VIDEO'] ? (
     <video src={src} controls className={className} />
-  ) : mediaType === 'AUDIO' ? (
+  ) : mediaType === MEDIA_TYPES['AUDIO'] ? (
     <audio src={src} controls />
   ) : null
 }

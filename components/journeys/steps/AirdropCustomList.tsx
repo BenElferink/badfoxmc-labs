@@ -159,7 +159,7 @@ const AirdropCustomList = (props: {
           onClick: () => {},
           type: 'file',
           acceptFile: '.xlsx',
-          callbackFile: (buffer) => loadFile(buffer),
+          callbackFile: async (file) => loadFile(await file.arrayBuffer()),
         },
       ]}
     >
