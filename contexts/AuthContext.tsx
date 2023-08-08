@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 import { useWallet } from '@meshsdk/react'
 import { badApi } from '@/utils/badApi'
 import getUser from '@/functions/storage/users/getUser'
-import { POLICY_IDS } from '@/constants'
+import { BFMC_BANKER_CARD_TOKEN_IDS, POLICY_IDS } from '@/constants'
 import type { User } from '@/@types'
 
 interface AuthContext {
@@ -57,7 +57,11 @@ export const AuthProvider = (props: PropsWithChildren) => {
           }
         }) || []
       )
-      const isTokenGateHolder = !!tokens?.find(({ tokenId }) => tokenId.indexOf(POLICY_IDS['BAD_KEY']) == 0)
+
+      const isTokenGateHolder = !!tokens?.find(
+        ({ tokenId }) =>
+          tokenId.indexOf(POLICY_IDS['BAD_KEY']) == 0 || BFMC_BANKER_CARD_TOKEN_IDS.includes(tokenId)
+      )
 
       const user = await getUser(stakeKey)
 
