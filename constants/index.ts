@@ -15,6 +15,10 @@ export const POLICY_IDS = {
   BAD_KEY: '80e3ccc66f4dfeff6bc7d906eb166a984a1fc6d314e33721ad6add14',
 }
 
+export const WALLET_ADDRESSES = {
+  GIVEAWAYS: 'addr1v9qxndxhkl2g5qsz5mdv0w07zau5gpp5vttw0perr2py9ugrr25fs',
+}
+
 export const BFMC_BANKER_CARD_TOKEN_IDS = [
   '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303733',
   '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303534',
@@ -49,6 +53,9 @@ export const LS_KEYS = {
 }
 
 export const ONE_MILLION = 1000000
+export const DECIMALS = {
+  ADA: 6,
+}
 
 export const TIME_LABELS = {
   MINUTES: 'Minutes',

@@ -1,15 +1,16 @@
 import Head from 'next/head'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Roboto } from 'next/font/google'
 import { useState } from 'react'
 import { MeshProvider } from '@meshsdk/react'
 import { Toaster } from 'react-hot-toast'
 import { Bars3Icon, BeakerIcon } from '@heroicons/react/24/solid'
+import { AuthProvider } from '@/contexts/AuthContext'
 import Auth from '@/components/Auth'
 import Sidebar from '@/components/Sidebar'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
-import { AuthProvider } from '@/contexts/AuthContext'
 
 const inter = Roboto({ weight: '300', subsets: ['latin'] })
 
@@ -66,7 +67,14 @@ function MyApp({ Component, pageProps }: AppProps) {
                   rel='noopener noreferrer'
                   className='p-2 flex items-center justify-center'
                 >
-                  <img src='https://badfoxmc.com/media/logo/white_cropped.png' alt='logo' width={50} height={50} />
+                  <Image
+                    src='https://badfoxmc.com/media/logo/white_cropped.png'
+                    alt='logo'
+                    width={50}
+                    height={50}
+                    priority
+                    unoptimized
+                  />
                   <div className='ml-2 text-start whitespace-nowrap'>
                     <span className='text-xs'>Powered by:</span>
                     <h6 className='text-sm'>Bad Fox MC</h6>

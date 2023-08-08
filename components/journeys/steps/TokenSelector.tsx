@@ -20,6 +20,7 @@ const TokenAmount = (props: {
 
   useEffect(() => {
     if (Object.keys(data).length) callback(data)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   const _ticker = data.tokenName?.ticker || ''
@@ -51,7 +52,7 @@ const TokenAmount = (props: {
 
       mountRef.current = true
     }
-  }, [defaultData])
+  }, [defaultData, user])
 
   const handleAmountChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     let v = Number(e.target.value)
@@ -211,6 +212,7 @@ const TokenSelector = (props: {
 
   useEffect(() => {
     if (Object.keys(data).length) callback(data)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   const [selectAmount, setSelectAmount] = useState(false)

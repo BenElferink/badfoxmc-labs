@@ -288,6 +288,7 @@ const AirdropSnapshot = (props: {
 
       setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings])
 
   return (

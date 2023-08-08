@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
@@ -13,17 +13,6 @@ const HolderBlacklist = (props: {
 }) => {
   const { defaultData, callback, next, back } = props
   const [formData, setFormData] = useState(defaultData)
-
-  useEffect(() => {
-    if (Object.keys(formData).length) {
-      const filtered = (formData['blacklist'] || []).filter((str) => !!str)
-
-      callback({
-        withBlacklist: !!filtered.length,
-        blacklist: filtered,
-      })
-    }
-  }, [formData])
 
   const [loading, setLoading] = useState(false)
   const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({})

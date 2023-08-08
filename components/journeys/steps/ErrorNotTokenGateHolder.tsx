@@ -1,11 +1,12 @@
+import Image from 'next/image'
+import Link from 'next/link'
 import TextFrown from '@/components/TextFrown'
 import { POLICY_IDS } from '@/constants'
-import Link from 'next/link'
 
 const ErrorNotTokenGateHolder = () => {
   return (
     <div className='max-w-[350px] mx-auto flex flex-col items-center justify-center'>
-      <img src='/media/key.png' alt='key' width={300} height={300} className='mt-[10%]' />
+      <Image src='/media/key.png' alt='key' width={300} height={300} className='mt-[10%]' priority unoptimized />
 
       <TextFrown text="You don't own a Bad Key" className='mb-2' />
 

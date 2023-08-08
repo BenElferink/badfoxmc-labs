@@ -13,6 +13,7 @@ const GiveawayTokenOrOther = (props: {
 
   useEffect(() => {
     if (Object.keys(data).length) callback(data)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
   return (

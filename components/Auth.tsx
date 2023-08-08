@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { useWallet, useWalletList } from '@meshsdk/react'
 import { toast } from 'react-hot-toast'
@@ -32,6 +33,7 @@ const Auth = () => {
         localStorage.removeItem(LS_KEYS['WALLET_PROVIDER'])
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected, name])
 
   const [openProfileModal, setOpenProfileModal] = useState(false)
@@ -83,7 +85,15 @@ const Auth = () => {
       {connected ? (
         <div className='group relative p-1 flex items-center cursor-pointer'>
           {user?.profilePicture ? (
-            <img src={user.profilePicture} alt='' width={50} height={50} className='rounded-full' />
+            <Image
+              src={user.profilePicture}
+              alt=''
+              width={50}
+              height={50}
+              className='rounded-full'
+              priority
+              unoptimized
+            />
           ) : (
             <div className='p-2 rounded-full bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
               <UserIcon className='w-8 h-8' />
@@ -140,7 +150,15 @@ const Auth = () => {
                 disabled={connected || connecting}
                 className='w-full max-w-[420px] my-2 mx-auto p-2 flex items-center justify-between rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:opacity-40'
               >
-                <img src={icon} alt='' width={42} height={42} className='drop-shadow-[0_0_1px_rgba(0,0,0,1)]' />
+                <Image
+                  src={icon}
+                  alt=''
+                  width={42}
+                  height={42}
+                  className='drop-shadow-[0_0_1px_rgba(0,0,0,1)]'
+                  priority
+                  unoptimized
+                />
                 {name}
               </button>
             ))}
@@ -173,7 +191,7 @@ const Auth = () => {
               className='w-64 h-64 text-sm text-gray-400 hover:text-white rounded-full bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70'
             >
               {profilePicture ? (
-                <img src={profilePicture} alt='' className='w-full rounded-full' />
+                <Image src={profilePicture} alt='' className='w-full rounded-full' priority unoptimized />
               ) : (
                 <Fragment>
                   <PhotoIcon className='w-12 h-12 mx-auto' />

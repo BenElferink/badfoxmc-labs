@@ -12,7 +12,7 @@ import Loader from '@/components/Loader'
 import ProgressBar from '@/components/ProgressBar'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { Airdrop, PayoutHolder, AirdropSettings } from '@/@types'
-import { ONE_MILLION } from '@/constants'
+import { DECIMALS, ONE_MILLION } from '@/constants'
 
 const AirdropPayout = (props: {
   payoutHolders: PayoutHolder[]
@@ -46,7 +46,7 @@ const AirdropPayout = (props: {
       if (settings.tokenId !== 'lovelace') {
         const minAdaPerHolder = 1.2
         const adaNeeded = Math.ceil(payoutHolders.length / minAdaPerHolder)
-        const adaInWallet = Number(await wallet.getLovelace()) / ONE_MILLION
+        const adaInWallet = formatTokenAmount.fromChain(await wallet.getLovelace(), DECIMALS['ADA'])
 
         if (adaInWallet < adaNeeded) {
           setProgress((prev) => ({
@@ -85,9 +85,9 @@ const AirdropPayout = (props: {
             if (settings.tokenId === 'lovelace') {
               if (payout < ONE_MILLION) {
                 const str1 = 'Cardano requires at least 1 ADA per TX.'
-                const str2 = `This wallet has only ${(payout / ONE_MILLION).toFixed(
-                  2
-                )} ADA assigned to it:\n${address}`
+                const str2 = `This wallet has only ${formatTokenAmount
+                  .fromChain(payout, DECIMALS['ADA'])
+                  .toFixed(2)} ADA assigned to it:\n${address}`
                 const str3 = 'Click OK if you want to increase the payout for this wallet to 1 ADA.'
                 const str4 = 'Click cancel to exclude this wallet from the airdrop.'
                 const str5 = 'Note: accepting will increase the total pool size.'
@@ -166,7 +166,8 @@ const AirdropPayout = (props: {
         }
       }
     },
-    [payoutHolders, settings, wallet]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [payoutHolders, settings, wallet, user]
   )
 
   const downloadReceipt = useCallback(async () => {

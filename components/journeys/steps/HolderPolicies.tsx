@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Fragment, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
@@ -118,12 +119,14 @@ const HolderPolicies = (props: {
         <br />
         <br />* Ranks are obtained from
         <Link href='https://cnft.tools' target='_blank' rel='noopener noreferrer' className='group'>
-          <img
+          <Image
             src='https://badfoxmc.com/media/logo/other/cnfttools.png'
             alt=''
             width={20}
             height={20}
             className='inline ml-1 mr-0.5'
+            priority
+            unoptimized
           />
           <span className='text-blue-200 group-hover:underline'>cnft.tools</span>
         </Link>
