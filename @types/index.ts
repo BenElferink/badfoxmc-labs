@@ -127,9 +127,34 @@ export interface User extends BadApiWallet {
   tokens?: BadApiPopulatedToken[]
 }
 
+export interface SnapshotHolder {
+  stakeKey: StakeKey
+  addresses: Address['address'][]
+  assets: {
+    [policyId: string]: {
+      tokenId: string
+      amount: number
+    }[]
+  }
+}
+
+export interface PayoutHolder {
+  stakeKey: StakeKey
+  address: Address['address']
+  payout: number
+  txHash?: string
+}
+
+export interface FungibleTokenHolderWithPoints {
+  stakeKey: StakeKey
+  hasEntered: boolean
+  points: number
+}
+
 export interface HolderSettings {
   holderPolicies: {
     policyId: PolicyId
+    hasFungibleTokens?: boolean
     weight: number
 
     withTraits: boolean
@@ -178,7 +203,7 @@ export interface GiveawaySettings extends HolderSettings, TokenSelectionSettings
 
 export interface Airdrop extends TokenSelectionSettings {
   id?: string
-  stakeKey: string
+  stakeKey: StakeKey
   timestamp: number
 }
 
@@ -187,34 +212,22 @@ export interface Giveaway extends GiveawaySettings {
   stakeKey: string
   active: boolean
 
-  txDeposit?: string
-  txsWithdrawn?: string[]
+  // for entry
+  fungibleHolders: FungibleTokenHolderWithPoints[]
+  nonFungibleUsedUnits: TokenId[]
 
+  // for raffle
   entries: {
-    stakeKey: string
+    stakeKey: StakeKey
     points: number
   }[]
   winners: {
-    stakeKey: string
-    address: string
+    stakeKey: StakeKey
+    address: Address['address']
     amount: number
   }[]
-}
 
-export interface SnapshotHolder {
-  stakeKey: string
-  addresses: string[]
-  assets: {
-    [policyId: string]: {
-      tokenId: string
-      amount: number
-    }[]
-  }
-}
-
-export interface PayoutHolder {
-  stakeKey: string
-  address: string
-  payout: number
-  txHash?: string
+  // for payout
+  txDeposit?: string
+  txsWithdrawn?: string[]
 }
