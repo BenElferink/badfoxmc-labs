@@ -13,13 +13,19 @@ const HolderBlacklist = (props: {
 }) => {
   const { defaultData, callback, next, back } = props
   const [formData, setFormData] = useState(defaultData)
-
   const [loading, setLoading] = useState(false)
   const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({})
 
+  console.log(formData)
+
   return (
     <JourneyStepWrapper
-      disableNext={loading || (formData['withBlacklist'] && !formData['blacklist']?.length)}
+      disableNext={
+        loading ||
+        (formData['withBlacklist'] &&
+          !formData['blacklistWallets']?.filter((str) => !!str).length &&
+          !formData['blacklistTokens']?.filter((str) => !!str).length)
+      }
       disableBack={loading}
       next={async () => {
         setLoading(true)
@@ -29,7 +35,7 @@ const HolderBlacklist = (props: {
         if (formData['withBlacklist']) {
           toast.loading('Validating')
 
-          for await (const walletId of formData['blacklist'] || []) {
+          for await (const walletId of formData['blacklistWallets'] || []) {
             try {
               if (!!walletId) {
                 const { stakeKey } = await badApi.wallet.getData(walletId)
@@ -52,7 +58,7 @@ const HolderBlacklist = (props: {
 
         callback({
           withBlacklist: !!filtered.length,
-          blacklist: filtered,
+          blacklistWallets: filtered,
         })
 
         setLoading(false)
@@ -63,7 +69,7 @@ const HolderBlacklist = (props: {
       <h6 className='text-xl text-center'>Blacklist</h6>
 
       <div
-        onClick={() => setFormData(() => ({ withBlacklist: false, blacklist: [] }))}
+        onClick={() => setFormData(() => ({ withBlacklist: false, blacklistWallets: [] }))}
         className={
           'group cursor-pointer my-4 p-4 border rounded-lg ' +
           (formData['withBlacklist'] === false ? 'text-white' : 'text-zinc-400 border-transparent')
@@ -78,11 +84,11 @@ const HolderBlacklist = (props: {
           />
           <span className='ml-2 text-lg'>No</span>
         </label>
-        <p className='mt-1 text-sm group-hover:text-white'>All holding wallets have the right to participate.</p>
+        <p className='mt-1 text-sm group-hover:text-white'>All holders have the right to participate.</p>
       </div>
 
       <div
-        onClick={() => setFormData(() => ({ withBlacklist: true, blacklist: [''] }))}
+        onClick={() => setFormData(() => ({ withBlacklist: true, blacklistWallets: [''] }))}
         className={
           'group cursor-pointer my-4 p-4 border rounded-lg ' +
           (formData['withBlacklist'] === true ? 'text-white' : 'text-zinc-400 border-transparent')
@@ -98,7 +104,7 @@ const HolderBlacklist = (props: {
           <span className='ml-2 text-lg'>Yes</span>
         </label>
         <p className='mt-1 text-sm group-hover:text-white'>
-          Exclude wallets from participing, regardless of what they hold.
+          Exclude wallets/tokens from participing, regardless of their holdings.
         </p>
       </div>
 
@@ -106,8 +112,8 @@ const HolderBlacklist = (props: {
 
       <div>
         {formData['withBlacklist']
-          ? (formData['blacklist'] || []).map((str, idx) => (
-              <div key={`blacklist-${idx}`} className='flex items-center'>
+          ? (formData['blacklistWallets'] || []).map((str, idx) => (
+              <div key={`blacklistWallets-${idx}`} className='flex items-center'>
                 <input
                   placeholder='Wallet: $handle / addr1... / stake1...'
                   disabled={!formData['withBlacklist']}
@@ -117,10 +123,10 @@ const HolderBlacklist = (props: {
                       const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                       const v = e.target.value
 
-                      if (!payload['blacklist']) {
-                        payload['blacklist'] = [v]
+                      if (!payload['blacklistWallets']) {
+                        payload['blacklistWallets'] = [v]
                       } else {
-                        payload['blacklist'][idx] = v
+                        payload['blacklistWallets'][idx] = v
                       }
 
                       return payload
@@ -132,20 +138,20 @@ const HolderBlacklist = (props: {
                   }
                 />
 
-                {(formData['blacklist'] || []).length > 1 ? (
+                {(formData['blacklistWallets'] || []).length > 1 ? (
                   <button
                     onClick={() => {
                       setFormData((prev) => {
                         const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
-                        if (!payload['blacklist']) {
-                          payload['blacklist'] = []
+                        if (!payload['blacklistWallets']) {
+                          payload['blacklistWallets'] = []
                         }
 
-                        const foundIdx = payload['blacklist'].findIndex((val) => val === str)
+                        const foundIdx = payload['blacklistWallets'].findIndex((val) => val === str)
 
                         if (foundIdx !== -1) {
-                          payload['blacklist'].splice(foundIdx, 1)
+                          payload['blacklistWallets'].splice(foundIdx, 1)
                         }
 
                         return payload
@@ -164,16 +170,16 @@ const HolderBlacklist = (props: {
       {formData['withBlacklist'] ? (
         <button
           type='button'
-          disabled={!!(formData['blacklist'] || []).filter((str) => !str).length}
+          disabled={!!(formData['blacklistWallets'] || []).filter((str) => !str).length}
           onClick={() =>
             setFormData((prev) => {
               const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
-              if (!payload['blacklist']) {
-                payload['blacklist'] = []
+              if (!payload['blacklistWallets']) {
+                payload['blacklistWallets'] = []
               }
 
-              payload['blacklist'].push('')
+              payload['blacklistWallets'].push('')
 
               return payload
             })

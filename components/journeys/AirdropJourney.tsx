@@ -31,7 +31,8 @@ const defaultSettings: AirdropSettings = {
   holderPolicies: [],
 
   withBlacklist: false,
-  blacklist: [],
+  blacklistWallets: [],
+  blacklistTokens: [],
 
   withDelegators: false,
   stakePools: [],
@@ -151,7 +152,8 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
         <HolderBlacklist
           defaultData={{
             withBlacklist: settings['withBlacklist'],
-            blacklist: settings['blacklist'],
+            blacklistWallets: settings['blacklistWallets'],
+            blacklistTokens: settings['blacklistTokens'],
           }}
           callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))}
           next={increment}

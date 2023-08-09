@@ -18,7 +18,9 @@ const HolderStakePools = (props: {
 
   return (
     <JourneyStepWrapper
-      disableNext={loading || (formData['withDelegators'] && !formData['stakePools']?.length)}
+      disableNext={
+        loading || (formData['withDelegators'] && !formData['stakePools']?.filter((str) => !!str).length)
+      }
       disableBack={loading}
       next={async () => {
         setLoading(true)

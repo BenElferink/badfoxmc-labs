@@ -120,7 +120,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
               const { address, isScript } = addresses[0]
 
               const isOnCardano = address.indexOf('addr1') === 0
-              // const isBlacklisted = withBlacklist && !!blacklist.find((str) => str === stakeKey)
+              // const isBlacklisted = withBlacklist && !!blacklistWallets.find((str) => str === stakeKey)
               // const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
 
               if (
@@ -215,7 +215,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
             },
           ])
 
-        console.log('Building TX...', tx)
+        console.log('Building TX...')
         const unsigned = await tx.build()
         console.log('Awaiting signature...', unsigned)
         const signed = await wallet.signTx(unsigned)

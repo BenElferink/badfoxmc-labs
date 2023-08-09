@@ -34,9 +34,13 @@ const AirdropSnapshot = (props: {
       current: !!payoutHolders.length ? settings.stakePools.length || 0 : 0,
       max: settings.stakePools.length || 0,
     },
-    black: {
-      current: !!payoutHolders.length ? settings.blacklist.length || 0 : 0,
-      max: settings.blacklist.length || 0,
+    blackWallet: {
+      current: !!payoutHolders.length ? settings.blacklistWallets.length || 0 : 0,
+      max: settings.blacklistWallets.length || 0,
+    },
+    blackToken: {
+      current: !!payoutHolders.length ? settings.blacklistTokens.length || 0 : 0,
+      max: settings.blacklistTokens.length || 0,
     },
     policy: {
       current: !!payoutHolders.length ? settings.holderPolicies.length || 0 : 0,
@@ -54,23 +58,19 @@ const AirdropSnapshot = (props: {
 
     try {
       const {
-        tokenId,
-        tokenName,
         tokenAmount,
-        thumb,
-
-        useCustomList,
         holderPolicies,
 
         withDelegators,
         stakePools,
 
         withBlacklist,
-        blacklist,
+        blacklistWallets,
+        blacklistTokens,
       } = settings
 
       const delegators: string[] = []
-      const blacklistWallets: BadApiWallet[] = []
+      const blacklistWalletsPopulated: BadApiWallet[] = []
       const holders: SnapshotHolder[] = []
 
       const fetchedRankedTokens: Record<string, BadApiPolicy['tokens']> = {}
@@ -91,17 +91,21 @@ const AirdropSnapshot = (props: {
         }
       }
 
-      if (withBlacklist) {
+      if (withBlacklist && blacklistWallets.length) {
         setProgress((prev) => ({ ...prev, msg: 'Processing Blacklisted Wallets...' }))
 
-        for await (const walletId of blacklist) {
+        for await (const walletId of blacklistWallets) {
           const fetched = await badApi.wallet.getData(walletId)
 
-          blacklistWallets.push(fetched)
+          blacklistWalletsPopulated.push(fetched)
 
           setProgress((prev) => ({
             ...prev,
-            black: { ...prev.black, current: prev.black.current + 1, max: blacklist.length },
+            blackWallet: {
+              ...prev.blackWallet,
+              current: prev.blackWallet.current + 1,
+              max: blacklistWallets.length,
+            },
           }))
         }
       }
@@ -130,70 +134,82 @@ const AirdropSnapshot = (props: {
         for (let aIdx = 0; aIdx < policyTokens.length; aIdx++) {
           const { tokenId, tokenAmount } = policyTokens[aIdx]
 
-          if (tokenAmount.onChain !== 0) {
-            const fetchedToken = await badApi.token.getData(tokenId)
-            const tokenOwners: BadApiTokenOwners['owners'] = []
+          // token blacklisted
+          if (withBlacklist && !!blacklistTokens.find((str) => str === tokenId)) {
+            setProgress((prev) => ({
+              ...prev,
+              blackToken: {
+                ...prev.blackToken,
+                current: prev.blackToken.current + 1,
+                max: blacklistTokens.length,
+              },
+            }))
+          } else {
+            if (tokenAmount.onChain !== 0) {
+              const fetchedToken = await badApi.token.getData(tokenId)
+              const tokenOwners: BadApiTokenOwners['owners'] = []
 
-            for (let page = 1; true; page++) {
-              const fetched = await badApi.token.getOwners(tokenId, { page })
+              for (let page = 1; true; page++) {
+                const fetched = await badApi.token.getOwners(tokenId, { page })
 
-              if (!fetched.owners.length) break
-              tokenOwners.push(...fetched.owners)
-              if (fetched.owners.length < 100) break
-            }
+                if (!fetched.owners.length) break
+                tokenOwners.push(...fetched.owners)
+                if (fetched.owners.length < 100) break
+              }
 
-            for (const { stakeKey, addresses, quantity } of tokenOwners) {
-              const { address, isScript } = addresses[0]
+              for (const { stakeKey, addresses, quantity } of tokenOwners) {
+                const { address, isScript } = addresses[0]
 
-              const isOnCardano = address.indexOf('addr1') === 0
+                const isOnCardano = address.indexOf('addr1') === 0
 
-              const isBlacklisted =
-                withBlacklist &&
-                !!blacklistWallets.find((obj) =>
-                  stakeKey
-                    ? obj.stakeKey === stakeKey
-                    : !!obj.addresses.find((addrObj) => addrObj.address === address)
-                )
+                const isBlacklisted =
+                  withBlacklist &&
+                  !!blacklistWalletsPopulated.find((obj) =>
+                    stakeKey
+                      ? obj.stakeKey === stakeKey
+                      : !!obj.addresses.find((addrObj) => addrObj.address === address)
+                  )
 
-              const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
+                const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
 
-              if (isOnCardano && !!stakeKey && !isScript && !isBlacklisted && isDelegator) {
-                if (fetchedTokens[policyId]) {
-                  fetchedTokens[policyId].push(fetchedToken)
-                } else {
-                  fetchedTokens[policyId] = [fetchedToken]
-                }
-
-                const humanAmount = formatTokenAmount.fromChain(quantity, fetchedToken.tokenAmount.decimals)
-
-                const holderItem = {
-                  tokenId,
-                  amount: humanAmount,
-                }
-
-                const foundHolderIndex = holders.findIndex((item) => item.stakeKey === stakeKey)
-
-                if (foundHolderIndex === -1) {
-                  holders.push({
-                    stakeKey,
-                    addresses: [address],
-                    assets: {
-                      [policyId]: [holderItem],
-                    },
-                  })
-                } else {
-                  if (!holders.find((item) => item.addresses.includes(address))) {
-                    holders[foundHolderIndex].addresses.push(address)
-                  }
-
-                  if (Array.isArray(holders[foundHolderIndex].assets[policyId])) {
-                    holders[foundHolderIndex].assets[policyId].push(holderItem)
+                if (isOnCardano && !!stakeKey && !isScript && !isBlacklisted && isDelegator) {
+                  if (fetchedTokens[policyId]) {
+                    fetchedTokens[policyId].push(fetchedToken)
                   } else {
-                    holders[foundHolderIndex].assets[policyId] = [holderItem]
+                    fetchedTokens[policyId] = [fetchedToken]
                   }
-                }
 
-                includedTokenCounts[policyId] += humanAmount
+                  const humanAmount = formatTokenAmount.fromChain(quantity, fetchedToken.tokenAmount.decimals)
+
+                  const holderItem = {
+                    tokenId,
+                    amount: humanAmount,
+                  }
+
+                  const foundHolderIndex = holders.findIndex((item) => item.stakeKey === stakeKey)
+
+                  if (foundHolderIndex === -1) {
+                    holders.push({
+                      stakeKey,
+                      addresses: [address],
+                      assets: {
+                        [policyId]: [holderItem],
+                      },
+                    })
+                  } else {
+                    if (!holders.find((item) => item.addresses.includes(address))) {
+                      holders[foundHolderIndex].addresses.push(address)
+                    }
+
+                    if (Array.isArray(holders[foundHolderIndex].assets[policyId])) {
+                      holders[foundHolderIndex].assets[policyId].push(holderItem)
+                    } else {
+                      holders[foundHolderIndex].assets[policyId] = [holderItem]
+                    }
+                  }
+
+                  includedTokenCounts[policyId] += humanAmount
+                }
               }
             }
           }
@@ -330,12 +346,24 @@ const AirdropSnapshot = (props: {
         )
       </p>
 
-      {settings.withDelegators ? (
+      {settings.withDelegators && progress.pool.max ? (
         <ProgressBar label='Stake Pools' max={progress.pool.max} current={progress.pool.current} />
       ) : null}
 
-      {settings.withBlacklist ? (
-        <ProgressBar label='Blacklisted Wallets' max={progress.black.max} current={progress.black.current} />
+      {settings.withBlacklist && progress.blackWallet.max ? (
+        <ProgressBar
+          label='Blacklisted Wallets'
+          max={progress.blackWallet.max}
+          current={progress.blackWallet.current}
+        />
+      ) : null}
+
+      {settings.withBlacklist && progress.blackToken.max ? (
+        <ProgressBar
+          label='Blacklisted Tokens'
+          max={progress.blackToken.max}
+          current={progress.blackToken.current}
+        />
       ) : null}
 
       <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} />
