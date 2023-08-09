@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { HolderSettings, StakeKey } from '@/@types'
+import type { HolderSettings, StakeKey, TokenId } from '@/@types'
 
 const HolderBlacklist = (props: {
   defaultData: Partial<HolderSettings>
@@ -16,8 +16,6 @@ const HolderBlacklist = (props: {
   const [loading, setLoading] = useState(false)
   const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({})
 
-  console.log(formData)
-
   return (
     <JourneyStepWrapper
       disableNext={
@@ -28,18 +26,31 @@ const HolderBlacklist = (props: {
       }
       disableBack={loading}
       next={async () => {
+        if (!formData['withBlacklist']) {
+          callback({
+            withBlacklist: false,
+            blacklistWallets: [],
+            blacklistTokens: [],
+          })
+
+          if (next) return setTimeout(() => next(), 0)
+          else return
+        }
+
         setLoading(true)
+
         let allowNext = true
         const blacklistStakeKeys: StakeKey[] = []
+        const blacklistTokenIds: TokenId[] = []
 
-        if (formData['withBlacklist']) {
-          toast.loading('Validating')
+        toast.loading('Validating')
 
-          for await (const walletId of formData['blacklistWallets'] || []) {
+        if (formData['blacklistWallets']?.length) {
+          for await (const walletId of formData['blacklistWallets']) {
             try {
               if (!!walletId) {
-                const { stakeKey } = await badApi.wallet.getData(walletId)
-                blacklistStakeKeys.push(stakeKey)
+                const { stakeKey: id } = await badApi.wallet.getData(walletId)
+                blacklistStakeKeys.push(id)
               }
 
               setFormErrors((prev) => ({ ...prev, [walletId]: false }))
@@ -49,16 +60,35 @@ const HolderBlacklist = (props: {
               setFormErrors((prev) => ({ ...prev, [walletId]: true }))
             }
           }
-
-          toast.dismiss()
-          if (!allowNext) toast.error('Bad Value(s)')
         }
 
-        const filtered = blacklistStakeKeys.filter((str) => !!str)
+        if (formData['blacklistTokens']?.length) {
+          for await (const tokenId of formData['blacklistTokens']) {
+            try {
+              if (!!tokenId) {
+                const { tokenId: id } = await badApi.token.getData(tokenId)
+                blacklistTokenIds.push(id)
+              }
+
+              setFormErrors((prev) => ({ ...prev, [tokenId]: false }))
+            } catch (error) {
+              allowNext = false
+
+              setFormErrors((prev) => ({ ...prev, [tokenId]: true }))
+            }
+          }
+        }
+
+        toast.dismiss()
+        if (!allowNext) toast.error('Bad Value(s)')
+
+        const filteredWallets = blacklistStakeKeys.filter((str) => !!str)
+        const filteredTokenIds = blacklistTokenIds.filter((str) => !!str)
 
         callback({
-          withBlacklist: !!filtered.length,
-          blacklistWallets: filtered,
+          withBlacklist: !!filteredWallets.length || !!filteredTokenIds.length,
+          blacklistWallets: filteredWallets,
+          blacklistTokens: filteredTokenIds,
         })
 
         setLoading(false)
@@ -88,7 +118,7 @@ const HolderBlacklist = (props: {
       </div>
 
       <div
-        onClick={() => setFormData(() => ({ withBlacklist: true, blacklistWallets: [''] }))}
+        onClick={() => setFormData(() => ({ withBlacklist: true, blacklistWallets: [''], blacklistTokens: [''] }))}
         className={
           'group cursor-pointer my-4 p-4 border rounded-lg ' +
           (formData['withBlacklist'] === true ? 'text-white' : 'text-zinc-400 border-transparent')
@@ -110,9 +140,10 @@ const HolderBlacklist = (props: {
 
       <div className='w-3/4 h-0.5 my-4 mx-auto bg-zinc-400 rounded-full' />
 
-      <div>
-        {formData['withBlacklist']
-          ? (formData['blacklistWallets'] || []).map((str, idx) => (
+      {formData['withBlacklist'] ? (
+        <Fragment>
+          <div>
+            {(formData['blacklistWallets'] || []).map((str, idx) => (
               <div key={`blacklistWallets-${idx}`} className='flex items-center'>
                 <input
                   placeholder='Wallet: $handle / addr1... / stake1...'
@@ -133,7 +164,7 @@ const HolderBlacklist = (props: {
                     })
                   }
                   className={
-                    'w-full mb-2 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white border rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none ' +
+                    'w-full mb-1 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white border rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none ' +
                     (formErrors[str] ? 'border-red-400' : 'border-transparent')
                   }
                 />
@@ -163,32 +194,110 @@ const HolderBlacklist = (props: {
                   </button>
                 ) : null}
               </div>
-            ))
-          : null}
-      </div>
+            ))}
+          </div>
 
-      {formData['withBlacklist'] ? (
-        <button
-          type='button'
-          disabled={!!(formData['blacklistWallets'] || []).filter((str) => !str).length}
-          onClick={() =>
-            setFormData((prev) => {
-              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+          <button
+            type='button'
+            disabled={!!(formData['blacklistWallets'] || []).filter((str) => !str).length}
+            onClick={() =>
+              setFormData((prev) => {
+                const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
-              if (!payload['blacklistWallets']) {
-                payload['blacklistWallets'] = []
-              }
+                if (!payload['blacklistWallets']) {
+                  payload['blacklistWallets'] = []
+                }
 
-              payload['blacklistWallets'].push('')
+                payload['blacklistWallets'].push('')
 
-              return payload
-            })
-          }
-          className='w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-        >
-          <PlusCircleIcon className='w-6 h-6 mr-2' />
-          Add another Wallet
-        </button>
+                return payload
+              })
+            }
+            className='w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+          >
+            <PlusCircleIcon className='w-6 h-6 mr-2' />
+            Add another Wallet
+          </button>
+
+          <div className='w-3/4 h-0.5 my-4 mx-auto bg-zinc-400 rounded-full' />
+
+          <div>
+            {(formData['blacklistTokens'] || []).map((str, idx) => (
+              <div key={`blacklistTokens-${idx}`} className='flex items-center'>
+                <input
+                  placeholder='Token ID:'
+                  disabled={!formData['withBlacklist']}
+                  value={str}
+                  onChange={(e) =>
+                    setFormData((prev) => {
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                      const v = e.target.value
+
+                      if (!payload['blacklistTokens']) {
+                        payload['blacklistTokens'] = [v]
+                      } else {
+                        payload['blacklistTokens'][idx] = v
+                      }
+
+                      return payload
+                    })
+                  }
+                  className={
+                    'w-full mb-1 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white border rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none ' +
+                    (formErrors[str] ? 'border-red-400' : 'border-transparent')
+                  }
+                />
+
+                {(formData['blacklistTokens'] || []).length > 1 ? (
+                  <button
+                    onClick={() => {
+                      setFormData((prev) => {
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+
+                        if (!payload['blacklistTokens']) {
+                          payload['blacklistTokens'] = []
+                        }
+
+                        const foundIdx = payload['blacklistTokens'].findIndex((val) => val === str)
+
+                        if (foundIdx !== -1) {
+                          payload['blacklistTokens'].splice(foundIdx, 1)
+                        }
+
+                        return payload
+                      })
+                    }}
+                    className='w-8 h-8 p-1.5 ml-2 text-sm text-red-400 rounded-full border bg-red-900 border-red-400 hover:text-red-200 hover:bg-red-700 hover:border-red-200'
+                  >
+                    <TrashIcon />
+                  </button>
+                ) : null}
+              </div>
+            ))}
+          </div>
+
+          <button
+            type='button'
+            disabled={!!(formData['blacklistTokens'] || []).filter((str) => !str).length}
+            onClick={() =>
+              setFormData((prev) => {
+                const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+
+                if (!payload['blacklistTokens']) {
+                  payload['blacklistTokens'] = []
+                }
+
+                payload['blacklistTokens'].push('')
+
+                return payload
+              })
+            }
+            className='w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+          >
+            <PlusCircleIcon className='w-6 h-6 mr-2' />
+            Add another Token
+          </button>
+        </Fragment>
       ) : null}
     </JourneyStepWrapper>
   )
