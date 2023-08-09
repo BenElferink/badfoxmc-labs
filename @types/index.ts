@@ -173,7 +173,8 @@ export interface HolderSettings {
   }[]
 
   withBlacklist: boolean
-  blacklist: StakeKey[]
+  blacklistWallets: StakeKey[]
+  blacklistTokens: TokenId[]
 
   withDelegators: boolean
   stakePools: PoolId[]
@@ -231,3 +232,4 @@ export interface Giveaway extends GiveawaySettings {
   txDeposit?: string
   txsWithdrawn?: string[]
 }
+
