@@ -95,24 +95,12 @@ const AirdropCustomList = (props: {
               console.error(error)
               const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
 
-              const isBankerCoin = [
-                'stake1uxq7mehxxywwzf0cczf7tq4surcphjdd53ngw5ev6qxf7hstnt9qf',
-                'stake1uy6r0h9rmjek4572v5xjjswz9qpc89705gsxqv87hpm6cuq5ghfka',
-              ].includes(user?.stakeKey as string)
-
-              if (isBankerCoin) {
-                payoutWallet['address'] = keyVal
-                payoutWallet['stakeKey'] = ''
-                payoutWallet['txHash'] = ''
-                keyCount++
-              } else {
-                setProgress((prev) => ({
-                  ...prev,
-                  loading: false,
-                  msg: errMsg,
-                }))
-                return
-              }
+              setProgress((prev) => ({
+                ...prev,
+                loading: false,
+                msg: errMsg,
+              }))
+              return
             }
           }
         }
