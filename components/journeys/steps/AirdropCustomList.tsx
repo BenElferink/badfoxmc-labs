@@ -35,6 +35,7 @@ const AirdropCustomList = (props: {
     const wb = read(buffer, { type: 'buffer' })
     const rows: Record<string, any>[] = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])
     const payload: PayoutHolder[] = []
+    let totalAmountOnChain = 0
 
     for (const rowObj of rows) {
       const payoutWallet: Record<string, any> = {}
@@ -56,8 +57,10 @@ const AirdropCustomList = (props: {
               return
             }
 
-            payoutWallet['payout'] = Math.floor(formatTokenAmount.toChain(v, settings.tokenAmount.decimals))
+            const amountOnChain = Math.floor(formatTokenAmount.toChain(v, settings.tokenAmount.decimals))
+            payoutWallet['payout'] = amountOnChain
             keyCount++
+            totalAmountOnChain += amountOnChain
           }
 
           if (key === 'wallet') {
@@ -121,6 +124,24 @@ const AirdropCustomList = (props: {
         ...prev,
         row: { ...prev.row, current: prev.row.current + 1, max: rows.length },
       }))
+    }
+
+    const userOwnedOnChain =
+      user?.tokens?.find((token) => token.tokenId === settings.tokenId)?.tokenAmount.onChain || 0
+
+    if (totalAmountOnChain > userOwnedOnChain) {
+      setProgress((prev) => ({
+        ...prev,
+        loading: false,
+        msg: `Woopsies! The total amount on-file (${formatTokenAmount.fromChain(
+          totalAmountOnChain,
+          settings.tokenAmount.decimals
+        )}), is greater than the amount you own (${formatTokenAmount.fromChain(
+          userOwnedOnChain,
+          settings.tokenAmount.decimals
+        )}).`,
+      }))
+      return
     }
 
     callback(payload.sort((a, b) => b.payout - a.payout))
