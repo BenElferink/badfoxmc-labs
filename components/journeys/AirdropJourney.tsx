@@ -86,7 +86,6 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
         step === 2 ? (
           <TokenSelector
             onlyFungible
-            withAmount
             defaultData={{
               thumb: settings['thumb'],
               tokenId: settings['tokenId'],
