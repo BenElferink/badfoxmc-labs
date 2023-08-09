@@ -17,14 +17,14 @@ import { DECIMALS, ONE_MILLION } from '@/constants'
 const AirdropPayout = (props: {
   payoutHolders: PayoutHolder[]
   settings: AirdropSettings
-  callback: (payload: PayoutHolder[]) => void
   next?: () => void
   back?: () => void
 }) => {
-  const { payoutHolders, settings, callback, next, back } = props
+  const { payoutHolders, settings, next, back } = props
   const { wallet } = useWallet()
   const { user } = useAuth()
 
+  const [processedPayoutHolders, setProcessedPayoutHolders] = useState([...payoutHolders])
   const [payoutEnded, setPayoutEnded] = useState(false)
   const [progress, setProgress] = useState({
     msg: '',
@@ -45,7 +45,7 @@ const AirdropPayout = (props: {
 
       if (settings.tokenId !== 'lovelace') {
         const minAdaPerHolder = 1.2
-        const adaNeeded = Math.ceil(payoutHolders.length / minAdaPerHolder)
+        const adaNeeded = Math.ceil(processedPayoutHolders.length / minAdaPerHolder)
         const adaInWallet = formatTokenAmount.fromChain(await wallet.getLovelace(), DECIMALS['ADA'])
 
         if (adaInWallet < adaNeeded) {
@@ -58,8 +58,7 @@ const AirdropPayout = (props: {
         }
       }
 
-      const unpayedWallets = payoutHolders.filter(({ txHash }) => !txHash)
-
+      const unpayedWallets = processedPayoutHolders.filter(({ txHash }) => !txHash)
       const batchSize = difference ? Math.floor(difference * unpayedWallets.length) : unpayedWallets.length
       const batches: PayoutHolder[][] = []
 
@@ -121,8 +120,8 @@ const AirdropPayout = (props: {
 
           await txConfirmation(txHash)
 
-          callback(
-            payoutHolders.map((item) =>
+          setProcessedPayoutHolders((prev) =>
+            prev.map((item) =>
               batch.some(({ stakeKey }) => stakeKey === item.stakeKey)
                 ? {
                     ...item,
@@ -167,7 +166,7 @@ const AirdropPayout = (props: {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [payoutHolders, settings, wallet, user]
+    [processedPayoutHolders, settings, wallet, user]
   )
 
   const downloadReceipt = useCallback(async () => {
@@ -175,7 +174,7 @@ const AirdropPayout = (props: {
 
     try {
       const ws = utils.json_to_sheet(
-        payoutHolders.map((item) => ({
+        processedPayoutHolders.map((item) => ({
           ...item,
           payout: formatTokenAmount.fromChain(item.payout, settings.tokenAmount.decimals),
           tokenName: settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain,
@@ -197,10 +196,10 @@ const AirdropPayout = (props: {
 
       setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }))
     }
-  }, [payoutHolders, settings])
+  }, [processedPayoutHolders, settings])
 
   return (
-    <JourneyStepWrapper disableBack={progress.loading || payoutEnded} back={back}>
+    <JourneyStepWrapper disableBack={progress.loading || payoutEnded} next={next} back={back}>
       <h6 className='mb-6 text-xl text-center'>Payout</h6>
 
       <div className='w-full my-2 flex items-center justify-between'>
@@ -240,10 +239,10 @@ const AirdropPayout = (props: {
       <div className='w-2/3 h-0.5 my-8 mx-auto rounded-full bg-zinc-400' />
 
       <p className='w-full my-2 text-center'>
-        {payoutHolders.length} Receiving Wallet{payoutHolders.length > 1 ? 's' : ''}
+        {processedPayoutHolders.length} Receiving Wallet{processedPayoutHolders.length > 1 ? 's' : ''}
       </p>
 
-      {payoutHolders.map((item) => (
+      {processedPayoutHolders.map((item) => (
         <div
           key={`wallet-${item.stakeKey || item.address}`}
           className='w-full my-2 py-2 px-1 rounded-lg border border-zinc-600 flex flex-col items-center justify-evenly'

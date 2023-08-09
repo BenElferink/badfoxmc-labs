@@ -109,7 +109,6 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
           <AirdropPayout
             payoutHolders={payoutHolders}
             settings={settings as AirdropSettings}
-            callback={(payload) => setPayoutHolders(payload)}
             // next={increment}
             back={decrement}
           />
@@ -171,7 +170,6 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
         <AirdropPayout
           payoutHolders={payoutHolders}
           settings={settings as AirdropSettings}
-          callback={(payload) => setPayoutHolders(payload)}
           // next={increment}
           back={decrement}
         />
