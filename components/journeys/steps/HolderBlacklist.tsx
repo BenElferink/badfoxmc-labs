@@ -138,6 +138,9 @@ const HolderBlacklist = (props: {
             try {
               if (!!walletId) {
                 const { stakeKey: id } = await badApi.wallet.getData(walletId)
+
+                if (!id) throw new Error(`No stake key for wallet ID: ${walletId}`)
+
                 blacklistStakeKeys.push(id)
               }
 
@@ -417,7 +420,7 @@ const HolderBlacklist = (props: {
               <button
                 type='button'
                 disabled={!!(formData['blacklistTokens'] || []).filter((str) => !str).length || loading || progress.loading}
-                onClick={() =>
+                onClick={() => {
                   setFormData((prev) => {
                     const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
@@ -429,7 +432,9 @@ const HolderBlacklist = (props: {
 
                     return payload
                   })
-                }
+
+                  setTokensAlreadyScanned(false)
+                }}
                 className='w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
               >
                 <PlusCircleIcon className='w-6 h-6 mr-2' />

@@ -136,7 +136,7 @@ export interface SnapshotHolder {
   assets: {
     [policyId: string]: {
       tokenId: string
-      amount: number
+      humanAmount: number
     }[]
   }
 }

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { toast } from 'react-hot-toast'
 import { Transaction } from '@meshsdk/core'
 import { useWallet } from '@meshsdk/react'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
@@ -9,9 +10,8 @@ import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
-import type { BadApiBaseToken, BadApiTokenOwners, FungibleTokenHolderWithPoints, Giveaway, GiveawaySettings } from '@/@types'
+import type { BadApiBaseToken, BadApiTokenOwners, FungibleTokenHolderWithPoints, Giveaway, GiveawaySettings, StakeKey } from '@/@types'
 import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
-import { toast } from 'react-hot-toast'
 
 const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void; back?: () => void }) => {
   const { settings, next, back } = props
@@ -23,9 +23,13 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
   const [progress, setProgress] = useState({
     msg: '',
     loading: false,
+    pool: {
+      current: 0,
+      max: 0,
+    },
     policy: {
       current: 0,
-      max: settings.holderPolicies.length || 0,
+      max: 0,
     },
     token: {
       current: 0,
@@ -35,17 +39,54 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
 
   const clickPublish = useCallback(async () => {
     if (!settings) return
-    setProgress((prev) => ({ ...prev, loading: true, msg: 'Processing Policy IDs...' }))
+    setProgress((prev) => ({ ...prev, loading: true, msg: 'Processing...' }))
 
     try {
-      const { isToken, tokenId, tokenAmount, numOfWinners, holderPolicies, withBlacklist, blacklistWallets, blacklistTokens } = settings
+      const {
+        isToken,
+        tokenId,
+        tokenAmount,
+        numOfWinners,
+        holderPolicies,
+
+        withDelegators,
+        stakePools,
+
+        withBlacklist,
+        blacklistWallets,
+        blacklistTokens,
+      } = settings
 
       const updatedHolderPolicies = [...holderPolicies]
+
+      const delegators: StakeKey[] = []
+
       const fungibleTokens: (BadApiBaseToken & { policyId: string })[] = []
+      const fungibleHolders: FungibleTokenHolderWithPoints[] = []
+
+      if (withDelegators) {
+        setProgress((prev) => ({
+          ...prev,
+          pool: { ...prev.pool, current: 0, max: stakePools.length },
+          msg: 'Processing Stake Pool Delegators...',
+        }))
+
+        for await (const poolId of stakePools) {
+          const fetched = await badApi.stakePool.getData(poolId, { withDelegators: true })
+
+          delegators.push(...(fetched.delegators || []))
+
+          setProgress((prev) => ({
+            ...prev,
+            pool: { ...prev.pool, current: prev.pool.current + 1, max: stakePools.length },
+          }))
+        }
+      }
 
       setProgress((prev) => ({
         ...prev,
         policy: { ...prev.policy, current: 0, max: updatedHolderPolicies.length },
+        msg: 'Processing Policy IDs...',
       }))
 
       for (let pIdx = 0; pIdx < updatedHolderPolicies.length; pIdx++) {
@@ -65,15 +106,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
         }))
       }
 
-      const fungibleHolders: FungibleTokenHolderWithPoints[] = []
-
       if (fungibleTokens.length) {
-        setProgress((prev) => ({
-          ...prev,
-          token: { ...prev.token, current: 0, max: fungibleTokens.length },
-          msg: '',
-        }))
-
         const shouldRunSnapshot = window.confirm(
           'Detected Policy ID(s) with Fungible Token(s).\n\nFungible Tokens cannot be "scanned" when the holder connects, because they are not "unique" assets.\n\nThe solution would be running a snapshot. Do you want to run a snapshot now?\n\nBy clicking "cancel", the giveaway will not be published, allowing you to make changes.'
         )
@@ -92,15 +125,21 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
             }
           }[] = []
 
+          setProgress((prev) => ({
+            ...prev,
+            token: { ...prev.token, current: 0, max: fungibleTokens.length },
+            msg: '',
+          }))
+
           for (let tIdx = 0; tIdx < fungibleTokens.length; tIdx++) {
-            const { policyId, tokenId, tokenAmount } = fungibleTokens[tIdx]
+            const { policyId, tokenId, isFungible, tokenAmount } = fungibleTokens[tIdx]
 
             // token not blacklisted
-            if (withBlacklist && !blacklistTokens.find((str) => str === tokenId)) {
+            if (!withBlacklist || (withBlacklist && !blacklistTokens.find((str) => str === tokenId))) {
               const tokenOwners: BadApiTokenOwners['owners'] = []
 
               for (let page = 1; true; page++) {
-                setProgress((prev) => ({ ...prev, msg: `Processing Holders (${tokenOwners.length})` }))
+                if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
 
                 const fetched = await badApi.token.getOwners(tokenId, { page })
 
@@ -110,7 +149,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
                 if (fetched.owners.length < 100) break
               }
 
-              setProgress((prev) => ({ ...prev, msg: `Processing Holders (${tokenOwners.length})` }))
+              if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
 
               for (const owner of tokenOwners) {
                 const { quantity, stakeKey, addresses } = owner
@@ -118,33 +157,29 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
 
                 const isOnCardano = address.indexOf('addr1') === 0
                 const isBlacklisted = withBlacklist && !!blacklistWallets.find((str) => str === stakeKey)
-                // const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
+                const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
 
-                if (
-                  isOnCardano &&
-                  !!stakeKey &&
-                  !isScript &&
-                  !isBlacklisted
-                  // && isDelegator
-                ) {
-                  const foundIndex = tempHolders.findIndex((item) => item.stakeKey === stakeKey)
+                if (isOnCardano && !!stakeKey && !isScript && !isBlacklisted && isDelegator) {
+                  const humanAmount = formatTokenAmount.fromChain(quantity, tokenAmount.decimals)
 
-                  const holderAsset = {
+                  const holderItem = {
                     tokenId,
-                    humanAmount: formatTokenAmount.fromChain(quantity, tokenAmount.decimals),
+                    humanAmount,
                   }
+
+                  const foundIndex = tempHolders.findIndex((item) => item.stakeKey === stakeKey)
 
                   if (foundIndex === -1) {
                     tempHolders.push({
                       stakeKey,
                       assets: {
-                        [policyId]: [holderAsset],
+                        [policyId]: [holderItem],
                       },
                     })
                   } else if (Array.isArray(tempHolders[foundIndex].assets[policyId])) {
-                    tempHolders[foundIndex].assets[policyId].push(holderAsset)
+                    tempHolders[foundIndex].assets[policyId].push(holderItem)
                   } else {
-                    tempHolders[foundIndex].assets[policyId] = [holderAsset]
+                    tempHolders[foundIndex].assets[policyId] = [holderItem]
                   }
                 }
               }
@@ -286,8 +321,11 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
     >
       <h6 className='mb-6 text-xl text-center'>Publish Giveaway</h6>
 
-      {!published && progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}
+      {!published && settings.withDelegators && progress.pool.max ? (
+        <ProgressBar label='Stake Pools' max={progress.pool.max} current={progress.pool.current} />
+      ) : null}
 
+      {!published && progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}
       {!published && progress.token.max ? <ProgressBar label='Fungible Tokens' max={progress.token.max} current={progress.token.current} /> : null}
 
       {progress.loading ? (

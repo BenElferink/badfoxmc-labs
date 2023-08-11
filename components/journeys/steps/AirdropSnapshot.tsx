@@ -11,10 +11,10 @@ import type {
   BadApiPopulatedToken,
   BadApiRankedToken,
   BadApiTokenOwners,
-  BadApiWallet,
   PayoutHolder,
   AirdropSettings,
   SnapshotHolder,
+  StakeKey,
 } from '@/@types'
 
 const AirdropSnapshot = (props: {
@@ -33,14 +33,6 @@ const AirdropSnapshot = (props: {
     pool: {
       current: !!payoutHolders.length ? settings.stakePools.length || 0 : 0,
       max: settings.stakePools.length || 0,
-    },
-    blackWallet: {
-      current: !!payoutHolders.length ? settings.blacklistWallets.length || 0 : 0,
-      max: settings.blacklistWallets.length || 0,
-    },
-    blackToken: {
-      current: !!payoutHolders.length ? settings.blacklistTokens.length || 0 : 0,
-      max: settings.blacklistTokens.length || 0,
     },
     policy: {
       current: !!payoutHolders.length ? settings.holderPolicies.length || 0 : 0,
@@ -69,15 +61,19 @@ const AirdropSnapshot = (props: {
         blacklistTokens,
       } = settings
 
-      const delegators: string[] = []
-      const blacklistWalletsPopulated: BadApiWallet[] = []
+      const delegators: StakeKey[] = []
       const holders: SnapshotHolder[] = []
 
-      const fetchedRankedTokens: Record<string, BadApiPolicy['tokens']> = {}
       const fetchedTokens: Record<string, BadApiPopulatedToken[]> = {}
+      const fetchedRankedTokens: Record<string, BadApiPolicy['tokens']> = {}
+
+      const includedTokenCounts: Record<string, number> = {}
 
       if (withDelegators) {
-        setProgress((prev) => ({ ...prev, msg: 'Processing Stake Pool Delegators...' }))
+        setProgress((prev) => ({
+          ...prev,
+          msg: 'Processing Stake Pool Delegators...',
+        }))
 
         for await (const poolId of stakePools) {
           const fetched = await badApi.stakePool.getData(poolId, { withDelegators: true })
@@ -91,29 +87,14 @@ const AirdropSnapshot = (props: {
         }
       }
 
-      if (withBlacklist && blacklistWallets.length) {
-        setProgress((prev) => ({ ...prev, msg: 'Processing Blacklisted Wallets...' }))
+      setProgress((prev) => ({
+        ...prev,
+        msg: 'Processing Policy IDs...',
+      }))
 
-        for await (const walletId of blacklistWallets) {
-          const fetched = await badApi.wallet.getData(walletId)
+      for (let pIdx = 0; pIdx < holderPolicies.length; pIdx++) {
+        const { policyId, withRanks } = holderPolicies[pIdx]
 
-          blacklistWalletsPopulated.push(fetched)
-
-          setProgress((prev) => ({
-            ...prev,
-            blackWallet: {
-              ...prev.blackWallet,
-              current: prev.blackWallet.current + 1,
-              max: blacklistWallets.length,
-            },
-          }))
-        }
-      }
-
-      setProgress((prev) => ({ ...prev, msg: 'Processing Policy IDs...' }))
-      const includedTokenCounts: Record<string, number> = {}
-
-      for (const { policyId, withRanks } of holderPolicies) {
         includedTokenCounts[policyId] = 0
 
         const { tokens: policyTokens } = await badApi.policy.getData(policyId, { allTokens: true, withRanks })
@@ -131,45 +112,34 @@ const AirdropSnapshot = (props: {
           token: { ...prev.token, current: 0, max: policyTokens.length },
         }))
 
-        for (let aIdx = 0; aIdx < policyTokens.length; aIdx++) {
-          const { tokenId, tokenAmount } = policyTokens[aIdx]
+        for (let tIdx = 0; tIdx < policyTokens.length; tIdx++) {
+          const { tokenId, isFungible, tokenAmount } = policyTokens[tIdx]
 
-          // token blacklisted
-          if (withBlacklist && !!blacklistTokens.find((str) => str === tokenId)) {
-            setProgress((prev) => ({
-              ...prev,
-              blackToken: {
-                ...prev.blackToken,
-                current: prev.blackToken.current + 1,
-                max: blacklistTokens.length,
-              },
-            }))
-          } else {
+          // token not blacklisted
+          if (!withBlacklist || (withBlacklist && !blacklistTokens.find((str) => str === tokenId))) {
             if (tokenAmount.onChain !== 0) {
               const fetchedToken = await badApi.token.getData(tokenId)
               const tokenOwners: BadApiTokenOwners['owners'] = []
 
               for (let page = 1; true; page++) {
+                if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
+
                 const fetched = await badApi.token.getOwners(tokenId, { page })
 
                 if (!fetched.owners.length) break
                 tokenOwners.push(...fetched.owners)
+
                 if (fetched.owners.length < 100) break
               }
 
-              for (const { stakeKey, addresses, quantity } of tokenOwners) {
+              if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
+
+              for (const owner of tokenOwners) {
+                const { quantity, stakeKey, addresses } = owner
                 const { address, isScript } = addresses[0]
 
                 const isOnCardano = address.indexOf('addr1') === 0
-
-                const isBlacklisted =
-                  withBlacklist &&
-                  !!blacklistWalletsPopulated.find((obj) =>
-                    stakeKey
-                      ? obj.stakeKey === stakeKey
-                      : !!obj.addresses.find((addrObj) => addrObj.address === address)
-                  )
-
+                const isBlacklisted = withBlacklist && !!blacklistWallets.find((str) => str === stakeKey)
                 const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
 
                 if (isOnCardano && !!stakeKey && !isScript && !isBlacklisted && isDelegator) {
@@ -183,7 +153,7 @@ const AirdropSnapshot = (props: {
 
                   const holderItem = {
                     tokenId,
-                    amount: humanAmount,
+                    humanAmount,
                   }
 
                   const foundHolderIndex = holders.findIndex((item) => item.stakeKey === stakeKey)
@@ -245,13 +215,11 @@ const AirdropSnapshot = (props: {
             const policySetting = settings.holderPolicies.find((item) => item.policyId === heldPolicyId)
             const policyWeight = policySetting?.weight || 0
 
-            for (const { tokenId, amount } of heldPolicyAssets) {
-              amountForAssets += amount * sharePerToken * policyWeight
+            for (const { tokenId, humanAmount } of heldPolicyAssets) {
+              amountForAssets += humanAmount * sharePerToken * policyWeight
 
               if (policySetting?.withTraits && policySetting.traitOptions.length) {
-                const asset = fetchedTokens[heldPolicyId].find(
-                  (asset) => asset.tokenId === tokenId
-                ) as BadApiPopulatedToken
+                const asset = fetchedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as BadApiPopulatedToken
 
                 const attributes: BadApiPopulatedToken['attributes'] = asset.attributes
 
@@ -268,9 +236,7 @@ const AirdropSnapshot = (props: {
               }
 
               if (policySetting?.withRanks && policySetting.rankOptions.length) {
-                const asset = fetchedRankedTokens[heldPolicyId].find(
-                  (asset) => asset.tokenId === tokenId
-                ) as BadApiRankedToken
+                const asset = fetchedRankedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as BadApiRankedToken
 
                 policySetting?.rankOptions.forEach(({ minRange, maxRange, amount }) => {
                   if (asset?.rarityRank && asset.rarityRank >= minRange && asset.rarityRank <= maxRange) {
@@ -326,21 +292,11 @@ const AirdropSnapshot = (props: {
         Snapshot does not include &apos;script&apos; wallets
         <br />
         (For example:{' '}
-        <Link
-          href='https://jpg.store'
-          target='_blank'
-          rel='noopener noreferrer'
-          className='text-blue-200 hover:underline'
-        >
+        <Link href='https://jpg.store' target='_blank' rel='noopener noreferrer' className='text-blue-200 hover:underline'>
           jpg.store
         </Link>
         ,{' '}
-        <Link
-          href='https://labs.mutant-nft.com'
-          target='_blank'
-          rel='noopener noreferrer'
-          className='text-blue-200 hover:underline'
-        >
+        <Link href='https://labs.mutant-nft.com' target='_blank' rel='noopener noreferrer' className='text-blue-200 hover:underline'>
           Mutant Labs
         </Link>
         )
@@ -350,27 +306,8 @@ const AirdropSnapshot = (props: {
         <ProgressBar label='Stake Pools' max={progress.pool.max} current={progress.pool.current} />
       ) : null}
 
-      {settings.withBlacklist && progress.blackWallet.max ? (
-        <ProgressBar
-          label='Blacklisted Wallets'
-          max={progress.blackWallet.max}
-          current={progress.blackWallet.current}
-        />
-      ) : null}
-
-      {settings.withBlacklist && progress.blackToken.max ? (
-        <ProgressBar
-          label='Blacklisted Tokens'
-          max={progress.blackToken.max}
-          current={progress.blackToken.current}
-        />
-      ) : null}
-
-      <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} />
-
-      {progress.token.max ? (
-        <ProgressBar label='Tokens' max={progress.token.max} current={progress.token.current} />
-      ) : null}
+      {progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}
+      {progress.token.max ? <ProgressBar label='Tokens' max={progress.token.max} current={progress.token.current} /> : null}
 
       {progress.loading ? (
         <Loader withLabel label={progress.msg} />
