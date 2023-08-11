@@ -86,8 +86,8 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
             stakeKey: string
             assets: {
               [policyId: string]: {
-                assetId: string
-                amount: number
+                tokenId: string
+                humanAmount: number
               }[]
             }
           }[] = []
@@ -130,8 +130,8 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
                   const foundIndex = tempHolders.findIndex((item) => item.stakeKey === stakeKey)
 
                   const holderAsset = {
-                    assetId: tokenId,
-                    amount: formatTokenAmount.fromChain(quantity, tokenAmount.decimals),
+                    tokenId,
+                    humanAmount: formatTokenAmount.fromChain(quantity, tokenAmount.decimals),
                   }
 
                   if (foundIndex === -1) {
@@ -165,8 +165,8 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
                   const policySetting = updatedHolderPolicies.find((item) => item.policyId === heldPolicyId)
                   const policyWeight = policySetting?.weight || 0
 
-                  for (const { amount } of heldPolicyAssets) {
-                    points += amount * policyWeight
+                  for (const { humanAmount } of heldPolicyAssets) {
+                    points += humanAmount * policyWeight
                   }
                 })
 
