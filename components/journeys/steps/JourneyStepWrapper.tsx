@@ -23,9 +23,9 @@ const JourneyStepWrapper = (
     <div className='min-h-[95vh] sm:min-h-[70vh] mx-auto flex flex-col items-center justify-between'>
       <div className='w-full'>{children}</div>
 
-      <div className='w-full'>
+      <div className='w-full sticky bottom-0'>
         {buttons ? (
-          <div className='mt-2 w-full flex items-center justify-between'>
+          <div className='w-full flex items-center justify-between'>
             {buttons.map(({ label, disabled, onClick, type, acceptFile, callbackFile }, idx) =>
               type === 'file' ? (
                 <button
@@ -41,7 +41,7 @@ const JourneyStepWrapper = (
                       : buttons.length > 1
                       ? 'mx-1'
                       : '') +
-                    ' relative w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+                    ' relative w-full my-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
                   }
                 >
                   <input
@@ -73,7 +73,7 @@ const JourneyStepWrapper = (
                       : buttons.length > 1
                       ? 'mx-1'
                       : '') +
-                    ' w-full p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+                    ' w-full my-1 p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
                   }
                 >
                   {label}
@@ -83,14 +83,14 @@ const JourneyStepWrapper = (
           </div>
         ) : null}
 
-        <div className='mt-2 w-full flex items-center justify-between'>
+        <div className='w-full flex items-center justify-between'>
           {back ? (
             <button
               onClick={back}
               disabled={disableBack}
               className={
                 (!!next ? 'mr-1' : '') +
-                ' w-full p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+                ' w-full my-1 p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
               }
             >
               Back
@@ -103,7 +103,7 @@ const JourneyStepWrapper = (
               disabled={disableNext}
               className={
                 (!!back ? 'ml-1' : '') +
-                ' w-full p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+                ' w-full my-1 p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
               }
             >
               Next
