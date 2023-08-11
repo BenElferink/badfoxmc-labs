@@ -9,13 +9,7 @@ import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
-import type {
-  BadApiBaseToken,
-  BadApiTokenOwners,
-  FungibleTokenHolderWithPoints,
-  Giveaway,
-  GiveawaySettings,
-} from '@/@types'
+import type { BadApiBaseToken, BadApiTokenOwners, FungibleTokenHolderWithPoints, Giveaway, GiveawaySettings } from '@/@types'
 import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
 import { toast } from 'react-hot-toast'
 
@@ -44,7 +38,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
     setProgress((prev) => ({ ...prev, loading: true, msg: 'Processing Policy IDs...' }))
 
     try {
-      const { isToken, tokenId, tokenAmount, numOfWinners, holderPolicies } = settings
+      const { isToken, tokenId, tokenAmount, numOfWinners, holderPolicies, withBlacklist, blacklistWallets, blacklistTokens } = settings
 
       const updatedHolderPolicies = [...holderPolicies]
       const fungibleTokens: (BadApiBaseToken & { policyId: string })[] = []
@@ -100,54 +94,58 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
 
           for (let tIdx = 0; tIdx < fungibleTokens.length; tIdx++) {
             const { policyId, tokenId, tokenAmount } = fungibleTokens[tIdx]
-            const tokenOwners: BadApiTokenOwners['owners'] = []
 
-            for (let page = 1; true; page++) {
+            // token not blacklisted
+            if (withBlacklist && !blacklistTokens.find((str) => str === tokenId)) {
+              const tokenOwners: BadApiTokenOwners['owners'] = []
+
+              for (let page = 1; true; page++) {
+                setProgress((prev) => ({ ...prev, msg: `Processing Holders (${tokenOwners.length})` }))
+
+                const fetched = await badApi.token.getOwners(tokenId, { page })
+
+                if (!fetched.owners.length) break
+                tokenOwners.push(...fetched.owners)
+
+                if (fetched.owners.length < 100) break
+              }
+
               setProgress((prev) => ({ ...prev, msg: `Processing Holders (${tokenOwners.length})` }))
 
-              const fetched = await badApi.token.getOwners(tokenId, { page })
+              for (const owner of tokenOwners) {
+                const { quantity, stakeKey, addresses } = owner
+                const { address, isScript } = addresses[0]
 
-              if (!fetched.owners.length) break
-              tokenOwners.push(...fetched.owners)
+                const isOnCardano = address.indexOf('addr1') === 0
+                const isBlacklisted = withBlacklist && !!blacklistWallets.find((str) => str === stakeKey)
+                // const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
 
-              if (fetched.owners.length < 100) break
-            }
+                if (
+                  isOnCardano &&
+                  !!stakeKey &&
+                  !isScript &&
+                  !isBlacklisted
+                  // && isDelegator
+                ) {
+                  const foundIndex = tempHolders.findIndex((item) => item.stakeKey === stakeKey)
 
-            setProgress((prev) => ({ ...prev, msg: `Processing Holders (${tokenOwners.length})` }))
+                  const holderAsset = {
+                    assetId: tokenId,
+                    amount: formatTokenAmount.fromChain(quantity, tokenAmount.decimals),
+                  }
 
-            for (const owner of tokenOwners) {
-              const { quantity, stakeKey, addresses } = owner
-              const { address, isScript } = addresses[0]
-
-              const isOnCardano = address.indexOf('addr1') === 0
-              // const isBlacklisted = withBlacklist && !!blacklistWallets.find((str) => str === stakeKey)
-              // const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
-
-              if (
-                isOnCardano &&
-                !!stakeKey &&
-                !isScript
-                // && !isBlacklisted
-                // && isDelegator
-              ) {
-                const foundIndex = tempHolders.findIndex((item) => item.stakeKey === stakeKey)
-
-                const holderAsset = {
-                  assetId: tokenId,
-                  amount: formatTokenAmount.fromChain(quantity, tokenAmount.decimals),
-                }
-
-                if (foundIndex === -1) {
-                  tempHolders.push({
-                    stakeKey,
-                    assets: {
-                      [policyId]: [holderAsset],
-                    },
-                  })
-                } else if (Array.isArray(tempHolders[foundIndex].assets[policyId])) {
-                  tempHolders[foundIndex].assets[policyId].push(holderAsset)
-                } else {
-                  tempHolders[foundIndex].assets[policyId] = [holderAsset]
+                  if (foundIndex === -1) {
+                    tempHolders.push({
+                      stakeKey,
+                      assets: {
+                        [policyId]: [holderAsset],
+                      },
+                    })
+                  } else if (Array.isArray(tempHolders[foundIndex].assets[policyId])) {
+                    tempHolders[foundIndex].assets[policyId].push(holderAsset)
+                  } else {
+                    tempHolders[foundIndex].assets[policyId] = [holderAsset]
+                  }
                 }
               }
             }
@@ -288,13 +286,9 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
     >
       <h6 className='mb-6 text-xl text-center'>Publish Giveaway</h6>
 
-      {!published && progress.policy.max ? (
-        <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} />
-      ) : null}
+      {!published && progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}
 
-      {!published && progress.token.max ? (
-        <ProgressBar label='Fungible Tokens' max={progress.token.max} current={progress.token.current} />
-      ) : null}
+      {!published && progress.token.max ? <ProgressBar label='Fungible Tokens' max={progress.token.max} current={progress.token.current} /> : null}
 
       {progress.loading ? (
         <Loader withLabel label={progress.msg} />
