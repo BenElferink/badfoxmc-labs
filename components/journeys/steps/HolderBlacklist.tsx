@@ -557,7 +557,7 @@ const HolderBlacklist = (props: {
                                       return payload
                                     })
                                   }
-                                  className='w-20 my-0 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
+                                  className='w-28 my-0 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                                 />
                               </div>
                             </div>
