@@ -41,6 +41,7 @@ const TokenExplorer = (props: {
           fingerprint: 'lovelace',
           policyId: 'lovelace',
           isFungible: true,
+          mintTransactionId: '',
           tokenName: {
             onChain: 'lovelace',
             ticker: 'ADA',
