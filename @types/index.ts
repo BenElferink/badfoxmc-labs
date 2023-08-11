@@ -53,6 +53,8 @@ export interface BadApiPopulatedToken extends BadApiRankedToken {
   fingerprint: string
   policyId: PolicyId
   serialNumber?: number
+  mintTransactionId: string
+  mintBlockHeight?: number
   image: {
     ipfs: string
     url: string
@@ -109,6 +111,7 @@ export interface BadApiUtxo {
 export interface BadApiTransaction {
   transactionId: TransactionId
   block: string
+  blockHeight: number
   utxos?: BadApiUtxo[]
 }
 
@@ -232,4 +235,3 @@ export interface Giveaway extends GiveawaySettings {
   txDeposit?: string
   txsWithdrawn?: string[]
 }
-

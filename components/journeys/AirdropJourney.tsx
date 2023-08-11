@@ -152,6 +152,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
             withBlacklist: settings['withBlacklist'],
             blacklistWallets: settings['blacklistWallets'],
             blacklistTokens: settings['blacklistTokens'],
+            holderPolicies: settings['holderPolicies'],
           }}
           callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))}
           next={increment}
