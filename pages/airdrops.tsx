@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ArrowTopRightOnSquareIcon, PlusIcon } from '@heroicons/react/24/solid'
 import getAirdrops from '@/functions/storage/airdrops/getAirdrops'
 import resolveMonthName from '@/functions/formatters/resolveMonthName'
@@ -21,7 +21,7 @@ const Page = () => {
   const [openJourney, setOpenJourney] = useState(false)
   const [airdropTimeline, setAirdropTimeline] = useState<AirdropTimeline | null>(null)
 
-  useEffect(() => {
+  const getAndSetAirdrops = useCallback(() => {
     setLoading(true)
     getAirdrops()
       .then((data) => {
@@ -49,12 +49,16 @@ const Page = () => {
       .finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    getAndSetAirdrops()
+  }, [getAndSetAirdrops])
+
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
       <div className='max-w-lg sm:max-w-2xl mx-1 text-sm'>
         <p className='my-4'>
-          The airdrop tool utilizes Cardano&apos;s Extended UTXO model to distribute rewards (ADA and
-          Fungible-Tokens) amongst holders of given Policy ID(s).
+          The airdrop tool utilizes Cardano&apos;s Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy
+          ID(s).
         </p>
 
         <button
@@ -64,7 +68,13 @@ const Page = () => {
           <PlusIcon className='w-6 h-6 mr-2' /> Run an Airdrop
         </button>
 
-        <AirdropJourney open={openJourney} onClose={() => setOpenJourney(false)} />
+        <AirdropJourney
+          open={openJourney}
+          onClose={() => {
+            setOpenJourney(false)
+            getAndSetAirdrops()
+          }}
+        />
       </div>
 
       {loading ? (
@@ -85,17 +95,12 @@ const Page = () => {
 
                   <div className='flex flex-wrap justify-center sm:justify-start'>
                     {drops.map((drop) => (
-                      <div
-                        key={`drop-${drop.id}`}
-                        className='m-1 p-0.5 rounded-lg bg-gradient-to-b from-purple-900 via-blue-900 to-green-900'
-                      >
+                      <div key={`drop-${drop.id}`} className='m-1 p-0.5 rounded-lg bg-gradient-to-b from-purple-900 via-blue-900 to-green-900'>
                         <div className='w-[190px] h-[160px] rounded-lg bg-zinc-800 flex flex-col items-center justify-evenly'>
                           <MediaViewer mediaType='IMAGE' src={drop.thumb} size='w-[55px] h-[55px]' />
 
                           <div>
-                            <p className='text-center text-xs'>
-                              {drop.tokenName.ticker || drop.tokenName.display || drop.tokenName.onChain}
-                            </p>
+                            <p className='text-center text-xs'>{drop.tokenName.ticker || drop.tokenName.display || drop.tokenName.onChain}</p>
                             <p className='text-center truncate'>
                               {drop.tokenAmount.display.toLocaleString('en-US', {
                                 minimumFractionDigits: 2,
