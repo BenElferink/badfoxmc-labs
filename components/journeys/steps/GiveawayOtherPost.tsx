@@ -93,10 +93,7 @@ const GiveawayOtherPost = (props: {
           type: 'file',
           acceptFile: '.jpg,.jpeg,.png,.webp,.gif',
           callbackFile: async (file) => {
-            console.log('here', file)
-
             if (!file) return
-
             if (data['thumb']) await deleteFile(data['thumb'])
 
             const mediaUrl = (await uploadFile(file)) as string
@@ -162,9 +159,7 @@ const GiveawayOtherPost = (props: {
         className='w-full my-2 p-4 flex items-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none'
       />
 
-      {data['thumb'] ? (
-        <MediaViewer mediaType='IMAGE' src={data['thumb']} size='max-w-[555px] w-full h-full mx-auto' />
-      ) : null}
+      {data['thumb'] ? <MediaViewer mediaType='IMAGE' src={data['thumb']} size='max-w-[555px] w-full h-full mx-auto' /> : null}
 
       {progress.loading ? (
         <ProgressBar label='Upload Percent' max={progress.upload.max} current={progress.upload.current} />
