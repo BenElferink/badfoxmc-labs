@@ -12,6 +12,7 @@ import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
 import type { BadApiBaseToken, BadApiTokenOwners, FungibleTokenHolderWithPoints, Giveaway, GiveawaySettings, StakeKey } from '@/@types'
 import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
+import ViewGiveaway from '@/components/ViewGiveaway'
 
 const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void; back?: () => void }) => {
   const { settings, next, back } = props
@@ -58,9 +59,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
       } = settings
 
       const updatedHolderPolicies = [...holderPolicies]
-
       const delegators: StakeKey[] = []
-
       const fungibleTokens: (BadApiBaseToken & { policyId: string })[] = []
       const fungibleHolders: FungibleTokenHolderWithPoints[] = []
 
@@ -321,10 +320,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
     >
       <h6 className='mb-6 text-xl text-center'>Publish Giveaway</h6>
 
-      {!published && settings.withDelegators && progress.pool.max ? (
-        <ProgressBar label='Stake Pools' max={progress.pool.max} current={progress.pool.current} />
-      ) : null}
-
+      {!published && progress.pool.max ? <ProgressBar label='Stake Pools' max={progress.pool.max} current={progress.pool.current} /> : null}
       {!published && progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}
       {!published && progress.token.max ? <ProgressBar label='Fungible Tokens' max={progress.token.max} current={progress.token.current} /> : null}
 
@@ -336,6 +332,10 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
           <span>{progress.msg}</span>
         </div>
       )}
+
+      <div className={progress.policy.max ? 'mt-6' : ''}>
+        <ViewGiveaway giveaway={settings as Giveaway} />
+      </div>
     </JourneyStepWrapper>
   )
 }
