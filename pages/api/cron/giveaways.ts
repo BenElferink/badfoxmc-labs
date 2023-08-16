@@ -2,17 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { AppWallet, BlockfrostProvider, Transaction } from '@meshsdk/core'
 import { firebase, firestore } from '@/utils/firebase'
 import { badApi } from '@/utils/badApi'
+import txConfirmation from '@/functions/txConfirmation'
 import { API_KEYS, WALLET_KEYS } from '@/constants'
-import type { Address, Giveaway, StakeKey, TokenId, TransactionId } from '@/@types'
-// import txConfirmation from '@/functions/txConfirmation'
+import type { Giveaway, GiveawayWinner, TokenId, TransactionId } from '@/@types'
 
-interface Winner {
-  stakeKey: StakeKey
-  address: Address['address']
-  amount: number
-}
-
-interface PayTo extends Winner {
+interface PayTo extends GiveawayWinner {
   tokenId: TokenId
   transactionId?: TransactionId
 }
@@ -61,12 +55,11 @@ const sendToWallets = async (payTo: PayTo[], difference?: number): Promise<PayTo
 
       console.log('Submitting TX...', signedTx)
       const txHash = await wallet.submitTx(signedTx)
-
       console.log('TX submitted!', txHash)
 
-      // console.log('Awaiting network confirmation...')
-      // await txConfirmation(txHash)
-      // console.log('Confirmed!', txHash)
+      console.log('Awaiting network confirmation...', txHash)
+      await txConfirmation(txHash)
+      console.log('Confirmed!', txHash)
 
       payTo = payTo.map((item) =>
         batch.some(({ stakeKey }) => stakeKey === item.stakeKey)
@@ -123,11 +116,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           .filter((item) => !item.active)
 
         const payTo: PayTo[] = []
+        const batch = firestore.batch()
 
         for await (const doc of docsThatNeedToRaffleWinners) {
           const { id, stakeKey, isToken, tokenId, tokenAmount, otherAmount, numOfWinners, entries } = doc
 
-          const winners: Winner[] = []
+          const winners: GiveawayWinner[] = []
           const enteredStakeKeys: string[] = entries.map((entry) => new Array(entry.points).fill(entry.stakeKey)).flat()
 
           let finalNumOfWinners = Math.min(numOfWinners, enteredStakeKeys.length)
@@ -162,13 +156,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             enteredStakeKeys.splice(randomIdx, 1)
           }
 
-          const updateBody: {
-            active: boolean
-            winners: firebase.firestore.FieldValue
-            txsWithdrawn?: firebase.firestore.FieldValue
-          } = {
+          const updateBody: Partial<Giveaway> = {
             active: false,
-            winners: FieldValue.arrayUnion(...winners),
+            fungibleHolders: [],
+            nonFungibleUsedUnits: [],
+            winners: FieldValue.arrayUnion(...winners) as unknown as Giveaway['winners'],
           }
 
           if (isToken) {
@@ -180,8 +172,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             )
           }
 
-          await collection.doc(id).update(updateBody)
+          batch.update(collection.doc(id), updateBody)
         }
+
+        await batch.commit()
 
         if (payTo.length) {
           const payedOut = await sendToWallets(payTo)
