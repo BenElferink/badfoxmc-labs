@@ -79,9 +79,7 @@ const TokenExplorer = (props: {
         }
       })
 
-      setCollections(
-        payload.sort((a, b) => (b.policyId === 'lovelace' ? 1 : a.policyId.localeCompare(b.policyId)))
-      )
+      setCollections(payload.sort((a, b) => (b.policyId === 'lovelace' ? 1 : a.policyId.localeCompare(b.policyId))))
     } catch (error: any) {
       console.error(error)
       // const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
@@ -145,30 +143,17 @@ const TokenExplorer = (props: {
                   type='button'
                   disabled={loading}
                   onClick={() => callback(t)}
-                  className={
-                    'group w-[160px] m-2 flex flex-col items-center ' +
-                    (selectedTokenId === t.tokenId ? 'border rounded-lg' : '')
-                  }
+                  className={'group w-[160px] m-2 flex flex-col items-center ' + (selectedTokenId === t.tokenId ? 'border rounded-lg' : '')}
                 >
                   <MediaViewer mediaType='IMAGE' src={t.image.url} size='w-[150px] h-[150px] m-[5px]' />
 
                   {showTokenAmounts ? (
-                    <p
-                      className={
-                        'm-0 p-0 px-2 text-xs ' +
-                        (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')
-                      }
-                    >
+                    <p className={'m-0 p-0 px-2 text-xs ' + (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')}>
                       {t.tokenAmount.display.toLocaleString('en-US')}
                     </p>
                   ) : null}
 
-                  <p
-                    className={
-                      'm-0 p-0 px-2 text-sm ' +
-                      (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')
-                    }
-                  >
+                  <p className={'m-0 p-0 px-2 text-sm ' + (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')}>
                     {t.tokenName?.ticker ? '$' : ''}
                     {t.tokenName?.ticker || t.tokenName?.display || t.tokenName?.onChain}
                   </p>

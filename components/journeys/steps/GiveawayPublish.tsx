@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { badApi } from '@/utils/badApi'
 import { firestore } from '@/utils/firebase'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
+import txConfirmation from '@/functions/txConfirmation'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
@@ -239,8 +240,8 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
         const lovelaces = formatTokenAmount.toChain(numOfWinners * 1.5, DECIMALS['ADA'])
 
         const tx = new Transaction({ initiator: wallet })
-          .sendLovelace({ address: WALLET_ADDRESSES['GIVEAWAYS'] }, lovelaces.toString())
-          .sendAssets({ address: WALLET_ADDRESSES['GIVEAWAYS'] }, [
+          .sendLovelace({ address: WALLET_ADDRESSES['GIVEAWAY_APP'] }, lovelaces.toString())
+          .sendAssets({ address: WALLET_ADDRESSES['GIVEAWAY_APP'] }, [
             {
               unit: tokenId,
               quantity: tokenAmount.onChain.toString(),
@@ -248,18 +249,24 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
           ])
 
         console.log('Building TX...')
-        const unsigned = await tx.build()
-        console.log('Awaiting signature...', unsigned)
-        const signed = await wallet.signTx(unsigned)
-        console.log('Submitting TX...', signed)
-        const txHash = await wallet.submitTx(signed)
-        console.log('TX submitted!', txHash)
+        setProgress((prev) => ({ ...prev, msg: 'Building TX...' }))
+        const unsignedTx = await tx.build()
 
-        const { id } = await collection.add({
-          ...payload,
-          txDeposit: txHash,
-          txsWithdrawn: [],
-        })
+        console.log('Awaiting signature...', unsignedTx)
+        setProgress((prev) => ({ ...prev, msg: 'Awaiting signature...' }))
+        const signedTx = await wallet.signTx(unsignedTx)
+
+        console.log('Submitting TX...', signedTx)
+        setProgress((prev) => ({ ...prev, msg: 'Submitting TX...' }))
+        const txHash = await wallet.submitTx(signedTx)
+
+        console.log('Awaiting network confirmation...', txHash)
+        setProgress((prev) => ({ ...prev, msg: 'Awaiting network confirmation...' }))
+        await txConfirmation(txHash)
+
+        console.log('TX confirmed!', txHash)
+
+        const { id } = await collection.add(payload)
 
         docId = id
       } else {

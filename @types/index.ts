@@ -232,6 +232,6 @@ export interface Giveaway extends GiveawaySettings {
   }[]
 
   // for payout
-  txDeposit?: string
-  txsWithdrawn?: string[]
+  // txDeposit?: string
+  // txsWithdrawn?: string[]
 }

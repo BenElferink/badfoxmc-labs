@@ -1,14 +1,14 @@
 'use client'
 import axios from 'axios'
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
 import { firebase, firestore } from '@/utils/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import GiveawayViewer from './GiveawayViewer'
+import Loader from './Loader'
 import type { BadApiRankedToken, Giveaway, User } from '@/@types'
 import type { FetchedTimestampResponse } from '@/pages/api/timestamp'
-import Loader from './Loader'
-import { toast } from 'react-hot-toast'
 
 const GiveawayEnter = (props: { giveaway: Giveaway }) => {
   const { giveaway } = props
@@ -221,17 +221,18 @@ const GiveawayEnter = (props: { giveaway: Giveaway }) => {
     <div className='w-[80vw] md:w-[555px] mx-auto'>
       <GiveawayViewer giveaway={{ ...giveaway, active: giveawayActive }} callbackTimeExpired={() => setGiveawayActive(false)} />
 
-      {loading ? <Loader withLabel label={message} /> : <p className='my-2 text-center'>{message}</p>}
-
       {giveawayActive ? (
-        <button
-          type='button'
-          disabled={!user?.stakeKey || !giveawayActive || !holderPoints.points || !holderEligible || loading}
-          onClick={() => enterGiveaway()}
-          className='w-full my-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-        >
-          Enter Giveaway
-        </button>
+        <Fragment>
+          {loading ? <Loader withLabel label={message} /> : <p className='mb-2 text-center'>{message}</p>}
+          <button
+            type='button'
+            disabled={!user?.stakeKey || !giveawayActive || !holderPoints.points || !holderEligible || loading}
+            onClick={() => enterGiveaway()}
+            className='w-full my-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+          >
+            Enter Giveaway
+          </button>
+        </Fragment>
       ) : null}
 
       <button

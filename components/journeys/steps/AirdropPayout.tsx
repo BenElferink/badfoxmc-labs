@@ -4,9 +4,9 @@ import { utils, writeFileXLSX } from 'xlsx'
 import { useWallet } from '@meshsdk/react'
 import { Transaction } from '@meshsdk/core'
 import { ArrowTopRightOnSquareIcon, CheckBadgeIcon } from '@heroicons/react/24/solid'
+import { firestore } from '@/utils/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import setAirdrop from '@/functions/storage/airdrops/setAirdrop'
 import txConfirmation from '@/functions/txConfirmation'
 import Loader from '@/components/Loader'
 import ProgressBar from '@/components/ProgressBar'
@@ -14,12 +14,7 @@ import JourneyStepWrapper from './JourneyStepWrapper'
 import type { Airdrop, PayoutHolder, AirdropSettings } from '@/@types'
 import { DECIMALS, ONE_MILLION } from '@/constants'
 
-const AirdropPayout = (props: {
-  payoutHolders: PayoutHolder[]
-  settings: AirdropSettings
-  next?: () => void
-  back?: () => void
-}) => {
+const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: AirdropSettings; next?: () => void; back?: () => void }) => {
   const { payoutHolders, settings, next, back } = props
   const { wallet } = useWallet()
   const { user } = useAuth()
@@ -84,9 +79,7 @@ const AirdropPayout = (props: {
             if (settings.tokenId === 'lovelace') {
               if (payout < ONE_MILLION) {
                 const str1 = 'Cardano requires at least 1 ADA per TX.'
-                const str2 = `This wallet has only ${formatTokenAmount
-                  .fromChain(payout, DECIMALS['ADA'])
-                  .toFixed(2)} ADA assigned to it:\n${address}`
+                const str2 = `This wallet has only ${formatTokenAmount.fromChain(payout, DECIMALS['ADA']).toFixed(2)} ADA assigned to it:\n${address}`
                 const str3 = 'Click OK if you want to increase the payout for this wallet to 1 ADA.'
                 const str4 = 'Click cancel to exclude this wallet from the airdrop.'
                 const str5 = 'Note: accepting will increase the total pool size.'
@@ -142,7 +135,8 @@ const AirdropPayout = (props: {
           thumb: settings.thumb,
         }
 
-        await setAirdrop(airdrop)
+        const collection = firestore.collection('airdrops')
+        await collection.add(airdrop)
 
         setProgress((prev) => ({ ...prev, loading: false, msg: 'Airdrop Done' }))
         setPayoutEnded(true)
@@ -223,9 +217,7 @@ const AirdropPayout = (props: {
         </button>
       </div>
 
-      {!payoutEnded && progress.batch.max ? (
-        <ProgressBar label='TX Batches' max={progress.batch.max} current={progress.batch.current} />
-      ) : null}
+      {!payoutEnded && progress.batch.max ? <ProgressBar label='TX Batches' max={progress.batch.max} current={progress.batch.current} /> : null}
 
       {progress.loading ? (
         <Loader withLabel label={progress.msg} />
@@ -254,9 +246,7 @@ const AirdropPayout = (props: {
                 maximumFractionDigits: 2,
               })}
             </span>
-            <span className='text-center text-xs'>
-              &nbsp;{settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain}
-            </span>
+            <span className='text-center text-xs'>&nbsp;{settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain}</span>
           </div>
 
           <Link

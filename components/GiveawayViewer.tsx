@@ -47,7 +47,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
       <MediaViewer mediaType='IMAGE' src={giveaway.thumb} size='w-[250px] sm:w-[555px] h-[250px] sm:h-[555px] my-4' />
 
       {!!giveaway.id && giveaway.active ? (
-        <div>
+        <div className='mb-2'>
           <table className='mx-auto'>
             <tbody>
               <tr className='text-xl'>
@@ -122,13 +122,22 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
           </div>
         </div>
       ) : !!giveaway.id && !giveaway.active && !giveaway.winners.length ? (
-        <div>Winner{giveaway.numOfWinners > 1 ? 's' : ''} pending...</div>
+        <div className='mb-2'>Winner{giveaway.numOfWinners > 1 ? 's' : ''} pending...</div>
       ) : !!giveaway.id && !giveaway.active && !!giveaway.winners.length ? (
-        <div>
+        <div className='mb-2'>
           Winner{giveaway.winners.length > 1 ? 's' : ''}:
           <ul className='text-xs'>
-            {giveaway.winners.map((item, i) => (
-              <li key={`winner-${i}`}>{item.stakeKey}</li>
+            {giveaway.winners.map((item) => (
+              <Link
+                key={`winner-${item.stakeKey}`}
+                href={`https://cardanoscan.io/stakekey/${item.stakeKey}`}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='flex items-center text-blue-400 hover:underline'
+              >
+                {item.stakeKey}
+                <ArrowTopRightOnSquareIcon className='w-4 h-4 ml-1' />
+              </Link>
             ))}
           </ul>
         </div>

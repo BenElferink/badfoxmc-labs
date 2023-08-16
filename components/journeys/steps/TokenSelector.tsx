@@ -66,10 +66,7 @@ const TokenAmount = (props: {
       // verify the amount is between the min and max ranges (with the help of available balance)
       if (amountType === 'FIXED') {
         const min = 0
-        const max = formatTokenAmount.toChain(
-          Math.floor(formatTokenAmount.fromChain(balanceOnChain || 0, _decimals)),
-          _decimals
-        )
+        const max = formatTokenAmount.toChain(Math.floor(formatTokenAmount.fromChain(balanceOnChain || 0, _decimals)), _decimals)
 
         v = v < min ? min : v > max ? max : v
 
@@ -91,10 +88,7 @@ const TokenAmount = (props: {
 
         setAmountValue(v)
 
-        v = formatTokenAmount.toChain(
-          Math.floor(formatTokenAmount.fromChain(balanceOnChain * (v / 100), _decimals)),
-          _decimals
-        )
+        v = formatTokenAmount.toChain(Math.floor(formatTokenAmount.fromChain(balanceOnChain * (v / 100), _decimals)), _decimals)
 
         setData((prev) => ({
           ...prev,
@@ -129,18 +123,11 @@ const TokenAmount = (props: {
             }))
           }}
           className={
-            'group cursor-pointer my-2 p-4 border rounded-lg ' +
-            (amountType === 'FIXED' ? 'text-white' : 'text-zinc-400 border-transparent')
+            'group cursor-pointer my-2 p-4 border rounded-lg ' + (amountType === 'FIXED' ? 'text-white' : 'text-zinc-400 border-transparent')
           }
         >
           <label className='flex items-center group-hover:text-white cursor-pointer'>
-            <input
-              type='radio'
-              name='amountType'
-              value='FIXED'
-              onChange={() => {}}
-              checked={amountType === 'FIXED'}
-            />
+            <input type='radio' name='amountType' value='FIXED' onChange={() => {}} checked={amountType === 'FIXED'} />
             <span className='ml-2'>Fixed Amount</span>
           </label>
         </div>
@@ -159,18 +146,11 @@ const TokenAmount = (props: {
             }))
           }}
           className={
-            'group cursor-pointer my-2 p-4 border rounded-lg ' +
-            (amountType === 'PERCENT' ? 'text-white' : 'text-zinc-400 border-transparent')
+            'group cursor-pointer my-2 p-4 border rounded-lg ' + (amountType === 'PERCENT' ? 'text-white' : 'text-zinc-400 border-transparent')
           }
         >
           <label className='flex items-center group-hover:text-white cursor-pointer'>
-            <input
-              type='radio'
-              name='amountType'
-              value='PERCENT'
-              onChange={() => {}}
-              checked={amountType === 'PERCENT'}
-            />
+            <input type='radio' name='amountType' value='PERCENT' onChange={() => {}} checked={amountType === 'PERCENT'} />
             <span className='ml-2'>Percent Amount</span>
           </label>
         </div>
@@ -178,13 +158,7 @@ const TokenAmount = (props: {
 
       <input
         placeholder='Token Amount:'
-        value={
-          amountType === 'FIXED'
-            ? formatTokenAmount.fromChain(amountValue, _decimals) || ''
-            : amountType === 'PERCENT'
-            ? amountValue || ''
-            : ''
-        }
+        value={amountType === 'FIXED' ? formatTokenAmount.fromChain(amountValue, _decimals) || '' : amountType === 'PERCENT' ? amountValue || '' : ''}
         onChange={handleAmountChange}
         className='w-full my-2 p-4 flex items-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none'
       />
@@ -206,8 +180,9 @@ const TokenSelector = (props: {
   withAmount?: boolean
   onlyFungible?: boolean
   onlyNonFungible?: boolean
+  withAda?: boolean
 }) => {
-  const { defaultData, callback, next, back, withAmount, onlyFungible, onlyNonFungible } = props
+  const { defaultData, callback, next, back, withAmount, onlyFungible, onlyNonFungible, withAda } = props
   const [data, setData] = useState(defaultData)
 
   useEffect(() => {
@@ -218,14 +193,7 @@ const TokenSelector = (props: {
   const [selectAmount, setSelectAmount] = useState(false)
 
   if (selectAmount) {
-    return (
-      <TokenAmount
-        defaultData={data}
-        callback={(payload) => setData((prev) => ({ ...prev, ...payload }))}
-        next={next}
-        back={back}
-      />
-    )
+    return <TokenAmount defaultData={data} callback={(payload) => setData((prev) => ({ ...prev, ...payload }))} next={next} back={back} />
   }
 
   return (
@@ -243,7 +211,7 @@ const TokenSelector = (props: {
         selectedTokenId={data.tokenId}
         onlyFungible={onlyFungible}
         onlyNonFungible={onlyNonFungible}
-        withAda
+        withAda={withAda}
         showTokenAmounts
         callback={(payload) => {
           const { isFungible } = payload
