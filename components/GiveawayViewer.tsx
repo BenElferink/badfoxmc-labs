@@ -3,12 +3,12 @@ import { useTimer } from 'react-timer-hook'
 import MediaViewer from './MediaViewer'
 import type { Giveaway } from '@/@types'
 
-interface ViewGiveawayProps {
+interface GiveawayViewerProps {
   giveaway: Giveaway
   callbackTimeExpired?: () => void
 }
 
-const ViewGiveaway = (props: ViewGiveawayProps) => {
+const GiveawayViewer = (props: GiveawayViewerProps) => {
   const { giveaway, callbackTimeExpired } = props
 
   const timer = useTimer({
@@ -30,7 +30,7 @@ const ViewGiveaway = (props: ViewGiveawayProps) => {
           </h6>
 
           {giveaway.otherDescription ? (
-            <p className='w-full mt-2 text-sm'>
+            <p className='w-full mt-2 text-sm text-zinc-400'>
               {giveaway.otherDescription.split('\n').map((str, idx) => (
                 <Fragment key={`str-${idx}-${str}`}>
                   {str}
@@ -74,4 +74,4 @@ const ViewGiveaway = (props: ViewGiveawayProps) => {
   )
 }
 
-export default ViewGiveaway
+export default GiveawayViewer

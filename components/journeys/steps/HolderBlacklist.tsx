@@ -201,6 +201,7 @@ const HolderBlacklist = (props: {
             ]
           : []
       }
+      hoverButtons={tokensAlreadyScanned}
     >
       <h6 className='text-xl text-center'>Blacklist</h6>
 

@@ -15,15 +15,16 @@ const JourneyStepWrapper = (
       acceptFile?: string
       callbackFile?: (_buffer: File) => void
     }[]
+    hoverButtons?: boolean
   }>
 ) => {
-  const { children, disableNext, disableBack, next, back, buttons } = props
+  const { children, disableNext, disableBack, next, back, buttons, hoverButtons } = props
 
   return (
     <div className='min-h-[95vh] sm:min-h-[70vh] mx-auto flex flex-col items-center justify-between'>
       <div className='w-full'>{children}</div>
 
-      <div className='w-full sticky bottom-0'>
+      <div className={'w-full ' + (hoverButtons ? 'sticky bottom-0' : '')}>
         {buttons ? (
           <div className='w-full flex items-center justify-between'>
             {buttons.map(({ label, disabled, onClick, type, acceptFile, callbackFile }, idx) =>
