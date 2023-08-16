@@ -67,7 +67,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
 
             {giveaway.holderPolicies.map((setting) => (
               <div key={`holderPolicies-${setting.policyId}`} className='w-full mt-2'>
-                <p>Policy ID ({setting.weight} points)</p>
+                <p className='text-zinc-400'>Policy ID ({setting.weight} points)</p>
 
                 <Link
                   href={
@@ -85,7 +85,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
 
                 {setting.withRanks
                   ? setting.rankOptions.map((rankSetting) => (
-                      <p key={`rankSetting-${rankSetting.minRange}-${rankSetting.maxRange}`}>
+                      <p className='text-zinc-400' key={`rankSetting-${rankSetting.minRange}-${rankSetting.maxRange}`}>
                         Ranks: {rankSetting.minRange}-{rankSetting.maxRange} ({rankSetting.amount} points)
                       </p>
                     ))
@@ -93,7 +93,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
 
                 {setting.withTraits
                   ? setting.traitOptions.map((traitSetting) => (
-                      <p key={`traitSetting-${traitSetting.category}-${traitSetting.trait}`}>
+                      <p className='text-zinc-400' key={`traitSetting-${traitSetting.category}-${traitSetting.trait}`}>
                         Attribute: {traitSetting.category} / {traitSetting.trait} ({traitSetting.amount} points)
                       </p>
                     ))
@@ -103,7 +103,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
 
             {giveaway.withDelegators && giveaway.stakePools.length ? (
               <div className='w-full mt-2'>
-                <p>Must be delegting to:</p>
+                <p className='text-zinc-400'>Must be delegting to:</p>
 
                 {giveaway.stakePools.map((str) => (
                   <Link
