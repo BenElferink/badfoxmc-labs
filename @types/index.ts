@@ -211,6 +211,12 @@ export interface Airdrop extends TokenSelectionSettings {
   timestamp: number
 }
 
+export interface GiveawayWinner {
+  stakeKey: StakeKey
+  address: Address['address']
+  amount: number
+}
+
 export interface Giveaway extends GiveawaySettings {
   id?: string
   stakeKey: string
@@ -225,11 +231,7 @@ export interface Giveaway extends GiveawaySettings {
     stakeKey: StakeKey
     points: number
   }[]
-  winners: {
-    stakeKey: StakeKey
-    address: Address['address']
-    amount: number
-  }[]
+  winners: GiveawayWinner[]
 
   // for payout
   // txDeposit?: string
