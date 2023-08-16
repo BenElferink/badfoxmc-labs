@@ -10,9 +10,9 @@ import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
+import GiveawayViewer from '@/components/GiveawayViewer'
 import type { BadApiBaseToken, BadApiTokenOwners, FungibleTokenHolderWithPoints, Giveaway, GiveawaySettings, StakeKey } from '@/@types'
 import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
-import GiveawayViewer from '@/components/GiveawayViewer'
 
 const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void; back?: () => void }) => {
   const { settings, next, back } = props
