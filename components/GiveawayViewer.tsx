@@ -1,5 +1,7 @@
+import Link from 'next/link'
 import { Fragment } from 'react'
 import { useTimer } from 'react-timer-hook'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
 import MediaViewer from './MediaViewer'
 import type { Giveaway } from '@/@types'
 
@@ -45,19 +47,80 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
       <MediaViewer mediaType='IMAGE' src={giveaway.thumb} size='w-[250px] sm:w-[555px] h-[250px] sm:h-[555px] my-4' />
 
       {!!giveaway.id && giveaway.active ? (
-        <table>
-          <tbody>
-            <tr className='text-xl'>
-              <td>{`${timer.days < 10 ? '0' : ''}${timer.days}`}</td>
-              <td>:</td>
-              <td>{`${timer.hours < 10 ? '0' : ''}${timer.hours}`}</td>
-              <td>:</td>
-              <td>{`${timer.minutes < 10 ? '0' : ''}${timer.minutes}`}</td>
-              <td>:</td>
-              <td>{`${timer.seconds < 10 ? '0' : ''}${timer.seconds}`}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div>
+          <table className='mx-auto'>
+            <tbody>
+              <tr className='text-xl'>
+                <td>{`${timer.days < 10 ? '0' : ''}${timer.days}`}</td>
+                <td>:</td>
+                <td>{`${timer.hours < 10 ? '0' : ''}${timer.hours}`}</td>
+                <td>:</td>
+                <td>{`${timer.minutes < 10 ? '0' : ''}${timer.minutes}`}</td>
+                <td>:</td>
+                <td>{`${timer.seconds < 10 ? '0' : ''}${timer.seconds}`}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className='my-2 text-xs text-start flex flex-col items-center justify-center'>
+            <h6 className='w-full text-lg'>Who can enter?</h6>
+
+            {giveaway.holderPolicies.map((setting) => (
+              <div key={`holderPolicies-${setting.policyId}`} className='w-full mt-2'>
+                <p>Policy ID ({setting.weight} points)</p>
+
+                <Link
+                  href={
+                    setting.hasFungibleTokens
+                      ? `https://cardanoscan.io/tokenPolicy/${setting.policyId}`
+                      : `https://jpg.store/collection/${setting.policyId}`
+                  }
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='flex items-center text-blue-400 hover:underline'
+                >
+                  {setting.policyId}
+                  <ArrowTopRightOnSquareIcon className='w-4 h-4 ml-1' />
+                </Link>
+
+                {setting.withRanks
+                  ? setting.rankOptions.map((rankSetting) => (
+                      <p key={`rankSetting-${rankSetting.minRange}-${rankSetting.maxRange}`}>
+                        Ranks: {rankSetting.minRange}-{rankSetting.maxRange} ({rankSetting.amount} points)
+                      </p>
+                    ))
+                  : null}
+
+                {setting.withTraits
+                  ? setting.traitOptions.map((traitSetting) => (
+                      <p key={`traitSetting-${traitSetting.category}-${traitSetting.trait}`}>
+                        Attribute: {traitSetting.category} / {traitSetting.trait} ({traitSetting.amount} points)
+                      </p>
+                    ))
+                  : null}
+              </div>
+            ))}
+
+            {giveaway.withDelegators && giveaway.stakePools.length ? (
+              <div className='w-full mt-2'>
+                <p>Must be delegting to:</p>
+
+                {giveaway.stakePools.map((str) => (
+                  <Link
+                    key={`stakePools-${str}`}
+                    href={`https://cardanoscan.io/pool/${str}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='flex items-center text-blue-400 hover:underline'
+                  >
+                    {str}
+                    <ArrowTopRightOnSquareIcon className='w-4 h-4 ml-1' />
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
       ) : !!giveaway.id && !giveaway.active && !giveaway.winners.length ? (
         <div>Winner{giveaway.numOfWinners > 1 ? 's' : ''} pending...</div>
       ) : !!giveaway.id && !giveaway.active && !!giveaway.winners.length ? (

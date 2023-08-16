@@ -63,25 +63,6 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
       const fungibleTokens: (BadApiBaseToken & { policyId: string })[] = []
       const fungibleHolders: FungibleTokenHolderWithPoints[] = []
 
-      if (withDelegators) {
-        setProgress((prev) => ({
-          ...prev,
-          pool: { ...prev.pool, current: 0, max: stakePools.length },
-          msg: 'Processing Stake Pool Delegators...',
-        }))
-
-        for await (const poolId of stakePools) {
-          const fetched = await badApi.stakePool.getData(poolId, { withDelegators: true })
-
-          delegators.push(...(fetched.delegators || []))
-
-          setProgress((prev) => ({
-            ...prev,
-            pool: { ...prev.pool, current: prev.pool.current + 1, max: stakePools.length },
-          }))
-        }
-      }
-
       setProgress((prev) => ({
         ...prev,
         policy: { ...prev.policy, current: 0, max: updatedHolderPolicies.length },
@@ -114,6 +95,25 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
           setProgress((prev) => ({ ...prev, loading: false, msg: '' }))
           return
         } else {
+          if (withDelegators) {
+            setProgress((prev) => ({
+              ...prev,
+              pool: { ...prev.pool, current: 0, max: stakePools.length },
+              msg: 'Processing Stake Pool Delegators...',
+            }))
+
+            for await (const poolId of stakePools) {
+              const fetched = await badApi.stakePool.getData(poolId, { withDelegators: true })
+
+              delegators.push(...(fetched.delegators || []))
+
+              setProgress((prev) => ({
+                ...prev,
+                pool: { ...prev.pool, current: prev.pool.current + 1, max: stakePools.length },
+              }))
+            }
+          }
+
           const tempHolders: {
             stakeKey: string
             assets: {
@@ -127,7 +127,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
           setProgress((prev) => ({
             ...prev,
             token: { ...prev.token, current: 0, max: fungibleTokens.length },
-            msg: '',
+            msg: 'Processing Fungible Tokens...',
           }))
 
           for (let tIdx = 0; tIdx < fungibleTokens.length; tIdx++) {
@@ -320,22 +320,22 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
     >
       <h6 className='mb-6 text-xl text-center'>Publish Giveaway</h6>
 
-      <div className={progress.policy.max ? 'mb-6' : ''}>
-        <GiveawayViewer giveaway={settings as Giveaway} />
+      <GiveawayViewer giveaway={settings as Giveaway} />
+
+      <div className={progress.policy.max ? 'my-6' : ''}>
+        {!published && progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}
+        {!published && progress.token.max ? <ProgressBar label='Fungible Tokens' max={progress.token.max} current={progress.token.current} /> : null}
+        {!published && progress.pool.max ? <ProgressBar label='Stake Pools' max={progress.pool.max} current={progress.pool.current} /> : null}
+
+        {progress.loading ? (
+          <Loader withLabel label={progress.msg} />
+        ) : (
+          <div className='flex flex-col items-center justify-center'>
+            {published ? <CheckBadgeIcon className='w-24 h-24 text-green-400' /> : null}
+            <span>{progress.msg}</span>
+          </div>
+        )}
       </div>
-
-      {!published && progress.pool.max ? <ProgressBar label='Stake Pools' max={progress.pool.max} current={progress.pool.current} /> : null}
-      {!published && progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}
-      {!published && progress.token.max ? <ProgressBar label='Fungible Tokens' max={progress.token.max} current={progress.token.current} /> : null}
-
-      {progress.loading ? (
-        <Loader withLabel label={progress.msg} />
-      ) : (
-        <div className='flex flex-col items-center justify-center'>
-          {published ? <CheckBadgeIcon className='w-24 h-24 text-green-400' /> : null}
-          <span>{progress.msg}</span>
-        </div>
-      )}
     </JourneyStepWrapper>
   )
 }
