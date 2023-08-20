@@ -237,3 +237,18 @@ export interface Giveaway extends GiveawaySettings {
   // txDeposit?: string
   // txsWithdrawn?: string[]
 }
+
+export interface Poll {
+  id: string
+  stakeKey: StakeKey
+  endAt: number
+  active: boolean
+  allowPublicView: boolean
+
+  description: string
+  question: string
+  // options: AnswerOptionType[]
+  // [vote_serial: string]: any
+
+  // settings: Settings
+}
