@@ -8,7 +8,7 @@ class BadLabsSDK {
   }
 
   loadWallets = async (options) => {
-    const { injectId, buttonBackgroundColor = '#f5f5f5', buttonTextColor = '#00000' } = options || {}
+    const { injectId, buttonBackgroundColor = '#f5f5f5', buttonTextColor = '#000000' } = options || {}
 
     if (!this.product || !this.creatorStakeKey) {
       throw new Error('400 BAD REQUEST; missing required params; new BadLabsSDK({ product: "string", creatorStakeKey: "string" })')
@@ -40,13 +40,13 @@ class BadLabsSDK {
     wallets.forEach((obj) => {
       const img = document.createElement('img')
       img.src = obj.icon
-      img.style = 'width: 30px; height: 30px; margin: 0 0.5rem 0 0;'
+      img.style = 'width: 30px; height: 30px; margin: 0.5rem;'
 
       const span = document.createElement('span')
       span.innerText = obj.name
 
       const btn = document.createElement('button')
-      btn.style = `width: 150px; height: 2.5rem; margin: 0.1rem; white-space: nowrap; color: ${buttonTextColor}; background-color: ${buttonBackgroundColor}; border: none; border-radius: 0.5rem;`
+      btn.style = `width: 150px; margin: 0.1rem; white-space: nowrap; color: ${buttonTextColor}; background-color: ${buttonBackgroundColor}; border: none; border-radius: 0.5rem; display: flex; align-items: center;`
 
       btn.appendChild(img)
       btn.appendChild(span)
