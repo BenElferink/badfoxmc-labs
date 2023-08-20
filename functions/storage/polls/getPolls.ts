@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { firebase, firestore } from '@/utils/firebase'
 import { FetchedTimestampResponse } from '@/pages/api/timestamp'
-import type { Giveaway, StakeKey } from '@/@types'
+import type { Poll, StakeKey } from '@/@types'
 
-const getGiveaways = async (id?: string, stakeKey?: StakeKey) => {
-  const collection = firestore.collection('giveaways')
+const getPolls = async (id?: string, stakeKey?: StakeKey) => {
+  const collection = firestore.collection('polls')
   const docs: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>[] = []
 
   if (!!id) {
@@ -24,7 +24,7 @@ const getGiveaways = async (id?: string, stakeKey?: StakeKey) => {
 
   const payload = docs
     .map((doc) => {
-      const data = doc.data() as Giveaway
+      const data = doc.data() as Poll
 
       return {
         ...data,
@@ -38,4 +38,4 @@ const getGiveaways = async (id?: string, stakeKey?: StakeKey) => {
   return payload
 }
 
-export default getGiveaways
+export default getPolls
