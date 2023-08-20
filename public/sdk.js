@@ -99,9 +99,9 @@ class BadLabsSDK {
     this.iFrame.setAttribute('src', src)
     this.iFrame.setAttribute(
       'style',
-      `max-width: ${isMobile ? '100vw' : '90vw'}; max-height: ${isMobile ? '100vh' : '90vh'}; border: none; border-radius: ${
-        isMobile ? '0' : '1rem'
-      }; box-shadow: 0 0 2px #fff;`
+      `max-width: ${isMobile ? '100vw' : '81vw'}; width: 100%; max-height: ${
+        isMobile ? '100vh' : '81vh'
+      }; height: 100%; border: none; border-radius: ${isMobile ? '0' : '1rem'}; box-shadow: 0 0 2px #fff;`
     )
 
     this.iFrame = this.iFrameWrapper.appendChild(this.iFrame)
