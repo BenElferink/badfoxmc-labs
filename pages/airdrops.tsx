@@ -55,26 +55,18 @@ const Page = () => {
 
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
-      <div className='max-w-lg sm:max-w-2xl mx-1 text-sm'>
-        <p className='my-4'>
+      <div className='max-w-lg sm:max-w-2xl text-sm'>
+        <p>
           The airdrop tool utilizes Cardano&apos;s Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy
           ID(s).
         </p>
 
         <button
-          className='w-full sm:max-w-[420px] p-4 flex items-center justify-center text-center rounded-lg bg-green-900 hover:bg-green-700 bg-opacity-50 hover:bg-opacity-50 border hover:border disabled:border border-green-700 hover:border-green-700'
+          className='w-full sm:max-w-[420px] my-4 p-4 flex items-center justify-center text-center rounded-lg bg-green-900 hover:bg-green-700 bg-opacity-50 hover:bg-opacity-50 border hover:border disabled:border border-green-700 hover:border-green-700'
           onClick={() => setOpenJourney(true)}
         >
           <PlusIcon className='w-6 h-6 mr-2' /> Run an Airdrop
         </button>
-
-        <AirdropJourney
-          open={openJourney}
-          onClose={() => {
-            setOpenJourney(false)
-            getAndSetAirdrops()
-          }}
-        />
       </div>
 
       {loading ? (
@@ -128,6 +120,14 @@ const Page = () => {
           )}
         </div>
       )}
+
+      <AirdropJourney
+        open={openJourney}
+        onClose={() => {
+          setOpenJourney(false)
+          getAndSetAirdrops()
+        }}
+      />
     </div>
   )
 }
