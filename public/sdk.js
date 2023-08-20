@@ -99,8 +99,8 @@ class BadLabsSDK {
     this.iFrame.setAttribute('src', src)
     this.iFrame.setAttribute(
       'style',
-      `max-width: ${isMobile ? '100vw' : '81vw'}; width: 100%; max-height: ${
-        isMobile ? '100vh' : '81vh'
+      `max-width: ${isMobile ? '100vw' : '90vw'}; width: 100%; max-height: ${
+        isMobile ? '100vh' : '90vh'
       }; height: 100%; border: none; border-radius: ${isMobile ? '0' : '1rem'}; box-shadow: 0 0 2px #fff;`
     )
 
