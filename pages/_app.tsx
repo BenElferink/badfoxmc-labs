@@ -26,8 +26,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     <div className={inter.className}>
       <Head>
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-        <meta name='author' content='Ben Elferink' />
-
         <title>Bad Labs</title>
       </Head>
 
@@ -39,12 +37,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <div className='overflow-auto relative w-screen h-screen p-4 bg-zinc-900 flex flex-col items-center'>
               <CloseButton />
 
-              <Link
-                href='https://labs.badfoxmc.com'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='mb-4 flex items-center justify-center'
-              >
+              <Link href='https://labs.badfoxmc.com' target='_blank' rel='noopener noreferrer' className='mb-4 flex items-center justify-center'>
                 <Image src='https://badfoxmc.com/media/logo/white_cropped.png' alt='logo' width={50} height={50} />
                 <h5 className='ml-2 text-sm text-start whitespace-nowrap'>
                   <span className='text-xs'>Powered by:</span>
