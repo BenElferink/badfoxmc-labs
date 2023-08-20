@@ -1,11 +1,11 @@
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import getGiveaways from '@/functions/storage/giveaways/getGiveaways'
-import GiveawayEnter from '@/components/GiveawayEnter'
+import getPolls from '@/functions/storage/polls/getPolls'
+// import PollEnter from '@/components/PollEnter'
 import BackButton from '@/components/sdk/BackButton'
 import Loader from '@/components/Loader'
-import type { Giveaway } from '@/@types'
+import type { Poll } from '@/@types'
 
 const Page: NextPage = () => {
   const {
@@ -14,7 +14,7 @@ const Page: NextPage = () => {
 
   const [isLoading, setIsLoading] = useState(true)
   const [message, setMessage] = useState('')
-  const [item, setItem] = useState<Giveaway | null>(null)
+  const [item, setItem] = useState<Poll | null>(null)
 
   useEffect(() => {
     ;(async () => {
@@ -22,7 +22,7 @@ const Page: NextPage = () => {
       setIsLoading(true)
 
       try {
-        const payload = await getGiveaways(docId as string)
+        const payload = await getPolls(docId as string)
 
         setItem(payload[0])
       } catch (error: any) {
@@ -47,7 +47,10 @@ const Page: NextPage = () => {
   return (
     <>
       <BackButton />
-      {!item ? <div className='flex items-center justify-center'>Giveaway does not exist...</div> : <GiveawayEnter giveaway={item} />}
+      {
+        !item ? <div className='flex items-center justify-center'>Poll does not exist...</div> : null
+        // <PollEnter poll={item} />
+      }
     </>
   )
 }

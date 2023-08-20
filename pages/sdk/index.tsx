@@ -85,6 +85,7 @@ const Page = () => {
         }
       })()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, creatorStakeKey, userStakeKey])
 
   if (isLoading || message) {
