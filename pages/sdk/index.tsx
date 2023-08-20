@@ -85,7 +85,7 @@ const Page = () => {
         }
       })()
     }
-  }, [product, creatorStakeKey, userStakeKey, getAndSetUser, user, cKey])
+  }, [product, creatorStakeKey, userStakeKey])
 
   if (isLoading || message) {
     return (
