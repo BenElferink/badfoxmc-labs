@@ -34,7 +34,7 @@ const GiveawayEnter = (props: { giveaway: Giveaway }) => {
   const processPoints = useCallback(
     async (u: User) => {
       const { stakeKey, poolId, tokens } = u
-      const { holderPolicies, withDelegators, stakePools, withBlacklist, blacklistWallets, blacklistTokens } = giveaway
+      const { holderPolicies, withDelegators, stakePools, withBlacklist, blacklistWallets, blacklistTokens, entries } = giveaway
 
       try {
         if (withBlacklist && blacklistWallets.includes(stakeKey)) {
@@ -133,7 +133,13 @@ const GiveawayEnter = (props: { giveaway: Giveaway }) => {
           }
         }
 
-        setMessage(`You have ${votePoints} entry points`)
+        if (votePoints) {
+          setMessage(`You have ${votePoints} entry points`)
+        } else {
+          const foundEntry = entries.find((item) => item.stakeKey === stakeKey)
+          setMessage(`You entered with ${foundEntry?.points || 0} points`)
+        }
+
         setHolderPoints({
           stakeKey,
           points: votePoints,
