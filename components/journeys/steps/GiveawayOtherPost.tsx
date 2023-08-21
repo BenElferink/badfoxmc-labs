@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import { firebase, storage } from '@/utils/firebase'
+import uploadFile from '@/functions/storage/bucket/uploadFile'
+import deleteFile from '@/functions/storage/bucket/deleteFile'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import ProgressBar from '@/components/ProgressBar'
+import Loader from '@/components/Loader'
 import MediaViewer from '@/components/MediaViewer'
 import type { GiveawaySettings } from '@/@types'
 
@@ -23,61 +23,26 @@ const GiveawayOtherPost = (props: {
   const [progress, setProgress] = useState({
     msg: '',
     loading: false,
-    upload: {
-      current: 0,
-      max: 0,
-    },
   })
 
-  const getFileLink = async (fileId: string) => {
-    const refList = await storage.ref('/lab').listAll()
-    for await (const item of refList.items) {
-      if (item.name === fileId) return await item.getDownloadURL()
+  const upload = async (file: File) => {
+    setProgress((prev) => ({ ...prev, loading: true, msg: 'Uploading...' }))
+
+    const sizeLimit = 1000000 // 1mb
+    if (file.size > sizeLimit) {
+      setProgress((prev) => ({ ...prev, loading: false, msg: 'File size is limited to 1mb' }))
+      return ''
     }
-  }
 
-  const uploadFile = (file: File) =>
-    new Promise((resolve) => {
-      setProgress((prev) => ({ ...prev, loading: true, msg: 'Uploading...' }))
-
-      const sizeLimit = 1000000 // 1mb
-      if (file.size > sizeLimit) {
-        setProgress((prev) => ({ ...prev, loading: false, msg: 'File size is limited to 1mb' }))
-        return resolve('')
-      }
-
-      const fileId = uuidv4()
-      const uploadTask = storage.ref(`/lab/${fileId}`).put(file, {
-        contentType: file.type,
-      })
-
-      uploadTask.on(
-        firebase.storage.TaskEvent.STATE_CHANGED,
-        (snapshot) => {
-          setProgress((prev) => ({
-            ...prev,
-            upload: {
-              ...prev.upload,
-              current: Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 100,
-              max: 100,
-            },
-          }))
-        },
-        (error) => {
-          setProgress((prev) => ({ ...prev, loading: false, msg: error.message }))
-          resolve('')
-        },
-        () => {
-          setProgress((prev) => ({ ...prev, loading: false, msg: '' }))
-          getFileLink(fileId).then((fileUrl) => resolve(fileUrl as string))
-        }
-      )
-    })
-
-  const deleteFile = async (mediaUrl: string) => {
-    if (!mediaUrl) return
-    const fileId = mediaUrl.split('?')[0].split('/lab%2F')[1]
-    await storage.ref(`/lab/${fileId}`).delete()
+    try {
+      const { fileUrl } = await uploadFile(file)
+      setProgress((prev) => ({ ...prev, loading: false, msg: '' }))
+      return fileUrl
+    } catch (error: any) {
+      const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
+      setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }))
+      return ''
+    }
   }
 
   return (
@@ -96,7 +61,7 @@ const GiveawayOtherPost = (props: {
             if (!file) return
             if (data['thumb']) await deleteFile(data['thumb'])
 
-            const mediaUrl = (await uploadFile(file)) as string
+            const mediaUrl = (await upload(file)) as string
 
             setData((prev) => {
               const payload = { ...prev }
@@ -161,11 +126,8 @@ const GiveawayOtherPost = (props: {
 
       {data['thumb'] ? <MediaViewer mediaType='IMAGE' src={data['thumb']} size='max-w-[555px] w-full h-full mx-auto' /> : null}
 
-      {progress.loading ? (
-        <ProgressBar label='Upload Percent' max={progress.upload.max} current={progress.upload.current} />
-      ) : (
-        <p className='mt-1 text-center'>{progress.msg}</p>
-      )}
+      {progress.loading ? <Loader /> : null}
+      {progress.msg ? <p className='mt-1 text-center'>{progress.msg}</p> : null}
     </JourneyStepWrapper>
   )
 }
