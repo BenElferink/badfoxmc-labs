@@ -33,7 +33,7 @@ const Sidebar = (props: { open: boolean }) => {
               label: 'Airdrops',
               Icon: (props) => <BanknotesIcon {...props} />,
               path: '/airdrops',
-              // tags: ['Pro'],
+              tags: ['Pro'],
             },
             {
               label: 'Governance',
@@ -45,7 +45,7 @@ const Sidebar = (props: { open: boolean }) => {
               label: 'Giveaways',
               Icon: (props) => <GiftIcon {...props} />,
               path: '/giveaways',
-              tags: ['Soon'],
+              tags: ['Free'],
             },
             // {
             //   label: 'Mint Tokens',
