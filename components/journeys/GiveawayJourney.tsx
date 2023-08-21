@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Modal from '../Modal'
 import ErrorNotConnected from './steps/ErrorNotConnected'
-import ErrorNotTokenGateHolder from './steps/ErrorNotTokenGateHolder'
+// import ErrorNotTokenGateHolder from './steps/ErrorNotTokenGateHolder'
 import TokenSelector from './steps/TokenSelector'
 import HolderPolicies from './steps/HolderPolicies'
 import HolderStakePools from './steps/HolderStakePools'
@@ -69,13 +69,13 @@ const GiveawayJourney = (props: { open: boolean; onClose: () => void }) => {
     )
   }
 
-  if (user && !user.isTokenGateHolder) {
-    return (
-      <Modal open={open} onClose={onClose}>
-        <ErrorNotTokenGateHolder />
-      </Modal>
-    )
-  }
+  // if (user && !user.isTokenGateHolder) {
+  //   return (
+  //     <Modal open={open} onClose={onClose}>
+  //       <ErrorNotTokenGateHolder />
+  //     </Modal>
+  //   )
+  // }
 
   const increment = () => setStep((prev) => prev + 1)
   const decrement = () => setStep((prev) => prev - 1)
@@ -90,24 +90,15 @@ const GiveawayJourney = (props: { open: boolean; onClose: () => void }) => {
           callback={(payload) =>
             setSettings((prev) => ({
               ...prev,
-              thumb:
-                (prev['isToken'] && !payload['isToken']) || (!prev['isToken'] && payload['isToken'])
-                  ? defaultSettings['thumb']
-                  : prev['thumb'],
+              thumb: (prev['isToken'] && !payload['isToken']) || (!prev['isToken'] && payload['isToken']) ? defaultSettings['thumb'] : prev['thumb'],
 
               tokenId: prev['isToken'] && !payload['isToken'] ? defaultSettings['tokenId'] : prev['tokenId'],
               tokenName: prev['isToken'] && !payload['isToken'] ? defaultSettings['tokenName'] : prev['tokenName'],
-              tokenAmount:
-                prev['isToken'] && !payload['isToken'] ? defaultSettings['tokenAmount'] : prev['tokenAmount'],
+              tokenAmount: prev['isToken'] && !payload['isToken'] ? defaultSettings['tokenAmount'] : prev['tokenAmount'],
 
-              otherAmount:
-                !prev['isToken'] && payload['isToken'] ? defaultSettings['otherAmount'] : prev['otherAmount'],
-              otherTitle:
-                !prev['isToken'] && payload['isToken'] ? defaultSettings['otherTitle'] : prev['otherTitle'],
-              otherDescription:
-                !prev['isToken'] && payload['isToken']
-                  ? defaultSettings['otherDescription']
-                  : prev['otherDescription'],
+              otherAmount: !prev['isToken'] && payload['isToken'] ? defaultSettings['otherAmount'] : prev['otherAmount'],
+              otherTitle: !prev['isToken'] && payload['isToken'] ? defaultSettings['otherTitle'] : prev['otherTitle'],
+              otherDescription: !prev['isToken'] && payload['isToken'] ? defaultSettings['otherDescription'] : prev['otherDescription'],
 
               ...payload,
             }))
@@ -128,10 +119,7 @@ const GiveawayJourney = (props: { open: boolean; onClose: () => void }) => {
               setSettings((prev) => ({
                 ...prev,
                 ...payload,
-                numOfWinners:
-                  payload['tokenAmount']?.onChain === 1 && payload['tokenAmount']?.decimals === 0
-                    ? 1
-                    : prev['numOfWinners'],
+                numOfWinners: payload['tokenAmount']?.onChain === 1 && payload['tokenAmount']?.decimals === 0 ? 1 : prev['numOfWinners'],
               }))
             }
             next={increment}
@@ -169,11 +157,7 @@ const GiveawayJourney = (props: { open: boolean; onClose: () => void }) => {
           back={decrement}
         />
       ) : step === 4 ? (
-        <EndTime
-          callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))}
-          next={increment}
-          back={decrement}
-        />
+        <EndTime callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))} next={increment} back={decrement} />
       ) : step === 5 ? (
         <HolderPolicies
           defaultData={{
