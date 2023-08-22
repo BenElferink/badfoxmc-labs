@@ -173,7 +173,13 @@ const Page = () => {
         }}
       />
 
-      <Modal open={!!selectedId && !!giveaways.length} onClose={() => setSelectedId('')}>
+      <Modal
+        open={!!selectedId && !!giveaways.length}
+        onClose={() => {
+          setSelectedId('')
+          getAndSetGiveaways()
+        }}
+      >
         <GiveawayEnter giveaway={giveaways.find(({ id }) => id === selectedId) as Giveaway} />
       </Modal>
     </div>
