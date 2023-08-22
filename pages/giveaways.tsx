@@ -60,110 +60,108 @@ const Page = () => {
         </button>
       </div>
 
-      {loading ? (
-        <Loader />
-      ) : (
-        <div className='flex flex-wrap justify-center sm:justify-start'>
-          <div className='w-full my-2 p-0.5 rounded-lg bg-gradient-to-b from-purple-900 via-blue-900 to-green-900'>
-            <div className='w-full p-2 rounded-lg bg-zinc-800 flex'>
-              <div className='grow'>
-                <DropDown
-                  items={[
-                    { label: 'For Anyone', value: 'everyone' as (typeof filters)['who'] },
-                    { label: 'For Me', value: 'me' as (typeof filters)['who'] },
-                  ]}
-                  value={filters['who']}
-                  changeValue={(_val) => setFilters((prev) => ({ ...prev, who: _val }))}
-                />
-              </div>
+      <div className='flex flex-wrap justify-center sm:justify-start'>
+        <div className='w-full my-2 p-0.5 rounded-lg bg-gradient-to-b from-purple-900 via-blue-900 to-green-900'>
+          <div className='w-full p-2 rounded-lg bg-zinc-800 flex'>
+            <div className='grow'>
+              <DropDown
+                items={[
+                  { label: 'For Anyone', value: 'everyone' as (typeof filters)['who'] },
+                  { label: 'For Me', value: 'me' as (typeof filters)['who'] },
+                ]}
+                value={filters['who']}
+                changeValue={(_val) => setFilters((prev) => ({ ...prev, who: _val }))}
+              />
+            </div>
 
-              <div className='grow'>
-                <DropDown
-                  items={[
-                    { label: 'All Types', value: 'alltype' as (typeof filters)['type'] },
-                    { label: 'On Chain', value: 'onchain' as (typeof filters)['type'] },
-                    { label: 'Off Chain', value: 'offchain' as (typeof filters)['type'] },
-                  ]}
-                  value={filters['type']}
-                  changeValue={(_val) => setFilters((prev) => ({ ...prev, type: _val }))}
-                />
-              </div>
+            <div className='grow'>
+              <DropDown
+                items={[
+                  { label: 'All Types', value: 'alltype' as (typeof filters)['type'] },
+                  { label: 'On Chain', value: 'onchain' as (typeof filters)['type'] },
+                  { label: 'Off Chain', value: 'offchain' as (typeof filters)['type'] },
+                ]}
+                value={filters['type']}
+                changeValue={(_val) => setFilters((prev) => ({ ...prev, type: _val }))}
+              />
+            </div>
 
-              <div className='grow'>
-                <DropDown
-                  items={[
-                    { label: 'All Statuses', value: 'allstatus' as (typeof filters)['status'] },
-                    { label: 'Active', value: 'active' as (typeof filters)['status'] },
-                    { label: 'Ended', value: 'ended' as (typeof filters)['status'] },
-                  ]}
-                  value={filters['status']}
-                  changeValue={(_val) => setFilters((prev) => ({ ...prev, status: _val }))}
-                />
-              </div>
+            <div className='grow'>
+              <DropDown
+                items={[
+                  { label: 'All Statuses', value: 'allstatus' as (typeof filters)['status'] },
+                  { label: 'Active', value: 'active' as (typeof filters)['status'] },
+                  { label: 'Ended', value: 'ended' as (typeof filters)['status'] },
+                ]}
+                value={filters['status']}
+                changeValue={(_val) => setFilters((prev) => ({ ...prev, status: _val }))}
+              />
             </div>
           </div>
-
-          {!giveaways.length ? (
-            <TextFrown text='Nothing to see here...' />
-          ) : (
-            giveaways.map(
-              ({
-                id,
-                active,
-                endAt,
-                thumb,
-                isToken,
-                tokenName,
-                tokenAmount,
-                otherTitle,
-                otherAmount,
-
-                holderPolicies,
-                fungibleHolders,
-                withBlacklist,
-                blacklistWallets,
-                withDelegators,
-                stakePools,
-              }) => {
-                const whoOK =
-                  filters['who'] === 'everyone' ||
-                  (filters['who'] === 'me' &&
-                    !!user?.tokens?.find(
-                      (item) =>
-                        (holderPolicies?.some(({ policyId }) => item.tokenId.indexOf(policyId) === 0) ||
-                          fungibleHolders?.some(({ stakeKey }) => stakeKey === user?.stakeKey)) &&
-                        (!withDelegators || stakePools.some((poolId) => poolId === user?.poolId)) &&
-                        (!withBlacklist || !blacklistWallets?.some((stakeKey) => stakeKey === user?.stakeKey))
-                    ))
-
-                const typeOK =
-                  filters['type'] === 'alltype' || (filters['type'] === 'onchain' && isToken) || (filters['type'] === 'offchain' && !isToken)
-
-                const statusOK =
-                  filters['status'] === 'allstatus' || (filters['status'] === 'active' && active) || (filters['status'] === 'ended' && !active)
-
-                if (!whoOK || !typeOK || !statusOK) return null
-
-                return (
-                  <GiveawayCard
-                    key={`giveaway-${id}`}
-                    onClick={(_id) => setSelectedId(_id)}
-                    id={id}
-                    active={active}
-                    endAt={endAt}
-                    thumb={thumb}
-                    isToken={isToken}
-                    tokenName={tokenName}
-                    tokenAmount={tokenAmount}
-                    otherTitle={otherTitle}
-                    otherAmount={otherAmount}
-                  />
-                )
-              }
-            )
-          )}
         </div>
-      )}
+
+        {giveaways.length ? (
+          giveaways.map(
+            ({
+              id,
+              active,
+              endAt,
+              thumb,
+              isToken,
+              tokenName,
+              tokenAmount,
+              otherTitle,
+              otherAmount,
+
+              holderPolicies,
+              fungibleHolders,
+              withBlacklist,
+              blacklistWallets,
+              withDelegators,
+              stakePools,
+            }) => {
+              const whoOK =
+                filters['who'] === 'everyone' ||
+                (filters['who'] === 'me' &&
+                  !!user?.tokens?.find(
+                    (item) =>
+                      (holderPolicies?.some(({ policyId }) => item.tokenId.indexOf(policyId) === 0) ||
+                        fungibleHolders?.some(({ stakeKey }) => stakeKey === user?.stakeKey)) &&
+                      (!withDelegators || stakePools.some((poolId) => poolId === user?.poolId)) &&
+                      (!withBlacklist || !blacklistWallets?.some((stakeKey) => stakeKey === user?.stakeKey))
+                  ))
+
+              const typeOK =
+                filters['type'] === 'alltype' || (filters['type'] === 'onchain' && isToken) || (filters['type'] === 'offchain' && !isToken)
+
+              const statusOK =
+                filters['status'] === 'allstatus' || (filters['status'] === 'active' && active) || (filters['status'] === 'ended' && !active)
+
+              if (!whoOK || !typeOK || !statusOK) return null
+
+              return (
+                <GiveawayCard
+                  key={`giveaway-${id}`}
+                  onClick={(_id) => setSelectedId(_id)}
+                  id={id}
+                  active={active}
+                  endAt={endAt}
+                  thumb={thumb}
+                  isToken={isToken}
+                  tokenName={tokenName}
+                  tokenAmount={tokenAmount}
+                  otherTitle={otherTitle}
+                  otherAmount={otherAmount}
+                />
+              )
+            }
+          )
+        ) : loading ? (
+          <Loader />
+        ) : (
+          <TextFrown text='Nothing to see here...' />
+        )}
+      </div>
 
       <GiveawayJourney
         open={openJourney}
