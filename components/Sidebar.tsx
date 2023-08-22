@@ -16,7 +16,7 @@ const Sidebar = (props: { open: boolean }) => {
     <aside
       id='sidebar'
       className={
-        `fixed top-20 left-0 w-60 h-[calc(100vh-5rem)] p-0.5 pl-0 rounded-r-xl bg-gradient-to-b from-purple-500 via-blue-500 to-green-500 transition-transform ` +
+        `fixed top-20 left-0 z-10 w-60 h-[calc(100vh-5rem)] p-0.5 pl-0 rounded-r-xl bg-gradient-to-b from-purple-500 via-blue-500 to-green-500 transition-transform ` +
         (open ? 'translate-x-0' : '-translate-x-full sm:translate-x-0')
       }
     >

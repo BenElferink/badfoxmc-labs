@@ -50,9 +50,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             </div>
           ) : (
             <div className='w-screen min-h-screen'>
-              <Sidebar open={openSidebar} />
-
-              <header id='header' className='sticky top-0 h-20 px-4 flex items-center justify-between'>
+              <header id='header' className='sticky top-0 h-20 px-4 z-20 flex items-center justify-between'>
                 <div className='flex items-center'>
                   <BeakerIcon className='w-10 h-10' />
                   <h1 className='ml-1.5 text-xl whitespace-nowrap'>Bad Labs</h1>
@@ -70,6 +68,8 @@ function MyApp({ Component, pageProps }: AppProps) {
                   <Auth />
                 </div>
               </header>
+
+              <Sidebar open={openSidebar} />
 
               <div className='w-full sm:w-[calc(100vw-15rem)] sm:ml-auto'>
                 <main className='w-full min-h-screen px-4'>

@@ -8,7 +8,7 @@ const Modal = (props: PropsWithChildren<{ open: boolean; onClose: () => void }>)
     <div
       className={
         (open ? 'block' : 'hidden') +
-        ' w-screen h-screen flex items-center justify-center fixed top-0 left-0 z-90 bg-black bg-opacity-50 backdrop-blur-lg'
+        ' w-screen h-screen flex items-center justify-center fixed top-0 left-0 z-50 bg-black bg-opacity-50 backdrop-blur-lg'
       }
     >
       {open ? (
