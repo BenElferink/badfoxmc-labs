@@ -47,7 +47,7 @@ const Page: NextPage = () => {
   return (
     <>
       <BackButton />
-      {!item ? <div className='flex items-center justify-center'>Giveaway does not exist...</div> : <GiveawayEnter giveaway={item} />}
+      {!item ? <div className='flex items-center justify-center'>Giveaway does not exist...</div> : <GiveawayEnter giveaway={item} isSdk />}
     </>
   )
 }

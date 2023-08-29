@@ -10,8 +10,8 @@ import Loader from './Loader'
 import type { BadApiRankedToken, Giveaway, User } from '@/@types'
 import type { FetchedTimestampResponse } from '@/pages/api/timestamp'
 
-const GiveawayEnter = (props: { giveaway: Giveaway }) => {
-  const { giveaway } = props
+const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
+  const { giveaway, isSdk } = props
   const { user } = useAuth()
 
   const [loading, setLoading] = useState(false)
@@ -241,17 +241,19 @@ const GiveawayEnter = (props: { giveaway: Giveaway }) => {
         </Fragment>
       ) : null}
 
-      <button
-        type='button'
-        disabled={loading}
-        onClick={() => {
-          navigator.clipboard.writeText(`${window.location.origin}/giveaways?id=${giveaway.id}`)
-          toast.success('Copied')
-        }}
-        className='w-full my-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-      >
-        Copy URL
-      </button>
+      {isSdk ? null : (
+        <button
+          type='button'
+          disabled={loading}
+          onClick={() => {
+            navigator.clipboard.writeText(`${window.location.origin}/giveaways?id=${giveaway.id}`)
+            toast.success('Copied')
+          }}
+          className='w-full my-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+        >
+          Copy URL
+        </button>
+      )}
     </div>
   )
 }
