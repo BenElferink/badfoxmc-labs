@@ -13,7 +13,7 @@ export type Marketplace = 'jpg.store'
 export type ActivityType = 'LIST' | 'DELIST' | 'BUY' | 'SELL' | 'UPDATE'
 export type ListingType = 'SINGLE' | 'BUNDLE' | 'UNKNOWN'
 
-export type MediaType = 'IMAGE' | 'VIDEO' | '360_VIDEO' | 'AUDIO'
+export type MediaType = 'IMAGE' | 'VIDEO' | 'AUDIO'
 
 type TokenAmount = {
   onChain: number
@@ -205,6 +205,23 @@ export interface GiveawaySettings extends HolderSettings, TokenSelectionSettings
   endAt: number
 }
 
+export interface PollOption {
+  serial: number
+  answer: string
+  isMedia: boolean
+  mediaType: MediaType | ''
+  mediaUrl: string
+}
+
+export interface PollSettings extends HolderSettings {
+  endAt: number
+  allowPublicView: boolean
+
+  question: string
+  description?: string
+  options: PollOption[]
+}
+
 export interface Airdrop extends TokenSelectionSettings {
   id?: string
   stakeKey: StakeKey
@@ -219,7 +236,7 @@ export interface GiveawayWinner {
 
 export interface Giveaway extends GiveawaySettings {
   id?: string
-  stakeKey: string
+  stakeKey: StakeKey
   active: boolean
 
   // for entry
@@ -238,17 +255,16 @@ export interface Giveaway extends GiveawaySettings {
   // txsWithdrawn?: string[]
 }
 
-export interface Poll {
-  id: string
+export interface Poll extends PollSettings {
+  id?: string
   stakeKey: StakeKey
-  endAt: number
   active: boolean
-  allowPublicView: boolean
 
-  description: string
-  question: string
-  // options: AnswerOptionType[]
-  // [vote_serial: string]: any
+  // for entry
+  fungibleHolders: FungibleTokenHolderWithPoints[]
+  nonFungibleUsedUnits: TokenId[]
 
-  // settings: Settings
+  // for poll results
+  [vote_serial: string]: any // number >= 0
+  topSerial?: number
 }
