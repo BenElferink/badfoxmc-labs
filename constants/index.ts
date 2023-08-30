@@ -86,6 +86,5 @@ export const TIME_LABELS = {
 export const MEDIA_TYPES: Record<MediaType, MediaType> = {
   IMAGE: 'IMAGE',
   VIDEO: 'VIDEO',
-  '360_VIDEO': '360_VIDEO',
   AUDIO: 'AUDIO',
 }

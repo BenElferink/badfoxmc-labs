@@ -60,7 +60,7 @@ const Page = () => {
         </button>
       </div>
 
-      <div className='flex flex-wrap justify-center sm:justify-start'>
+      <div className='w-full flex flex-wrap justify-center sm:justify-start'>
         <div className='w-full my-2 p-0.5 rounded-lg bg-gradient-to-b from-purple-900 via-blue-900 to-green-900'>
           <div className='w-full p-2 rounded-lg bg-zinc-800 flex'>
             <div className='grow'>
