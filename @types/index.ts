@@ -215,7 +215,7 @@ export interface PollOption {
 
 export interface PollSettings extends HolderSettings {
   endAt: number
-  allowPublicView: boolean
+  isClassified: boolean
 
   question: string
   description?: string
