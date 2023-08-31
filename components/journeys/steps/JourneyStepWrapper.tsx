@@ -1,5 +1,6 @@
-import { ArrowUpTrayIcon } from '@heroicons/react/24/solid'
 import { PropsWithChildren } from 'react'
+import { ArrowUpTrayIcon } from '@heroicons/react/24/solid'
+import Button from '@/components/form/Button'
 
 const JourneyStepWrapper = (
   props: PropsWithChildren<{
@@ -34,16 +35,7 @@ const JourneyStepWrapper = (
                   type='button'
                   onClick={() => {}}
                   disabled={disabled}
-                  className={
-                    (idx === 0 && buttons.length > 1
-                      ? 'mr-1'
-                      : idx === buttons.length - 1 && buttons.length > 1
-                      ? 'ml-1'
-                      : buttons.length > 1
-                      ? 'mx-1'
-                      : '') +
-                    ' relative w-full my-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-                  }
+                  className='relative w-full m-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
                 >
                   <input
                     type='file'
@@ -61,55 +53,15 @@ const JourneyStepWrapper = (
                   {label}
                 </button>
               ) : (
-                <button
-                  key={`btn-${label}-${idx}`}
-                  type='button'
-                  onClick={onClick}
-                  disabled={disabled}
-                  className={
-                    (idx === 0 && buttons.length > 1
-                      ? 'mr-1'
-                      : idx === buttons.length - 1 && buttons.length > 1
-                      ? 'ml-1'
-                      : buttons.length > 1
-                      ? 'mx-1'
-                      : '') +
-                    ' w-full my-1 p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-                  }
-                >
-                  {label}
-                </button>
+                <Button key={`btn-${label}-${idx}`} label={label} disabled={disabled} onClick={onClick} />
               )
             )}
           </div>
         ) : null}
 
         <div className='w-full flex items-center justify-between'>
-          {back ? (
-            <button
-              onClick={back}
-              disabled={disableBack}
-              className={
-                (!!next ? 'mr-1' : '') +
-                ' w-full my-1 p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-              }
-            >
-              Back
-            </button>
-          ) : null}
-
-          {next ? (
-            <button
-              onClick={next}
-              disabled={disableNext}
-              className={
-                (!!back ? 'ml-1' : '') +
-                ' w-full my-1 p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-              }
-            >
-              Next
-            </button>
-          ) : null}
+          {back ? <Button label='Back' disabled={disableBack} onClick={back} /> : null}
+          {next ? <Button label='Next' disabled={disableNext} onClick={next} /> : null}
         </div>
       </div>
     </div>

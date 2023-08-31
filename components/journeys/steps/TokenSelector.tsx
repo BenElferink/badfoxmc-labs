@@ -1,9 +1,10 @@
-import { ChangeEventHandler, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from '@/components/MediaViewer'
 import TokenExplorer from '@/components/TokenExplorer'
 import JourneyStepWrapper from './JourneyStepWrapper'
+import Input from '@/components/form/Input'
 import type { TokenSelectionSettings } from '@/@types'
 
 type AmountType = 'FIXED' | 'PERCENT'
@@ -54,8 +55,8 @@ const TokenAmount = (props: {
     }
   }, [defaultData, user])
 
-  const handleAmountChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    let v = Number(e.target.value)
+  const handleAmountChange = (val: string) => {
+    let v = Number(val)
 
     if (!isNaN(v)) {
       if (amountType === 'FIXED') {
@@ -156,11 +157,10 @@ const TokenAmount = (props: {
         </div>
       </div>
 
-      <input
+      <Input
         placeholder='Token Amount:'
         value={amountType === 'FIXED' ? formatTokenAmount.fromChain(amountValue, _decimals) || '' : amountType === 'PERCENT' ? amountValue || '' : ''}
-        onChange={handleAmountChange}
-        className='w-full my-2 p-4 flex items-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none'
+        setValue={(v) => handleAmountChange(v)}
       />
 
       <p className='my-2 text-center text-xs text-zinc-400'>

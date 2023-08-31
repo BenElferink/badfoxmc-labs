@@ -1,0 +1,29 @@
+import { ForwardRefExoticComponent, RefAttributes, SVGProps } from 'react'
+
+const Button: (props: {
+  label?: string
+  icon?: ForwardRefExoticComponent<
+    Omit<SVGProps<SVGSVGElement>, 'ref'> & {
+      title?: string | undefined
+      titleId?: string | undefined
+    } & RefAttributes<SVGSVGElement>
+  >
+  onClick?: () => void
+  disabled?: boolean
+}) => JSX.Element = (props) => {
+  const { label = 'Click', icon: Icon, onClick, disabled } = props
+
+  return (
+    <button
+      type='button'
+      disabled={disabled}
+      onClick={() => !!onClick && onClick()}
+      className='w-[calc(100%-0.5rem)] m-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
+    >
+      {Icon ? <Icon className='w-6 h-6 mr-2' /> : null}
+      {label}
+    </button>
+  )
+}
+
+export default Button

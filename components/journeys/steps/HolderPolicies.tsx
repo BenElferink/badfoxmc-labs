@@ -5,6 +5,8 @@ import { toast } from 'react-hot-toast'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import { badApi } from '@/utils/badApi'
 import JourneyStepWrapper from './JourneyStepWrapper'
+import Input from '@/components/form/Input'
+import Button from '@/components/form/Button'
 import type { HolderSettings } from '@/@types'
 
 const INIT_TRAIT_POINTS = {
@@ -130,10 +132,11 @@ const HolderPolicies = (props: {
         <div key={`pid-${policyIdx}-${formData['holderPolicies'].length}`}>
           <div>
             <div className='flex items-center'>
-              <input
+              <Input
                 placeholder='Policy ID:'
+                error={formErrors[policyId]}
                 value={policyId}
-                onChange={(e) =>
+                setValue={(v) =>
                   setFormData((prev) => {
                     const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
 
@@ -141,17 +144,14 @@ const HolderPolicies = (props: {
                     payload['holderPolicies'][policyIdx] = {
                       // @ts-ignore
                       ...payload['holderPolicies'][policyIdx],
-                      policyId: e.target.value,
+                      policyId: v,
                     }
 
                     return payload
                   })
                 }
-                className={
-                  'w-full my-2 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white border rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none ' +
-                  (formErrors[policyId] ? 'border-red-400' : '')
-                }
               />
+
               {/* @ts-ignore */}
               {formData['holderPolicies'].length > 1 ? (
                 <button
@@ -173,28 +173,27 @@ const HolderPolicies = (props: {
 
             <div className='flex items-center'>
               <div className='flex items-center'>
-                <label className={'mr-2 ml-4 ' + (!policyId ? 'text-zinc-600' : 'text-zinc-400')}>Weight:</label>
-                <input
+                <label className={'mr-2 ml-4 whitespace-nowrap ' + (!policyId ? 'text-zinc-600' : 'text-zinc-400')}>Weight:</label>
+                <Input
                   disabled={!policyId}
-                  value={String(weight)}
-                  onChange={(e) =>
+                  value={weight}
+                  setValue={(v) =>
                     setFormData((prev) => {
                       const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                      const v = Number(e.target.value)
+                      const n = Number(v)
 
-                      if (isNaN(v) || v < 0) return payload
+                      if (isNaN(n) || n < 0) return payload
 
                       // @ts-ignore
                       payload['holderPolicies'][policyIdx] = {
                         // @ts-ignore
                         ...payload['holderPolicies'][policyIdx],
-                        weight: v,
+                        weight: n,
                       }
 
                       return payload
                     })
                   }
-                  className='w-20 my-0 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                 />
               </div>
 
@@ -264,16 +263,16 @@ const HolderPolicies = (props: {
                   className='my-1'
                 >
                   <div className='flex items-center justify-between'>
-                    <input
+                    <Input
                       placeholder='Category: (ex. Eyewear)'
                       disabled={!policyId || !withTraits}
                       value={category}
-                      onChange={(e) =>
+                      setValue={(v) =>
                         setFormData((prev) => {
                           const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                           const arr = [...traitOptions]
 
-                          arr[rewardingTraitsIdx].category = e.target.value
+                          arr[rewardingTraitsIdx].category = v
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
@@ -283,19 +282,17 @@ const HolderPolicies = (props: {
                           return payload
                         })
                       }
-                      className='grow mx-0.5 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                     />
-
-                    <input
+                    <Input
                       placeholder='Value: (ex. 3D Glasses)'
                       disabled={!policyId || !withTraits}
                       value={trait}
-                      onChange={(e) =>
+                      setValue={(v) =>
                         setFormData((prev) => {
                           const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                           const arr = [...traitOptions]
 
-                          arr[rewardingTraitsIdx].trait = e.target.value
+                          arr[rewardingTraitsIdx].trait = v
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
@@ -305,22 +302,20 @@ const HolderPolicies = (props: {
                           return payload
                         })
                       }
-                      className='grow mx-0.5 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                     />
-
-                    <input
+                    <Input
                       placeholder='Amount: (ex. 10)'
                       disabled={!policyId || !withTraits}
-                      value={String(amount || '')}
-                      onChange={(e) =>
+                      value={amount}
+                      setValue={(v) =>
                         setFormData((prev) => {
                           const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                           const arr = [...traitOptions]
 
-                          const v = Number(e.target.value)
-                          if (isNaN(v) || v < 0) return payload
+                          const n = Number(v)
+                          if (isNaN(n) || n < 0) return payload
 
-                          arr[rewardingTraitsIdx].amount = v
+                          arr[rewardingTraitsIdx].amount = n
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
@@ -330,7 +325,6 @@ const HolderPolicies = (props: {
                           return payload
                         })
                       }
-                      className='grow mx-0.5 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                     />
 
                     {traitOptions.length > 1 ? (
@@ -356,8 +350,9 @@ const HolderPolicies = (props: {
                 </div>
               ))}
 
-              <button
-                type='button'
+              <Button
+                label='Add another Attribute'
+                icon={PlusCircleIcon}
                 disabled={!!formData['holderPolicies'][policyIdx].traitOptions.filter((obj) => !obj.category || !obj.trait || !obj.amount).length}
                 onClick={() =>
                   setFormData((prev) => {
@@ -368,11 +363,7 @@ const HolderPolicies = (props: {
                     return payload
                   })
                 }
-                className='w-full my-2 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-              >
-                <PlusCircleIcon className='w-6 h-6 mr-2' />
-                Add another Attribute
-              </button>
+              />
             </div>
           ) : null}
 
@@ -381,19 +372,19 @@ const HolderPolicies = (props: {
               {rankOptions.map(({ minRange, maxRange, amount }, rewardingRanksIdx) => (
                 <div key={`pid-${policyIdx}-${formData['holderPolicies'].length}-rank-${rewardingRanksIdx}-${rankOptions.length}`} className='my-1'>
                   <div className='flex items-center justify-between'>
-                    <input
+                    <Input
                       placeholder='Min. Range: (ex. 1)'
                       disabled={!policyId || !withRanks}
-                      value={minRange || ''}
-                      onChange={(e) =>
+                      value={minRange}
+                      setValue={(v) =>
                         setFormData((prev) => {
                           const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                           const arr = [...rankOptions]
 
-                          const v = Number(e.target.value)
-                          if (isNaN(v) || v < 0) return payload
+                          const n = Number(v)
+                          if (isNaN(n) || n < 0) return payload
 
-                          arr[rewardingRanksIdx].minRange = v
+                          arr[rewardingRanksIdx].minRange = n
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
@@ -403,22 +394,20 @@ const HolderPolicies = (props: {
                           return payload
                         })
                       }
-                      className='grow mx-0.5 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                     />
-
-                    <input
+                    <Input
                       placeholder='Max. Range: (ex. 1000)'
                       disabled={!policyId || !withRanks}
-                      value={maxRange || ''}
-                      onChange={(e) =>
+                      value={maxRange}
+                      setValue={(v) =>
                         setFormData((prev) => {
                           const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                           const arr = [...rankOptions]
 
-                          const v = Number(e.target.value)
-                          if (isNaN(v) || v < 0) return payload
+                          const n = Number(v)
+                          if (isNaN(n) || n < 0) return payload
 
-                          arr[rewardingRanksIdx].maxRange = v
+                          arr[rewardingRanksIdx].maxRange = n
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
@@ -428,22 +417,20 @@ const HolderPolicies = (props: {
                           return payload
                         })
                       }
-                      className='grow mx-0.5 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                     />
-
-                    <input
+                    <Input
                       placeholder='Amount: (ex. 10)'
                       disabled={!policyId || !withRanks}
-                      value={String(amount || '')}
-                      onChange={(e) =>
+                      value={amount}
+                      setValue={(v) =>
                         setFormData((prev) => {
                           const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
                           const arr = [...rankOptions]
 
-                          const v = Number(e.target.value)
-                          if (isNaN(v) || v < 0) return payload
+                          const n = Number(v)
+                          if (isNaN(n) || n < 0) return payload
 
-                          arr[rewardingRanksIdx].amount = v
+                          arr[rewardingRanksIdx].amount = n
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
@@ -453,7 +440,6 @@ const HolderPolicies = (props: {
                           return payload
                         })
                       }
-                      className='grow mx-0.5 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                     />
 
                     {rankOptions.length > 1 ? (
@@ -479,8 +465,9 @@ const HolderPolicies = (props: {
                 </div>
               ))}
 
-              <button
-                type='button'
+              <Button
+                label='Add another Range'
+                icon={PlusCircleIcon}
                 disabled={!!formData['holderPolicies'][policyIdx].rankOptions.filter((obj) => !obj.minRange || !obj.maxRange || !obj.amount).length}
                 onClick={() =>
                   setFormData((prev) => {
@@ -491,11 +478,7 @@ const HolderPolicies = (props: {
                     return payload
                   })
                 }
-                className='w-full my-2 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-              >
-                <PlusCircleIcon className='w-6 h-6 mr-2' />
-                Add another Range
-              </button>
+              />
             </div>
           ) : null}
 
@@ -503,8 +486,9 @@ const HolderPolicies = (props: {
         </div>
       ))}
 
-      <button
-        type='button'
+      <Button
+        label='Add another Policy ID'
+        icon={PlusCircleIcon}
         disabled={!formData.holderPolicies?.filter((obj) => !!obj.policyId).length}
         onClick={() =>
           setFormData((prev) => {
@@ -515,11 +499,7 @@ const HolderPolicies = (props: {
             return payload
           })
         }
-        className='w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-      >
-        <PlusCircleIcon className='w-6 h-6 mr-2' />
-        Add another Policy ID
-      </button>
+      />
     </JourneyStepWrapper>
   )
 }

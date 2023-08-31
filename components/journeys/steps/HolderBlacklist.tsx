@@ -3,9 +3,11 @@ import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
-import type { HolderSettings, PolicyId, StakeKey, TokenId } from '@/@types'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
+import Input from '@/components/form/Input'
+import Button from '@/components/form/Button'
+import type { HolderSettings, PolicyId, StakeKey, TokenId } from '@/@types'
 
 interface BlacklistByBlockHeight {
   policyId: PolicyId
@@ -268,14 +270,14 @@ const HolderBlacklist = (props: {
             <div>
               {(formData['blacklistWallets'] || []).map((str, idx) => (
                 <div key={`blacklistWallets-${idx}`} className='flex items-center'>
-                  <input
+                  <Input
                     placeholder='Wallet: $handle / addr1... / stake1...'
+                    error={formErrors[str]}
                     disabled={!formData['withBlacklist'] || loading || progress.loading}
                     value={str}
-                    onChange={(e) =>
+                    setValue={(v) =>
                       setFormData((prev) => {
                         const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                        const v = e.target.value
 
                         if (!payload['blacklistWallets']) {
                           payload['blacklistWallets'] = [v]
@@ -285,10 +287,6 @@ const HolderBlacklist = (props: {
 
                         return payload
                       })
-                    }
-                    className={
-                      'w-full mb-1 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white border rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none ' +
-                      (formErrors[str] ? 'border-red-400' : 'border-transparent')
                     }
                   />
 
@@ -320,8 +318,9 @@ const HolderBlacklist = (props: {
                 </div>
               ))}
 
-              <button
-                type='button'
+              <Button
+                label='Add another Wallet'
+                icon={PlusCircleIcon}
                 disabled={!!(formData['blacklistWallets'] || []).filter((str) => !str).length || loading || progress.loading}
                 onClick={() =>
                   setFormData((prev) => {
@@ -336,11 +335,7 @@ const HolderBlacklist = (props: {
                     return payload
                   })
                 }
-                className='w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-              >
-                <PlusCircleIcon className='w-6 h-6 mr-2' />
-                Add another Wallet
-              </button>
+              />
             </div>
           ) : null}
 
@@ -366,14 +361,14 @@ const HolderBlacklist = (props: {
             <div>
               {(formData['blacklistTokens'] || []).map((str, idx) => (
                 <div key={`blacklistTokens-${idx}`} className='flex items-center'>
-                  <input
+                  <Input
                     placeholder='Token ID:'
+                    error={formErrors[str]}
                     disabled={!formData['withBlacklist'] || loading || progress.loading}
                     value={str}
-                    onChange={(e) =>
+                    setValue={(v) =>
                       setFormData((prev) => {
                         const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                        const v = e.target.value
 
                         if (!payload['blacklistTokens']) {
                           payload['blacklistTokens'] = [v]
@@ -383,10 +378,6 @@ const HolderBlacklist = (props: {
 
                         return payload
                       })
-                    }
-                    className={
-                      'w-full mb-1 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white border rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none ' +
-                      (formErrors[str] ? 'border-red-400' : 'border-transparent')
                     }
                   />
 
@@ -418,8 +409,9 @@ const HolderBlacklist = (props: {
                 </div>
               ))}
 
-              <button
-                type='button'
+              <Button
+                label='Add another Token'
+                icon={PlusCircleIcon}
                 disabled={!!(formData['blacklistTokens'] || []).filter((str) => !str).length || loading || progress.loading}
                 onClick={() => {
                   setFormData((prev) => {
@@ -436,11 +428,7 @@ const HolderBlacklist = (props: {
 
                   setTokensAlreadyScanned(false)
                 }}
-                className='w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-              >
-                <PlusCircleIcon className='w-6 h-6 mr-2' />
-                Add another Token
-              </button>
+              />
 
               {!formData['blacklistTokens']?.filter((str) => !!str).length ? (
                 progress.loading ? (
@@ -461,14 +449,7 @@ const HolderBlacklist = (props: {
                         <div key={`pid-${policyIdx}-${defaultData['holderPolicies']?.length}`}>
                           <div>
                             <div className='flex items-center'>
-                              <input
-                                placeholder='Policy ID:'
-                                value={policyId}
-                                onChange={(e) => {}}
-                                readOnly
-                                disabled={!blockItem?.blockHeight}
-                                className='w-full my-2 p-4 flex items-center text-start rounded-lg bg-zinc-700 bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
-                              />
+                              <Input placeholder='Policy ID:' readOnly disabled={!blockItem?.blockHeight} value={policyId} />
                             </div>
 
                             <div className='flex items-center'>
@@ -531,34 +512,33 @@ const HolderBlacklist = (props: {
                               </div>
 
                               <div className='flex items-center'>
-                                <label className='mx-2 text-zinc-400'>Block Height:</label>
-                                <input
+                                <label className='mx-2 text-zinc-400 whitespace-nowrap'>Block Height:</label>
+                                <Input
                                   disabled={!policyId || loading || progress.loading}
-                                  value={String(blockItem?.blockHeight || '')}
-                                  onChange={(e) =>
+                                  value={blockItem?.blockHeight}
+                                  setValue={(v) =>
                                     setBlacklistByBlockHeight((prev) => {
                                       const payload: typeof blacklistByBlockHeight = JSON.parse(JSON.stringify(prev))
-                                      const v = Number(e.target.value)
+                                      const n = Number(v)
 
-                                      if (isNaN(v) || v < 0) return payload
+                                      if (isNaN(n) || n < 0) return payload
 
                                       if (blockIdx === -1) {
                                         payload.push({
                                           policyId,
-                                          blockHeight: v,
+                                          blockHeight: n,
                                           isAfter: false,
                                         })
                                       } else {
                                         payload[blockIdx] = {
                                           ...payload[blockIdx],
-                                          blockHeight: v,
+                                          blockHeight: n,
                                         }
                                       }
 
                                       return payload
                                     })
                                   }
-                                  className='w-28 my-0 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:placeholder:text-zinc-600 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 outline-none'
                                 />
                               </div>
                             </div>

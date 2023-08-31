@@ -3,6 +3,8 @@ import uploadFile from '@/functions/storage/bucket/uploadFile'
 import deleteFile from '@/functions/storage/bucket/deleteFile'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import Loader from '@/components/Loader'
+import Input from '@/components/form/Input'
+import TextArea from '@/components/form/TextArea'
 import MediaViewer from '@/components/MediaViewer'
 import type { GiveawaySettings } from '@/@types'
 
@@ -76,52 +78,49 @@ const GiveawayOtherPost = (props: {
     >
       <h6 className='mb-6 text-xl text-center'>What should be given away?</h6>
 
-      <input
+      <Input
         placeholder='Amount'
-        value={data['otherAmount'] || ''}
-        onChange={(e) =>
+        value={data['otherAmount']}
+        setValue={(v) =>
           setData((prev) => {
             const payload = { ...prev }
 
-            const v = Number(e.target.value)
-            if (isNaN(v) || v < 0) return prev
+            const n = Number(v)
+            if (isNaN(n) || n < 0) return prev
 
-            payload['otherAmount'] = Math.floor(v)
+            payload['otherAmount'] = Math.floor(n)
 
             return payload
           })
         }
-        className='w-full my-2 p-4 flex items-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none'
       />
 
-      <input
+      <Input
         placeholder='Title (ex. whitelist)'
         value={data['otherTitle']}
-        onChange={(e) =>
+        setValue={(v) =>
           setData((prev) => {
             const payload = { ...prev }
 
-            payload['otherTitle'] = e.target.value
+            payload['otherTitle'] = v
 
             return payload
           })
         }
-        className='w-full my-2 p-4 flex items-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none'
       />
 
-      <textarea
+      <TextArea
         placeholder='Description (optional)'
         value={data['otherDescription']}
-        onChange={(e) =>
+        setValue={(v) =>
           setData((prev) => {
             const payload = { ...prev }
 
-            payload['otherDescription'] = e.target.value
+            payload['otherDescription'] = v
 
             return payload
           })
         }
-        className='w-full my-2 p-4 flex items-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none'
       />
 
       {data['thumb'] ? <MediaViewer mediaType='IMAGE' src={data['thumb']} size='max-w-[555px] w-full h-full mx-auto' /> : null}

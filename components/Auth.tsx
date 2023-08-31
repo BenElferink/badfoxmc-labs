@@ -6,9 +6,11 @@ import { PhotoIcon, UserIcon, WalletIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
 import setUser from '@/functions/storage/users/setUser'
 import Modal from './Modal'
+import Input from './form/Input'
+import Button from './form/Button'
 import LinkList from './LinkList'
-import TokenExplorer from './TokenExplorer'
 import TextFrown from './TextFrown'
+import TokenExplorer from './TokenExplorer'
 import { Address, StakeKey } from '@/@types'
 import { LS_KEYS } from '@/constants'
 
@@ -136,24 +138,24 @@ const Auth = () => {
                 key={name}
                 onClick={() => connect(name)}
                 disabled={connected || connecting}
-                className='w-full max-w-[420px] my-2 mx-auto p-2 flex items-center justify-between rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:opacity-40'
+                className='w-full max-w-[420px] my-2 mx-auto p-4 flex items-center justify-between rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:opacity-40'
               >
-                <Image src={icon} alt='' width={42} height={42} className='drop-shadow-[0_0_1px_rgba(0,0,0,1)]' priority unoptimized />
+                <Image src={icon} alt='' width={35} height={35} className='drop-shadow-[0_0_1px_rgba(0,0,0,1)]' priority unoptimized />
                 {name}
               </button>
             ))}
 
             {connected ? (
-              <button
-                onClick={() => {
-                  disconnect()
-                  toast.success('Disconnected')
-                }}
-                disabled={!connected || connecting}
-                className='w-full max-w-[420px] my-2 mx-auto p-4 flex items-center justify-center rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:opacity-40'
-              >
-                Disconnect
-              </button>
+              <div className='max-w-[calc(420px+0.5rem)] mx-auto'>
+                <Button
+                  label='Disconnect'
+                  disabled={!connected || connecting}
+                  onClick={() => {
+                    disconnect()
+                    toast.success('Disconnected')
+                  }}
+                />
+              </div>
             ) : null}
           </div>
         )}
@@ -168,7 +170,7 @@ const Auth = () => {
                 toggleProfileModal(false)
               }}
               disabled={loading}
-              className='w-64 h-64 text-sm text-gray-400 hover:text-white rounded-full bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70'
+              className='w-64 h-64 m-1 text-sm text-gray-400 hover:text-white rounded-full bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70'
             >
               {profilePicture ? (
                 <Image src={profilePicture} alt='' className='w-full rounded-full' width={300} height={300} priority unoptimized />
@@ -180,24 +182,14 @@ const Auth = () => {
               )}
             </button>
 
-            <input
-              placeholder='Username:'
-              value={username}
-              onChange={(e) => setUsername(e.target.value.replaceAll(' ', ''))}
-              disabled={loading}
-              className='w-full mt-2 p-4 flex items-center text-center placeholder:text-gray-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:bg-zinc-800 outline-none'
-            />
+            <Input placeholder='Username' disabled={loading} value={username} setValue={(v) => setUsername(v.replaceAll(' ', ''))} />
           </div>
 
-          <div className='w-full rounded-lg bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
-            <button
-              onClick={handleSaveUser}
-              disabled={loading || (username === user?.username && profilePicture === user?.profilePicture)}
-              className='w-full p-4 flex items-center justify-center rounded-lg bg-opacity-50 hover:bg-opacity-50 bg-zinc-700 hover:bg-zinc-500 disabled:bg-zinc-800 disabled:text-zinc-600'
-            >
-              Save
-            </button>
-          </div>
+          <Button
+            label='Save'
+            disabled={loading || (username === user?.username && profilePicture === user?.profilePicture)}
+            onClick={handleSaveUser}
+          />
         </div>
       </Modal>
 

@@ -7,6 +7,7 @@ import { firebase, firestore } from '@/utils/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import GiveawayViewer from './GiveawayViewer'
 import Loader from './Loader'
+import Button from './form/Button'
 import type { BadApiRankedToken, Giveaway, User } from '@/@types'
 import type { FetchedTimestampResponse } from '@/pages/api/timestamp'
 
@@ -230,29 +231,23 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
       {giveawayActive ? (
         <Fragment>
           {loading ? <Loader withLabel label={message} /> : <p className='mb-2 text-center'>{message}</p>}
-          <button
-            type='button'
+          <Button
+            label='Enter Giveaway'
             disabled={!user?.stakeKey || !giveawayActive || !holderPoints.points || !holderEligible || loading}
             onClick={() => enterGiveaway()}
-            className='w-full my-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-          >
-            Enter Giveaway
-          </button>
+          />
         </Fragment>
       ) : null}
 
       {isSdk ? null : (
-        <button
-          type='button'
+        <Button
+          label='Copy URL'
           disabled={loading}
           onClick={() => {
             navigator.clipboard.writeText(`${window.location.origin}/giveaways?id=${giveaway.id}`)
             toast.success('Copied')
           }}
-          className='w-full my-1 p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-        >
-          Copy URL
-        </button>
+        />
       )}
     </div>
   )

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import JourneyStepWrapper from './JourneyStepWrapper'
+import Input from '@/components/form/Input'
 import type { GiveawaySettings } from '@/@types'
 
 const GiveawayNumOfWinners = (props: {
@@ -20,22 +21,21 @@ const GiveawayNumOfWinners = (props: {
     <JourneyStepWrapper disableNext={!data['numOfWinners']} back={back} next={next}>
       <h6 className='mb-6 text-xl text-center'>How many winners should there be?</h6>
 
-      <input
+      <Input
         placeholder='Amount'
-        value={data['numOfWinners'] || ''}
-        onChange={(e) =>
+        value={data['numOfWinners']}
+        setValue={(v) =>
           setData((prev) => {
             const payload = { ...prev }
 
-            const v = Number(e.target.value)
-            if (isNaN(v) || v < 0) return prev
+            const n = Number(v)
+            if (isNaN(n) || n < 0) return prev
 
-            payload['numOfWinners'] = Math.floor(v)
+            payload['numOfWinners'] = Math.floor(n)
 
             return payload
           })
         }
-        className='w-full my-2 p-4 flex items-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none'
       />
     </JourneyStepWrapper>
   )

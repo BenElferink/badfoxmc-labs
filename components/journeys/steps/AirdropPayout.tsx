@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import txConfirmation from '@/functions/txConfirmation'
 import Loader from '@/components/Loader'
+import Button from '@/components/form/Button'
 import ProgressBar from '@/components/ProgressBar'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { Airdrop, PayoutHolder, AirdropSettings } from '@/@types'
@@ -197,24 +198,8 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       <h6 className='mb-6 text-xl text-center'>Payout</h6>
 
       <div className='w-full my-2 flex items-center justify-between'>
-        <button
-          onClick={() => runPayout()}
-          disabled={progress.loading || payoutEnded}
-          className={
-            'w-full mr-1 p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-          }
-        >
-          Batch & Sign TXs
-        </button>
-        <button
-          onClick={() => downloadReceipt()}
-          disabled={progress.loading || !payoutEnded}
-          className={
-            'w-full ml-1 p-4 rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-          }
-        >
-          Download Receipt
-        </button>
+        <Button label='Batch & Sign TXs' disabled={progress.loading || payoutEnded} onClick={() => runPayout()} />
+        <Button label='Download Receipt' disabled={progress.loading || !payoutEnded} onClick={() => downloadReceipt()} />
       </div>
 
       {!payoutEnded && progress.batch.max ? <ProgressBar label='TX Batches' max={progress.batch.max} current={progress.batch.current} /> : null}

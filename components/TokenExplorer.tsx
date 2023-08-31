@@ -4,6 +4,7 @@ import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from './MediaViewer'
 import TextFrown from './TextFrown'
 import Loader from './Loader'
+import Input from './form/Input'
 import type { BadApiPopulatedToken } from '@/@types'
 
 type Collection = {
@@ -97,14 +98,7 @@ const TokenExplorer = (props: {
 
   return (
     <div className='flex flex-col items-center'>
-      {collections.length ? (
-        <input
-          placeholder='Search:'
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className='w-full m-2 p-4 flex items-center text-center placeholder:text-gray-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:bg-zinc-800 outline-none'
-        />
-      ) : null}
+      {collections.length ? <Input placeholder='Search:' value={search} setValue={(v) => setSearch(v)} /> : null}
 
       <div className='flex flex-wrap items-start justify-center text-center'>
         {!collections.length ? (

@@ -3,6 +3,8 @@ import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
+import Input from '@/components/form/Input'
+import Button from '@/components/form/Button'
 import type { HolderSettings } from '@/@types'
 
 const HolderStakePools = (props: {
@@ -18,9 +20,7 @@ const HolderStakePools = (props: {
 
   return (
     <JourneyStepWrapper
-      disableNext={
-        loading || (formData['withDelegators'] && !formData['stakePools']?.filter((str) => !!str).length)
-      }
+      disableNext={loading || (formData['withDelegators'] && !formData['stakePools']?.filter((str) => !!str).length)}
       disableBack={loading}
       next={async () => {
         setLoading(true)
@@ -67,17 +67,10 @@ const HolderStakePools = (props: {
         }
       >
         <label className='flex items-center group-hover:text-white cursor-pointer'>
-          <input
-            type='radio'
-            name='withDelegators'
-            onChange={() => {}}
-            checked={formData['withDelegators'] === false}
-          />
+          <input type='radio' name='withDelegators' onChange={() => {}} checked={formData['withDelegators'] === false} />
           <span className='ml-2 text-lg'>No</span>
         </label>
-        <p className='mt-1 text-sm group-hover:text-white'>
-          All holders will participate regardless of their delegation.
-        </p>
+        <p className='mt-1 text-sm group-hover:text-white'>All holders will participate regardless of their delegation.</p>
       </div>
 
       <div
@@ -88,17 +81,10 @@ const HolderStakePools = (props: {
         }
       >
         <label className='flex items-center group-hover:text-white cursor-pointer'>
-          <input
-            type='radio'
-            name='withDelegators'
-            onChange={() => {}}
-            checked={formData['withDelegators'] === true}
-          />
+          <input type='radio' name='withDelegators' onChange={() => {}} checked={formData['withDelegators'] === true} />
           <span className='ml-2 text-lg'>Yes</span>
         </label>
-        <p className='mt-1 text-sm group-hover:text-white'>
-          Only holders that delegate to at least 1 of the defined stake pools will participate.
-        </p>
+        <p className='mt-1 text-sm group-hover:text-white'>Only holders that delegate to at least 1 of the defined stake pools will participate.</p>
       </div>
 
       <div className='w-3/4 h-0.5 my-4 mx-auto bg-zinc-400 rounded-full' />
@@ -107,14 +93,14 @@ const HolderStakePools = (props: {
         {formData['withDelegators']
           ? (formData['stakePools'] || []).map((str, idx) => (
               <div key={`stake-pool-${idx}`} className='flex items-center'>
-                <input
+                <Input
                   placeholder='Pool ID:'
+                  error={formErrors[str]}
                   disabled={!formData['withDelegators']}
                   value={str}
-                  onChange={(e) =>
+                  setValue={(v) =>
                     setFormData((prev) => {
                       const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                      const v = e.target.value
 
                       if (!payload['stakePools']) {
                         payload['stakePools'] = [v]
@@ -124,10 +110,6 @@ const HolderStakePools = (props: {
 
                       return payload
                     })
-                  }
-                  className={
-                    'w-full mb-2 p-4 flex items-center text-start placeholder:text-zinc-400 hover:placeholder:text-white border rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none ' +
-                    (formErrors[str] ? 'border-red-400' : 'border-transparent')
                   }
                 />
 
@@ -161,8 +143,9 @@ const HolderStakePools = (props: {
       </div>
 
       {formData['withDelegators'] ? (
-        <button
-          type='button'
+        <Button
+          label='Add another Stake Pool'
+          icon={PlusCircleIcon}
           disabled={!!(formData['stakePools'] || []).filter((str) => !str).length}
           onClick={() =>
             setFormData((prev) => {
@@ -177,11 +160,7 @@ const HolderStakePools = (props: {
               return payload
             })
           }
-          className='w-full p-4 flex items-center justify-center rounded-lg bg-zinc-600 hover:bg-zinc-500 disabled:text-zinc-600 disabled:bg-zinc-800 disabled:hover:bg-zinc-800 disabled:cursor-not-allowed'
-        >
-          <PlusCircleIcon className='w-6 h-6 mr-2' />
-          Add another Stake Pool
-        </button>
+        />
       ) : null}
     </JourneyStepWrapper>
   )

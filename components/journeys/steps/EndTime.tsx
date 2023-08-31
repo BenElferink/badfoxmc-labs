@@ -2,15 +2,12 @@ import { useState } from 'react'
 import axios from 'axios'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
+import Input from '@/components/form/Input'
 import type { GiveawaySettings } from '@/@types'
 import type { FetchedTimestampResponse } from '@/pages/api/timestamp'
 import { TIME_LABELS } from '@/constants'
 
-const EndTime = (props: {
-  callback: (payload: Partial<GiveawaySettings>) => void
-  next?: () => void
-  back?: () => void
-}) => {
+const EndTime = (props: { callback: (payload: Partial<GiveawaySettings>) => void; next?: () => void; back?: () => void }) => {
   const { callback, next, back } = props
 
   const [amount, setAmount] = useState(0)
@@ -45,21 +42,20 @@ const EndTime = (props: {
     >
       <h6 className='mb-6 text-xl text-center'>When should it end?</h6>
 
-      <input
+      <Input
         placeholder='0'
-        value={amount || ''}
-        onChange={(e) =>
+        value={amount}
+        setValue={(v) =>
           setAmount((prev) => {
-            const v = Number(e.target.value)
+            const n = Number(v)
 
-            if (isNaN(v) || v < 0) {
+            if (isNaN(n) || n < 0) {
               return prev
             }
 
-            return v
+            return n
           })
         }
-        className='w-full my-2 p-4 flex items-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 outline-none'
       />
 
       <div className='w-full my-2 relative'>
@@ -69,11 +65,7 @@ const EndTime = (props: {
           className='w-full p-4 flex items-center justify-center text-center placeholder:text-zinc-400 hover:placeholder:text-white rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70'
         >
           <span>{period || 'Select a Period'}</span>
-          {openSelector ? (
-            <ChevronUpIcon className='w-4 h-4 ml-1' />
-          ) : (
-            <ChevronDownIcon className='w-4 h-4 ml-1' />
-          )}
+          {openSelector ? <ChevronUpIcon className='w-4 h-4 ml-1' /> : <ChevronDownIcon className='w-4 h-4 ml-1' />}
         </button>
 
         <div
