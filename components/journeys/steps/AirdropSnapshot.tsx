@@ -218,12 +218,12 @@ const AirdropSnapshot = (props: {
             for (const { tokenId, humanAmount } of heldPolicyAssets) {
               amountForAssets += humanAmount * sharePerToken * policyWeight
 
-              if (policySetting?.withTraits && policySetting.traitOptions.length) {
+              if (policySetting?.withTraits && !!policySetting.traitOptions?.length) {
                 const asset = fetchedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as BadApiPopulatedToken
 
                 const attributes: BadApiPopulatedToken['attributes'] = asset.attributes
 
-                policySetting?.traitOptions.forEach(({ category, trait, amount }) => {
+                policySetting.traitOptions.forEach(({ category, trait, amount }) => {
                   if (
                     attributes[category]?.toLowerCase() === trait.toLowerCase() ||
                     attributes[category.toLowerCase()]?.toLowerCase() === trait.toLowerCase()
@@ -235,10 +235,10 @@ const AirdropSnapshot = (props: {
                 })
               }
 
-              if (policySetting?.withRanks && policySetting.rankOptions.length) {
+              if (policySetting?.withRanks && !!policySetting.rankOptions?.length) {
                 const asset = fetchedRankedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as BadApiRankedToken
 
-                policySetting?.rankOptions.forEach(({ minRange, maxRange, amount }) => {
+                policySetting.rankOptions.forEach(({ minRange, maxRange, amount }) => {
                   if (asset?.rarityRank && asset.rarityRank >= minRange && asset.rarityRank <= maxRange) {
                     // calc here because it's not calculated at the time of input
                     // only token selection amount is calculated at the time of input

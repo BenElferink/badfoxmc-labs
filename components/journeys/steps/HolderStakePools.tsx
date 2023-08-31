@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
-import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
+import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import Input from '@/components/form/Input'
 import Button from '@/components/form/Button'
+import TrashButton from '@/components/form/TrashButton'
 import type { HolderSettings } from '@/@types'
 
 const HolderStakePools = (props: {
@@ -114,7 +115,7 @@ const HolderStakePools = (props: {
                 />
 
                 {(formData['stakePools'] || []).length > 1 ? (
-                  <button
+                  <TrashButton
                     onClick={() => {
                       setFormData((prev) => {
                         const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
@@ -132,10 +133,7 @@ const HolderStakePools = (props: {
                         return payload
                       })
                     }}
-                    className='w-8 h-8 p-1.5 ml-2 text-sm text-red-400 rounded-full border bg-red-900 border-red-400 hover:text-red-200 hover:bg-red-700 hover:border-red-200'
-                  >
-                    <TrashIcon />
-                  </button>
+                  />
                 ) : null}
               </div>
             ))

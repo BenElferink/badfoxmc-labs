@@ -1,12 +1,13 @@
 import { Fragment, useCallback, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { badApi } from '@/utils/badApi'
-import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
+import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
 import Input from '@/components/form/Input'
 import Button from '@/components/form/Button'
+import TrashButton from '@/components/form/TrashButton'
 import type { HolderSettings, PolicyId, StakeKey, TokenId } from '@/@types'
 
 interface BlacklistByBlockHeight {
@@ -291,7 +292,7 @@ const HolderBlacklist = (props: {
                   />
 
                   {(formData['blacklistWallets'] || []).length > 1 ? (
-                    <button
+                    <TrashButton
                       disabled={loading || progress.loading}
                       onClick={() => {
                         setFormData((prev) => {
@@ -310,10 +311,7 @@ const HolderBlacklist = (props: {
                           return payload
                         })
                       }}
-                      className='w-8 h-8 p-1.5 ml-2 text-sm text-red-400 rounded-full border bg-red-900 border-red-400 hover:text-red-200 hover:bg-red-700 hover:border-red-200'
-                    >
-                      <TrashIcon />
-                    </button>
+                    />
                   ) : null}
                 </div>
               ))}
@@ -382,7 +380,7 @@ const HolderBlacklist = (props: {
                   />
 
                   {(formData['blacklistTokens'] || []).length > 1 ? (
-                    <button
+                    <TrashButton
                       disabled={loading || progress.loading}
                       onClick={() => {
                         setFormData((prev) => {
@@ -401,10 +399,7 @@ const HolderBlacklist = (props: {
                           return payload
                         })
                       }}
-                      className='w-8 h-8 p-1.5 ml-2 text-sm text-red-400 rounded-full border bg-red-900 border-red-400 hover:text-red-200 hover:bg-red-700 hover:border-red-200'
-                    >
-                      <TrashIcon />
-                    </button>
+                    />
                   ) : null}
                 </div>
               ))}

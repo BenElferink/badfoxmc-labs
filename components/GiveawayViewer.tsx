@@ -83,7 +83,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
                   <ArrowTopRightOnSquareIcon className='w-4 h-4 ml-1' />
                 </Link>
 
-                {setting.withRanks
+                {setting.withRanks && !!setting.rankOptions?.length
                   ? setting.rankOptions.map((rankSetting) => (
                       <p className='text-zinc-400' key={`rankSetting-${rankSetting.minRange}-${rankSetting.maxRange}`}>
                         Ranks: {rankSetting.minRange}-{rankSetting.maxRange} ({rankSetting.amount} points)
@@ -91,7 +91,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
                     ))
                   : null}
 
-                {setting.withTraits
+                {setting.withTraits && !!setting.traitOptions?.length
                   ? setting.traitOptions.map((traitSetting) => (
                       <p className='text-zinc-400' key={`traitSetting-${traitSetting.category}-${traitSetting.trait}`}>
                         Attribute: {traitSetting.category} / {traitSetting.trait} ({traitSetting.amount} points)

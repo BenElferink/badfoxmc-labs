@@ -105,7 +105,7 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
 
                     const rankedAsset = rankedAssets[policyId].find((rankedItem) => rankedItem.tokenId === tokenId)
 
-                    if (rankedAsset) {
+                    if (rankedAsset && !!rankOptions?.length) {
                       rankOptions.forEach((rankSetting) => {
                         if ((rankedAsset.rarityRank || 0) >= rankSetting.minRange && (rankedAsset.rarityRank || 0) <= rankSetting.maxRange) {
                           rankPoints += rankSetting.amount
@@ -114,7 +114,7 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
                     }
                   }
 
-                  if (withTraits) {
+                  if (withTraits && !!traitOptions?.length) {
                     traitOptions.forEach((traitSetting) => {
                       if (
                         attributes[traitSetting.category]?.toLowerCase() === traitSetting.trait.toLowerCase() ||
