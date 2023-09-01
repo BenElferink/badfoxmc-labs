@@ -160,17 +160,24 @@ export interface HolderSettings {
     hasFungibleTokens?: boolean
     weight: number
 
-    withTraits: boolean
-    traitOptions: {
+    withTraits?: boolean
+    traitOptions?: {
       category: string
       trait: string
       amount: number
     }[]
 
-    withRanks: boolean
-    rankOptions: {
+    withRanks?: boolean
+    rankOptions?: {
       minRange: number
       maxRange: number
+      amount: number
+    }[]
+
+    withWhales?: boolean
+    whaleOptions?: {
+      shouldStack: boolean
+      groupSize: number
       amount: number
     }[]
   }[]

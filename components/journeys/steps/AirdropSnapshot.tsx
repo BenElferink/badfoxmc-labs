@@ -210,6 +210,7 @@ const AirdropSnapshot = (props: {
           let amountForAssets = 0
           let amountForTraits = 0
           let amountForRanks = 0
+          let amountForWhale = 0
 
           Object.entries(assets).forEach(([heldPolicyId, heldPolicyAssets]) => {
             const policySetting = settings.holderPolicies.find((item) => item.policyId === heldPolicyId)
@@ -220,7 +221,6 @@ const AirdropSnapshot = (props: {
 
               if (policySetting?.withTraits && !!policySetting.traitOptions?.length) {
                 const asset = fetchedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as BadApiPopulatedToken
-
                 const attributes: BadApiPopulatedToken['attributes'] = asset.attributes
 
                 policySetting.traitOptions.forEach(({ category, trait, amount }) => {
@@ -230,7 +230,8 @@ const AirdropSnapshot = (props: {
                   ) {
                     // calc here because it's not calculated at the time of input
                     // only token selection amount is calculated at the time of input
-                    amountForTraits += formatTokenAmount.toChain(amount, settings.tokenAmount.decimals)
+                    const onChainAmountConvertedWithDecimals = formatTokenAmount.toChain(amount, settings.tokenAmount.decimals)
+                    amountForTraits += onChainAmountConvertedWithDecimals
                   }
                 })
               }
@@ -242,14 +243,31 @@ const AirdropSnapshot = (props: {
                   if (asset?.rarityRank && asset.rarityRank >= minRange && asset.rarityRank <= maxRange) {
                     // calc here because it's not calculated at the time of input
                     // only token selection amount is calculated at the time of input
-                    amountForRanks += formatTokenAmount.toChain(amount, settings.tokenAmount.decimals)
+                    const onChainAmountConvertedWithDecimals = formatTokenAmount.toChain(amount, settings.tokenAmount.decimals)
+                    amountForRanks += onChainAmountConvertedWithDecimals
                   }
                 })
               }
             }
+
+            if (policySetting?.withWhales && !!policySetting.whaleOptions?.length) {
+              policySetting.whaleOptions
+                .sort((a, b) => b.groupSize - a.groupSize)
+                .forEach(({ shouldStack, groupSize, amount }) => {
+                  // must be sorted by biggest group first, so the !amountForWhale rule is valid
+                  if (!amountForWhale && heldPolicyAssets.length >= groupSize) {
+                    // calc here because it's not calculated at the time of input
+                    // only token selection amount is calculated at the time of input
+                    const onChainAmountConvertedWithDecimals = formatTokenAmount.toChain(amount, settings.tokenAmount.decimals)
+                    amountForWhale += shouldStack
+                      ? Math.floor(heldPolicyAssets.length / groupSize) * onChainAmountConvertedWithDecimals
+                      : onChainAmountConvertedWithDecimals
+                  }
+                })
+            }
           })
 
-          const payout = Math.floor(amountForAssets + amountForTraits + amountForRanks)
+          const payout = Math.floor(amountForAssets + amountForTraits + amountForRanks + amountForWhale)
 
           return {
             stakeKey,

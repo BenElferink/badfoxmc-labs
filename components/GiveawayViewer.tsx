@@ -98,6 +98,14 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
                       </p>
                     ))
                   : null}
+
+                {setting.withWhales && !!setting.whaleOptions?.length
+                  ? setting.whaleOptions.map((whaleSetting) => (
+                      <p className='text-zinc-400' key={`whaleSetting-${whaleSetting.groupSize}`}>
+                        Whale: {whaleSetting.groupSize}+ ({whaleSetting.amount} points{whaleSetting.shouldStack ? '' : ', not stackable'})
+                      </p>
+                    ))
+                  : null}
               </div>
             ))}
 

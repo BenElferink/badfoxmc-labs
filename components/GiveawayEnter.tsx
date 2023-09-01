@@ -74,7 +74,7 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
         let countedFungiblePoints = false
 
         for await (const setting of eligiblePolicySettings) {
-          const { policyId, hasFungibleTokens, weight, withTraits, traitOptions, withRanks, rankOptions } = setting
+          const { policyId, hasFungibleTokens, weight, withTraits, traitOptions, withRanks, rankOptions, withWhales, whaleOptions } = setting
 
           if (hasFungibleTokens) {
             if (foundFungibleHolder && !foundFungibleHolder.hasEntered && !countedFungiblePoints) {
@@ -86,6 +86,7 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
             let basePoints = 0
             let rankPoints = 0
             let traitPoints = 0
+            let whalePoints = 0
 
             const heldTokensOfThisPolicy = tokens?.filter((token) => token.tokenId.indexOf(policyId) === 0) || []
 
@@ -128,9 +129,22 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
               }
             }
 
+            if (withWhales && !!whaleOptions?.length) {
+              whaleOptions
+                .sort((a, b) => b.groupSize - a.groupSize)
+                .forEach((whaleSetting) => {
+                  if (!whalePoints && heldTokensOfThisPolicy.length >= whaleSetting.groupSize) {
+                    whalePoints += whaleSetting.shouldStack
+                      ? Math.floor(heldTokensOfThisPolicy.length / whaleSetting.groupSize) * whaleSetting.amount
+                      : whaleSetting.amount
+                  }
+                })
+            }
+
             votePoints += basePoints
             votePoints += rankPoints
             votePoints += traitPoints
+            votePoints += whalePoints
           }
         }
 
