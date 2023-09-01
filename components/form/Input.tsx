@@ -10,7 +10,7 @@ const Input: (props: {
 
   return (
     <input
-      value={value || ''}
+      value={value ?? ''}
       onChange={(e) => !!setValue && setValue(e.target.value)}
       placeholder={placeholder}
       disabled={disabled}

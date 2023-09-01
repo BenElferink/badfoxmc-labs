@@ -80,7 +80,7 @@ const GiveawayOtherPost = (props: {
 
       <Input
         placeholder='Amount'
-        value={data['otherAmount']}
+        value={data['otherAmount'] || ''}
         setValue={(v) =>
           setData((prev) => {
             const payload = { ...prev }

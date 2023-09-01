@@ -23,7 +23,7 @@ const GiveawayNumOfWinners = (props: {
 
       <Input
         placeholder='Amount'
-        value={data['numOfWinners']}
+        value={data['numOfWinners'] || ''}
         setValue={(v) =>
           setData((prev) => {
             const payload = { ...prev }

@@ -13,7 +13,7 @@ const TextArea: (props: {
   return (
     <textarea
       ref={ref}
-      value={value || ''}
+      value={value ?? ''}
       onChange={(e) => {
         if (!!setValue) {
           setValue(e.target.value)

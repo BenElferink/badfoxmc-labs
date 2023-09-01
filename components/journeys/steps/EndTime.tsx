@@ -11,7 +11,7 @@ const EndTime = (props: { callback: (payload: Partial<GiveawaySettings>) => void
   const { callback, next, back } = props
 
   const [amount, setAmount] = useState(0)
-  const [period, setPeriod] = useState(TIME_LABELS['HOURS'])
+  const [period, setPeriod] = useState(TIME_LABELS['DAYS'])
   const [openSelector, setOpenSelector] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -44,7 +44,7 @@ const EndTime = (props: { callback: (payload: Partial<GiveawaySettings>) => void
 
       <Input
         placeholder='0'
-        value={amount}
+        value={amount || ''}
         setValue={(v) =>
           setAmount((prev) => {
             const n = Number(v)
