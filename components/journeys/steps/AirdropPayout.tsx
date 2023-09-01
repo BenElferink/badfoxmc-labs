@@ -126,13 +126,29 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
           )
         }
 
+        const countPayouts = () =>
+          processedPayoutHolders.reduce((prev, curr) => {
+            if (!curr.payout) return prev
+            else return prev + curr.payout
+          }, 0)
+
+        const _dec = settings.tokenAmount.decimals
+        const _onch = settings.tokenAmount.onChain
+        const _disp = settings.tokenAmount.display
+        const tAmountOnChain = formatTokenAmount.fromChain(_onch, _dec) === 1 ? countPayouts() : _onch
+        const tAmountDisplay = _disp === 1 ? formatTokenAmount.fromChain(countPayouts(), _dec) : _disp
+
         const airdrop: Airdrop = {
           stakeKey: user?.stakeKey || (await wallet.getRewardAddresses())[0],
           timestamp: Date.now(),
 
           tokenId: settings.tokenId,
           tokenName: settings.tokenName,
-          tokenAmount: settings.tokenAmount,
+          tokenAmount: {
+            decimals: _dec,
+            onChain: tAmountOnChain,
+            display: tAmountDisplay,
+          },
           thumb: settings.thumb,
         }
 
