@@ -135,7 +135,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
         const _dec = settings.tokenAmount.decimals
         const _onch = settings.tokenAmount.onChain
         const _disp = settings.tokenAmount.display
-        const tAmountOnChain = formatTokenAmount.fromChain(_onch, _dec) === 1 ? countPayouts() : _onch
+        const tAmountOnChain = _onch === 1 || formatTokenAmount.fromChain(_onch, _dec) === 1 ? countPayouts() : _onch
         const tAmountDisplay = _disp === 1 ? formatTokenAmount.fromChain(countPayouts(), _dec) : _disp
 
         const airdrop: Airdrop = {
