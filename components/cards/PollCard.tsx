@@ -1,5 +1,4 @@
-import { Fragment } from 'react'
-import { ClockIcon, TrophyIcon } from '@heroicons/react/24/solid'
+import { ClockIcon, PaperClipIcon, TrophyIcon } from '@heroicons/react/24/solid'
 import type { Poll, PollOption } from '@/@types'
 
 const PollCard = (props: {
@@ -26,20 +25,17 @@ const PollCard = (props: {
             <ClockIcon className='w-5 h-5 mr-1 text-blue-400' />
             Pending Votes
           </div>
-        ) : (
+        ) : !active && !isClassified && topOption?.isMedia ? (
+          <div className='my-1 flex items-center text-sm text-zinc-400'>
+            <PaperClipIcon className='w-5 h-5 mr-1 text-amber-400' />
+            {topOption?.mediaType} (click to view)
+          </div>
+        ) : !active && !isClassified && !topOption?.isMedia ? (
           <div className='my-1 flex items-center text-sm text-zinc-400'>
             <TrophyIcon className='w-5 h-5 mr-1 text-amber-400' />
-            {isClassified ? (
-              'CLASSIFIED'
-            ) : topOption?.isMedia ? (
-              <Fragment>
-                {topOption?.mediaType}&nbsp;<span>click to view</span>
-              </Fragment>
-            ) : (
-              topOption?.answer
-            )}
+            {topOption?.answer}
           </div>
-        )}
+        ) : null}
 
         <p className={'mt-4 text-xs ' + (active ? 'text-green-400' : 'text-red-400')}>
           {active ? 'Active until:' : 'Ended at:'} {new Date(endAt).toLocaleString()}

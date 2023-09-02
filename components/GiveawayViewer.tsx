@@ -71,9 +71,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
 
                 <Link
                   href={
-                    setting.hasFungibleTokens
-                      ? `https://cardanoscan.io/tokenPolicy/${setting.policyId}`
-                      : `https://jpg.store/collection/${setting.policyId}`
+                    setting.hasFungibleTokens ? `https://cexplorer.io/policy/${setting.policyId}` : `https://jpg.store/collection/${setting.policyId}`
                   }
                   target='_blank'
                   rel='noopener noreferrer'
@@ -116,7 +114,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
                 {giveaway.stakePools.map((str) => (
                   <Link
                     key={`stakePools-${str}`}
-                    href={`https://cardanoscan.io/pool/${str}`}
+                    href={`https://cexplorer.io/pool/${str}`}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='flex items-center text-blue-400 hover:underline'
@@ -138,7 +136,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
             {giveaway.winners.map((item) => (
               <Link
                 key={`winner-${item.stakeKey}`}
-                href={`https://cardanoscan.io/stakekey/${item.stakeKey}`}
+                href={`https://cexplorer.io/stake/${item.stakeKey}`}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center text-blue-400 hover:underline'

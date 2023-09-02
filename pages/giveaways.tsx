@@ -49,7 +49,7 @@ const Page = () => {
 
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
-      <div className='w-full mb-4 flex flex-wrap'>
+      <div className='w-full mb-2 flex flex-wrap'>
         <p className='w-full m-1'>
           The giveaway tool is responsible for running weighted giveaways, it weighs the holder&apos;s assets and influences their entry points.
         </p>
