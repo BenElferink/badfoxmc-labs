@@ -44,7 +44,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
         </Fragment>
       )}
 
-      <MediaViewer mediaType='IMAGE' src={giveaway.thumb} size='w-[250px] sm:w-[555px] h-[250px] sm:h-[555px] my-4' />
+      <MediaViewer mediaType='IMAGE' src={giveaway.thumb} size='w-[250px] sm:w-[550px] h-[250px] sm:h-[550px] my-4' />
 
       {!!giveaway.id && giveaway.active ? (
         <div className='mb-2'>

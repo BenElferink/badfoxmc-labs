@@ -1,12 +1,10 @@
-import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { ArrowTopRightOnSquareIcon, PlusIcon } from '@heroicons/react/24/solid'
+import { PlusIcon } from '@heroicons/react/24/solid'
 import getAirdrops from '@/functions/storage/airdrops/getAirdrops'
 import resolveMonthName from '@/functions/formatters/resolveMonthName'
-import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle'
-import MediaViewer from '@/components/MediaViewer'
 import Loader from '@/components/Loader'
 import TextFrown from '@/components/TextFrown'
+import AirdropCard from '@/components/cards/AirdropCard'
 import AirdropJourney from '@/components/journeys/AirdropJourney'
 import type { Airdrop } from '@/@types'
 
@@ -55,14 +53,14 @@ const Page = () => {
 
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
-      <div className='max-w-lg sm:max-w-2xl text-sm'>
-        <p>
+      <div className='w-full mb-4 flex flex-wrap'>
+        <p className='w-full m-1'>
           The airdrop tool utilizes Cardano&apos;s Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy
           ID(s).
         </p>
 
         <button
-          className='w-full sm:max-w-[420px] my-4 p-4 flex items-center justify-center text-center rounded-lg bg-green-900 hover:bg-green-700 bg-opacity-50 hover:bg-opacity-50 border hover:border disabled:border border-green-700 hover:border-green-700'
+          className='w-full m-1 p-4 flex items-center justify-center text-center rounded-lg border border-transparent hover:border-green-600 bg-green-900 hover:bg-green-800'
           onClick={() => setOpenJourney(true)}
         >
           <PlusIcon className='w-6 h-6 mr-2' /> Run an Airdrop
@@ -80,31 +78,13 @@ const Page = () => {
 
                 <div className='flex flex-wrap justify-center sm:justify-start'>
                   {drops.map((drop) => (
-                    <div key={`drop-${drop.id}`} className='m-1 p-0.5 rounded-lg bg-gradient-to-b from-purple-900 via-blue-900 to-green-900'>
-                      <div className='w-[190px] h-[160px] rounded-lg bg-zinc-800 flex flex-col items-center justify-evenly'>
-                        <MediaViewer mediaType='IMAGE' src={drop.thumb} size='w-[55px] h-[55px]' />
-
-                        <div>
-                          <p className='text-center text-xs'>{drop.tokenName.ticker || drop.tokenName.display || drop.tokenName.onChain}</p>
-                          <p className='text-center truncate'>
-                            {drop.tokenAmount.display.toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </p>
-                        </div>
-
-                        <Link
-                          href={`https://cexplorer.io/stake/${drop.stakeKey}`}
-                          target='_blank'
-                          rel='noopener noreferrer'
-                          className='text-xs text-blue-200 flex items-center'
-                        >
-                          {truncateStringInMiddle(drop.stakeKey, 7)}
-                          <ArrowTopRightOnSquareIcon className='w-4 h-4 ml-1' />
-                        </Link>
-                      </div>
-                    </div>
+                    <AirdropCard
+                      key={`drop-${drop.id}`}
+                      stakeKey={drop.stakeKey}
+                      thumb={drop.thumb}
+                      tokenName={drop.tokenName}
+                      tokenAmount={drop.tokenAmount}
+                    />
                   ))}
                 </div>
               </div>

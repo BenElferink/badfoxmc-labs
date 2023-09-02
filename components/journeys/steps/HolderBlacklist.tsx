@@ -443,9 +443,7 @@ const HolderBlacklist = (props: {
                       return (
                         <div key={`pid-${policyIdx}-${defaultData['holderPolicies']?.length}`}>
                           <div>
-                            <div className='flex items-center'>
-                              <Input placeholder='Policy ID:' readOnly disabled={!blockItem?.blockHeight} value={policyId} />
-                            </div>
+                            <Input placeholder='Policy ID:' readOnly disabled={!blockItem?.blockHeight} value={policyId} />
 
                             <div className='flex items-center'>
                               <div className='mx-2 flex flex-wrap items-center'>

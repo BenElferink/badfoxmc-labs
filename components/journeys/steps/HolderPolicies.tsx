@@ -548,6 +548,7 @@ const HolderPolicies = (props: {
                         />
                         <span className='ml-2 text-sm whitespace-nowrap'>Should Stack</span>
                       </label>
+
                       <Input
                         placeholder='Group Size: (ex. 50+)'
                         disabled={!policyId || !withWhales}

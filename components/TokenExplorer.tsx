@@ -98,7 +98,7 @@ const TokenExplorer = (props: {
 
   return (
     <div className='flex flex-col items-center'>
-      {collections.length ? <Input placeholder='Search:' value={search} setValue={(v) => setSearch(v)} /> : null}
+      <Input placeholder='Search:' value={search} setValue={(v) => setSearch(v)} />
 
       <div className='flex flex-wrap items-start justify-center text-center'>
         {!collections.length ? (
