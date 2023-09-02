@@ -30,9 +30,9 @@ const GiveawayOtherPost = (props: {
   const upload = async (file: File) => {
     setProgress((prev) => ({ ...prev, loading: true, msg: 'Uploading...' }))
 
-    const sizeLimit = 1000000 // 1mb
+    const sizeLimit = 5000000 // 5mb
     if (file.size > sizeLimit) {
-      setProgress((prev) => ({ ...prev, loading: false, msg: 'File size is limited to 1mb' }))
+      setProgress((prev) => ({ ...prev, loading: false, msg: 'File size is limited to 5mb' }))
       return ''
     }
 
