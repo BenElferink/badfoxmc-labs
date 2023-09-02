@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import { useMemo } from 'react'
-import { MEDIA_TYPES } from '@/constants'
+import MusicPlayer from './MusicPlayer'
 import type { MediaType } from '@/@types'
+import { MEDIA_TYPES } from '@/constants'
 
 const MediaViewer = (props: { mediaType: MediaType; src: string; size?: string; withBorder?: boolean }) => {
   const { mediaType, src, size, withBorder } = props
@@ -19,7 +20,7 @@ const MediaViewer = (props: { mediaType: MediaType; src: string; size?: string; 
   ) : mediaType === MEDIA_TYPES['VIDEO'] ? (
     <video src={src} controls className={className} />
   ) : mediaType === MEDIA_TYPES['AUDIO'] ? (
-    <audio src={src} controls />
+    <MusicPlayer src={src} />
   ) : null
 }
 
