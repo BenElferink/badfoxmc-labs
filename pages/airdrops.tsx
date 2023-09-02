@@ -3,7 +3,6 @@ import { PlusIcon } from '@heroicons/react/24/solid'
 import getAirdrops from '@/functions/storage/airdrops/getAirdrops'
 import resolveMonthName from '@/functions/formatters/resolveMonthName'
 import Loader from '@/components/Loader'
-import TextFrown from '@/components/TextFrown'
 import AirdropCard from '@/components/cards/AirdropCard'
 import AirdropJourney from '@/components/journeys/AirdropJourney'
 import type { Airdrop } from '@/@types'
@@ -92,9 +91,7 @@ const Page = () => {
           )
         ) : loading ? (
           <Loader />
-        ) : (
-          <TextFrown text='Nothing to see here...' />
-        )}
+        ) : null}
       </div>
 
       <AirdropJourney

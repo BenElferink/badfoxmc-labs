@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
 import getGiveaways from '@/functions/storage/giveaways/getGiveaways'
-import TextFrown from '@/components/TextFrown'
 import DropDown from '@/components/form/DropDown'
 import Loader from '@/components/Loader'
 import Modal from '@/components/Modal'
@@ -154,9 +153,7 @@ const Page = () => {
           )
         ) : loading ? (
           <Loader />
-        ) : (
-          <TextFrown text='Nothing to see here...' />
-        )}
+        ) : null}
       </div>
 
       <GiveawayJourney
