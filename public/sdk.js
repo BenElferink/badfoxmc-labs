@@ -14,8 +14,8 @@ class BadLabsSDK {
       throw new Error('400 BAD REQUEST; missing required params; new BadLabsSDK({ product: "string", creatorStakeKey: "string" })')
     }
 
-    if (!['giveaways'].includes(this.product)) {
-      throw new Error('400 BAD REQUEST; "product" must be one of ["giveaways"]')
+    if (!['giveaways', 'polls'].includes(this.product)) {
+      throw new Error('400 BAD REQUEST; "product" must be one of ["giveaways", "polls"]')
     }
 
     if (!injectId) {
