@@ -143,6 +143,7 @@ export interface SnapshotHolder {
   assets: {
     [policyId: string]: {
       tokenId: string
+      isFungible: boolean
       humanAmount: number
     }[]
   }

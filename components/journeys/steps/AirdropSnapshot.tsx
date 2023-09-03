@@ -166,6 +166,7 @@ const AirdropSnapshot = (props: {
 
                   const holderItem = {
                     tokenId,
+                    isFungible,
                     humanAmount,
                   }
 
@@ -228,11 +229,13 @@ const AirdropSnapshot = (props: {
           Object.entries(assets).forEach(([heldPolicyId, heldPolicyAssets]) => {
             const policySetting = settings.holderPolicies.find((item) => item.policyId === heldPolicyId)
             const policyWeight = policySetting?.weight || 0
+            let totalHumanAmountHeld = 0
 
-            for (const { tokenId, humanAmount } of heldPolicyAssets) {
+            for (const { tokenId, isFungible, humanAmount } of heldPolicyAssets) {
               amountForAssets += humanAmount * sharePerToken * policyWeight
+              if (!isFungible) totalHumanAmountHeld += humanAmount
 
-              if (policySetting?.withTraits && !!policySetting.traitOptions?.length) {
+              if (!isFungible && policySetting?.withTraits && !!policySetting.traitOptions?.length) {
                 const asset = fetchedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as ApiPopulatedToken
                 const attributes: ApiPopulatedToken['attributes'] = asset.attributes
 
@@ -249,7 +252,7 @@ const AirdropSnapshot = (props: {
                 })
               }
 
-              if (policySetting?.withRanks && !!policySetting.rankOptions?.length) {
+              if (!isFungible && policySetting?.withRanks && !!policySetting.rankOptions?.length) {
                 const asset = fetchedRankedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as ApiRankedToken
 
                 policySetting.rankOptions.forEach(({ minRange, maxRange, amount }) => {
@@ -268,12 +271,12 @@ const AirdropSnapshot = (props: {
                 .sort((a, b) => b.groupSize - a.groupSize)
                 .forEach(({ shouldStack, groupSize, amount }) => {
                   // must be sorted by biggest group first, so the !amountForWhale rule is valid
-                  if (!amountForWhale && heldPolicyAssets.length >= groupSize) {
+                  if (!amountForWhale && totalHumanAmountHeld >= groupSize) {
                     // calc here because it's not calculated at the time of input
                     // only token selection amount is calculated at the time of input
                     const onChainAmountConvertedWithDecimals = formatTokenAmount.toChain(amount, settings.tokenAmount.decimals)
                     amountForWhale += shouldStack
-                      ? Math.floor(heldPolicyAssets.length / groupSize) * onChainAmountConvertedWithDecimals
+                      ? Math.floor(totalHumanAmountHeld / groupSize) * onChainAmountConvertedWithDecimals
                       : onChainAmountConvertedWithDecimals
                   }
                 })

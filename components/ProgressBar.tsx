@@ -1,3 +1,5 @@
+import { Fragment } from 'react'
+
 const ProgressBar = (props: { max: number; current: number; label?: string; isGreen?: boolean; isRed?: boolean }) => {
   const { max = 100, current = 0, label = '', isGreen = false, isRed = false } = props
 
@@ -12,7 +14,8 @@ const ProgressBar = (props: { max: number; current: number; label?: string; isGr
     <div className={'w-full h-fit my-2 bg-transparent rounded-full border ' + borderColor}>
       <div className={'py-0.5 px-2 rounded-full ' + bgColor} style={{ width: `${percent}%` }}>
         <span className={'whitespace-nowrap text-xs ' + txtColor}>
-          {percent}%&nbsp;&nbsp;&nbsp;({current}&nbsp;/&nbsp;{max})&nbsp;&nbsp;&nbsp;{label}
+          {label ? <Fragment>{label}&nbsp;&nbsp;&nbsp;</Fragment> : ''}
+          {percent}%&nbsp;&nbsp;&nbsp;({current}&nbsp;/&nbsp;{max})
         </span>
       </div>
     </div>
