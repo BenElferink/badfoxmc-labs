@@ -25,11 +25,27 @@ const getPolls = async (id?: string, stakeKey?: StakeKey) => {
   const payload = docs
     .map((doc) => {
       const data = doc.data() as Poll
+      const active = now < data.endAt
+
+      const top = {
+        serial: 0,
+        amount: 0,
+      }
+
+      if (!active) {
+        data['options'].forEach(({ serial }) => {
+          if (data[`vote_${serial}`] > top.amount) {
+            top.serial = serial
+            top.amount = data[`vote_${serial}`]
+          }
+        })
+      }
 
       return {
         ...data,
-        active: now < data.endAt,
         id: doc.id,
+        active,
+        topSerial: top.serial,
       }
     })
     .sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0))
