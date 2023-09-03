@@ -2,6 +2,7 @@ import { Fragment, useMemo } from 'react'
 import { useTimer } from 'react-timer-hook'
 import MediaViewer from './MediaViewer'
 import WhoHolders from './WhoHolders'
+import ProgressBar from './ProgressBar'
 import type { Poll, PollOption } from '@/@types'
 
 interface PollViewerProps {
@@ -60,11 +61,12 @@ const PollViewer = (props: PollViewerProps) => {
                   onClick={() => isActive && setSerial && setSerial(obj.serial)}
                   className={
                     'group max-w-[500px] my-4 mx-auto p-4 border rounded-lg ' +
-                    (isActive ? 'cursor-pointer ' : '') +
-                    (isWinner
-                      ? 'text-white border-green-400'
-                      : serial === obj.serial
+                    (isActive
+                      ? 'text-zinc-400 border-transparent cursor-pointer'
+                      : (!isActive && !totalPoints) || serial === obj.serial
                       ? 'text-white border-white'
+                      : isWinner
+                      ? 'text-white border-green-400'
                       : 'text-zinc-400 border-transparent')
                   }
                 >
@@ -85,18 +87,7 @@ const PollViewer = (props: PollViewerProps) => {
                     <p className={'mt-1 text-sm ' + (isActive ? 'group-hover:text-white' : '')}>{obj.answer}</p>
                   )}
 
-                  {isActive ? null : (
-                    <div className='w-full h-fit mt-2 rounded-full bg-transparent'>
-                      <div
-                        className={'leading-4 rounded-full bg-opacity-50 ' + (isWinner ? 'bg-green-600' : 'bg-red-600')}
-                        style={{ width: `${percentValue}%` }}
-                      >
-                        <span className={'ml-2 whitespace-nowrap text-[11px] ' + (isWinner ? 'text-green-200' : 'text-red-200')}>
-                          {percentValue}%&nbsp;&nbsp;&nbsp;({pointValue}&nbsp;/&nbsp;{totalPoints})
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                  {!isActive && !!totalPoints ? <ProgressBar max={totalPoints} current={pointValue} isGreen={isWinner} isRed={!isWinner} /> : null}
                 </div>
               )
             })}

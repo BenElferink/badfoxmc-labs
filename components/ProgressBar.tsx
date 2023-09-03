@@ -1,21 +1,18 @@
-const ProgressBar = (props: { max: number; current: number; label?: string }) => {
-  const { max = 100, current = 0, label = '' } = props
+const ProgressBar = (props: { max: number; current: number; label?: string; isGreen?: boolean; isRed?: boolean }) => {
+  const { max = 100, current = 0, label = '', isGreen = false, isRed = false } = props
 
-  const percent = (100 / max) * current
+  const percent = Math.round((100 / max) * current)
   const isFull = current === max
 
+  const borderColor = isFull || isGreen ? 'border-green-600' : isRed ? 'border-red-600' : 'border-blue-600'
+  const bgColor = isFull || isGreen ? 'bg-green-600/50' : isRed ? 'bg-red-600/50' : 'bg-blue-600/50'
+  const txtColor = isFull || isGreen ? 'text-green-200' : isRed ? 'text-red-200' : 'text-blue-200'
+
   return (
-    <div
-      className={
-        'w-full h-fit my-2 bg-transparent rounded-full border ' + (isFull ? 'border-green-600' : 'border-blue-600')
-      }
-    >
-      <div
-        className={'py-0.5 px-2 rounded-full ' + (isFull ? 'bg-green-600/50' : 'bg-blue-600/50')}
-        style={{ width: `${percent}%` }}
-      >
-        <span className={'whitespace-nowrap text-xs ' + (isFull ? 'text-green-200' : 'text-blue-200')}>
-          {current}&nbsp;/&nbsp;{max}&nbsp;&nbsp;&nbsp;{label}
+    <div className={'w-full h-fit my-2 bg-transparent rounded-full border ' + borderColor}>
+      <div className={'py-0.5 px-2 rounded-full ' + bgColor} style={{ width: `${percent}%` }}>
+        <span className={'whitespace-nowrap text-xs ' + txtColor}>
+          {percent}%&nbsp;&nbsp;&nbsp;({current}&nbsp;/&nbsp;{max})&nbsp;&nbsp;&nbsp;{label}
         </span>
       </div>
     </div>
