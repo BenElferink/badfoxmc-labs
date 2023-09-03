@@ -249,12 +249,12 @@ export interface Giveaway extends GiveawaySettings {
   // for entry
   fungibleHolders: FungibleTokenHolderWithPoints[]
   nonFungibleUsedUnits: TokenId[]
-
-  // for raffle
   entries: {
     stakeKey: StakeKey
     points: number
   }[]
+
+  // for raffle
   winners: GiveawayWinner[]
 
   // for payout
@@ -270,6 +270,10 @@ export interface Poll extends PollSettings {
   // for entry
   fungibleHolders: FungibleTokenHolderWithPoints[]
   nonFungibleUsedUnits: TokenId[]
+  entries: {
+    stakeKey: StakeKey
+    points: number
+  }[]
 
   // for poll results
   [vote_serial: string]: any // number >= 0

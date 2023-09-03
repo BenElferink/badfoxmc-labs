@@ -224,6 +224,7 @@ const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: 
         active: true,
         fungibleHolders,
         nonFungibleUsedUnits: [],
+        entries: [],
       }
 
       settings.options.forEach(({ serial }) => {

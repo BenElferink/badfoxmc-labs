@@ -122,7 +122,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const { id, stakeKey, isToken, tokenId, tokenAmount, otherAmount, numOfWinners, entries } = doc
 
           const winners: GiveawayWinner[] = []
-          const enteredStakeKeys: string[] = entries.map((entry) => new Array(entry.points).fill(entry.stakeKey)).flat()
+          const enteredStakeKeys: string[] = entries?.map((entry) => new Array(entry.points).fill(entry.stakeKey)).flat()
 
           let finalNumOfWinners = Math.min(numOfWinners, enteredStakeKeys.length)
 
@@ -160,6 +160,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             active: false,
             fungibleHolders: [],
             nonFungibleUsedUnits: [],
+            entries: [],
             winners: FieldValue.arrayUnion(...winners) as unknown as Giveaway['winners'],
           }
 

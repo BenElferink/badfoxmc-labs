@@ -151,7 +151,7 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
         if (votePoints) {
           setMessage(`You have ${votePoints} entry points`)
         } else {
-          const foundEntry = entries.find((item) => item.stakeKey === stakeKey)
+          const foundEntry = entries?.find((item) => item.stakeKey === stakeKey)
           setMessage(`You entered with ${foundEntry?.points || 0} points`)
         }
 
@@ -191,19 +191,19 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
 
         const foundEntry = giveaway.entries?.find((obj) => obj.stakeKey === holderPoints.stakeKey)
 
-        let points = holderPoints.points
+        let usedPoints = holderPoints.points
 
         if (foundEntry) {
           await collection.doc(giveaway?.id).update({
             entries: FieldValue.arrayRemove(foundEntry),
           })
 
-          points += foundEntry.points
+          usedPoints += foundEntry.points
         }
 
         const updateParams: Partial<Giveaway> = {
           nonFungibleUsedUnits: FieldValue.arrayUnion(...holderPoints.units) as unknown as Giveaway['nonFungibleUsedUnits'],
-          entries: FieldValue.arrayUnion({ stakeKey: holderPoints.stakeKey, points }) as unknown as Giveaway['entries'],
+          entries: FieldValue.arrayUnion({ stakeKey: holderPoints.stakeKey, points: usedPoints }) as unknown as Giveaway['entries'],
         }
 
         if (holderPoints.withFungible) {
