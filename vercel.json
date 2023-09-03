@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/giveaways",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/polls",
+      "schedule": "0 * * * *"
     }
   ]
 }
