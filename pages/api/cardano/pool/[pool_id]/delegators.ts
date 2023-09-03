@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import blockfrost from '@/utils/blockfrost'
-import type { ApiPool } from '@/@types'
+import type { ApiPoolDelegators } from '@/@types'
 
 export const config = {
   api: {
@@ -8,12 +8,13 @@ export const config = {
   },
 }
 
-export interface PoolResponse extends ApiPool {}
+export interface PoolDelegatorsResponse extends ApiPoolDelegators {}
 
-const handler = async (req: NextApiRequest, res: NextApiResponse<PoolResponse>) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<PoolDelegatorsResponse>) => {
   const { method, query } = req
 
   const poolId = query.pool_id?.toString()
+  const page = Number(query.page || 1)
 
   if (!poolId) {
     return res.status(400).end()
@@ -26,16 +27,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PoolResponse>) 
   try {
     switch (method) {
       case 'GET': {
-        console.log('Fetching stake pool:', poolId)
+        console.log('Fetching delegators:', poolId)
 
-        const data = await blockfrost.poolMetadata(poolId)
-        const ticker = data.ticker || ''
+        const delegators = await blockfrost.poolsByIdDelegators(poolId, {
+          count: 100,
+          page,
+          order: 'asc',
+        })
 
-        console.log('Fetched stake pool:', ticker)
+        console.log('Fetched delegators:', delegators.length)
 
-        const payload: ApiPool = {
+        const payload: ApiPoolDelegators = {
           poolId,
-          ticker,
+          page,
+          delegators: delegators.map((item) => item.address),
         }
 
         return res.status(200).json(payload)

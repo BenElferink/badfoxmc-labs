@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { ApiMarket, ApiPolicy, ApiPool, ApiPopulatedToken, ApiTokenOwners, ApiTransaction, ApiWallet } from '@/@types'
+import type { ApiMarket, ApiPolicy, ApiPool, ApiPoolDelegators, ApiPopulatedToken, ApiTokenOwners, ApiTransaction, ApiWallet } from '@/@types'
 
 class Api {
   baseUrl: string
@@ -202,13 +202,8 @@ class Api {
   }
 
   stakePool = {
-    getData: (
-      poolId: string,
-      queryOptions?: {
-        withDelegators?: boolean
-      }
-    ): Promise<ApiPool> => {
-      const uri = `${this.baseUrl}/pool/${poolId}` + this.getQueryStringFromQueryOptions(queryOptions)
+    getData: (poolId: string): Promise<ApiPool> => {
+      const uri = `${this.baseUrl}/pool/${poolId}`
 
       return new Promise(async (resolve, reject) => {
         try {
@@ -220,7 +215,29 @@ class Api {
 
           return resolve(data)
         } catch (error: any) {
-          return await this.handleError(error, reject, async () => await this.stakePool.getData(poolId, queryOptions))
+          return await this.handleError(error, reject, async () => await this.stakePool.getData(poolId))
+        }
+      })
+    },
+    getDelegators: (
+      poolId: string,
+      queryOptions?: {
+        page?: number
+      }
+    ): Promise<ApiPoolDelegators> => {
+      const uri = `${this.baseUrl}/pool/${poolId}/delegators` + this.getQueryStringFromQueryOptions(queryOptions)
+
+      return new Promise(async (resolve, reject) => {
+        try {
+          console.log('Fetching stake pool delegators:', poolId)
+
+          const { data } = await axios.get<ApiPoolDelegators>(uri)
+
+          console.log('Fetched stake pool delegators:', data.delegators.length)
+
+          return resolve(data)
+        } catch (error: any) {
+          return await this.handleError(error, reject, async () => await this.stakePool.getDelegators(poolId, queryOptions))
         }
       })
     },

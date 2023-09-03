@@ -79,20 +79,27 @@ export interface ApiMarket {
   items: ApiMarketToken[]
 }
 
+export interface TokenOwner {
+  quantity: number
+  stakeKey: string
+  addresses: Address[]
+}
+
 export interface ApiTokenOwners {
   tokenId: string
   page: number
-  owners: {
-    quantity: number
-    stakeKey: string
-    addresses: Address[]
-  }[]
+  owners: TokenOwner[]
 }
 
 export interface ApiPool {
   poolId: PoolId
   ticker: string
-  delegators?: StakeKey[]
+}
+
+export interface ApiPoolDelegators {
+  poolId: PoolId
+  page: number
+  delegators: Address['address'][]
 }
 
 export interface ApiUtxo {

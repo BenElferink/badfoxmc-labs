@@ -15,6 +15,7 @@ import type {
   AirdropSettings,
   SnapshotHolder,
   StakeKey,
+  ApiPoolDelegators,
 } from '@/@types'
 
 const AirdropSnapshot = (props: {
@@ -76,15 +77,29 @@ const AirdropSnapshot = (props: {
         }))
 
         for await (const poolId of stakePools) {
-          const fetched = await api.stakePool.getData(poolId, { withDelegators: true })
+          const poolDelegators: ApiPoolDelegators['delegators'] = []
 
-          delegators.push(...(fetched.delegators || []))
+          let continueLoop = true
+
+          for (let page = 1; continueLoop; page++) {
+            setProgress((prev) => ({ ...prev, msg: `Processing Stake Pool Delegators (${poolDelegators.length})` }))
+
+            const fetched = await api.stakePool.getDelegators(poolId, { page })
+
+            poolDelegators.push(...(fetched.delegators || []))
+
+            if (!fetched.delegators.length) continueLoop = false
+          }
+
+          delegators.push(...poolDelegators)
 
           setProgress((prev) => ({
             ...prev,
             pool: { ...prev.pool, current: prev.pool.current + 1, max: stakePools.length },
           }))
         }
+
+        return
       }
 
       setProgress((prev) => ({

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import blockfrost from '@/utils/blockfrost'
-import type { Address } from '@/@types'
+import type { ApiTokenOwners, TokenOwner } from '@/@types'
 
 export const config = {
   api: {
@@ -8,19 +8,9 @@ export const config = {
   },
 }
 
-interface Owner {
-  quantity: number
-  stakeKey: string
-  addresses: Address[]
-}
+export interface TokenOwnersResponse extends ApiTokenOwners {}
 
-export interface AssetOwnersResponse {
-  tokenId: string
-  page: number
-  owners: Owner[]
-}
-
-const handler = async (req: NextApiRequest, res: NextApiResponse<AssetOwnersResponse>) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<TokenOwnersResponse>) => {
   const { method, query } = req
 
   const tokenId = query.token_id?.toString()
@@ -43,7 +33,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<AssetOwnersResp
 
         console.log('Fetched addresses:', assetAddresses.length)
 
-        const payload: Owner[] = []
+        const payload: TokenOwner[] = []
 
         for await (const { address, quantity } of assetAddresses) {
           console.log('Fetching wallet:', address)

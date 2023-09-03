@@ -10,7 +10,7 @@ import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
 import PollViewer from '@/components/PollViewer'
-import type { ApiBaseToken, ApiTokenOwners, FungibleTokenHolderWithPoints, Poll, PollSettings, StakeKey } from '@/@types'
+import type { ApiBaseToken, ApiPoolDelegators, ApiTokenOwners, FungibleTokenHolderWithPoints, Poll, PollSettings, StakeKey } from '@/@types'
 
 const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: () => void }) => {
   const { settings, next, back } = props
@@ -97,9 +97,21 @@ const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: 
             }))
 
             for await (const poolId of stakePools) {
-              const fetched = await api.stakePool.getData(poolId, { withDelegators: true })
+              const poolDelegators: ApiPoolDelegators['delegators'] = []
 
-              delegators.push(...(fetched.delegators || []))
+              let continueLoop = true
+
+              for (let page = 1; continueLoop; page++) {
+                setProgress((prev) => ({ ...prev, msg: `Processing Stake Pool Delegators (${poolDelegators.length})` }))
+
+                const fetched = await api.stakePool.getDelegators(poolId, { page })
+
+                poolDelegators.push(...(fetched.delegators || []))
+
+                if (!fetched.delegators.length) continueLoop = false
+              }
+
+              delegators.push(...poolDelegators)
 
               setProgress((prev) => ({
                 ...prev,

@@ -6,7 +6,7 @@ import JourneyStepWrapper from './JourneyStepWrapper'
 import Input from '@/components/form/Input'
 import Button from '@/components/form/Button'
 import TrashButton from '@/components/form/TrashButton'
-import type { HolderSettings } from '@/@types'
+import type { HolderSettings, PoolId } from '@/@types'
 
 const HolderStakePools = (props: {
   defaultData: Partial<HolderSettings>
@@ -26,13 +26,17 @@ const HolderStakePools = (props: {
       next={async () => {
         setLoading(true)
         let allowNext = true
+        const poolIds: PoolId[] = []
 
         if (formData['withDelegators']) {
           toast.loading('Validating')
 
           for await (const poolId of formData['stakePools'] || []) {
             try {
-              if (!!poolId) await api.stakePool.getData(poolId)
+              if (!!poolId) {
+                const stakePool = await api.stakePool.getData(poolId)
+                poolIds.push(stakePool.poolId)
+              }
 
               setFormErrors((prev) => ({ ...prev, [poolId]: false }))
             } catch (error) {
@@ -46,7 +50,7 @@ const HolderStakePools = (props: {
           if (!allowNext) toast.error('Bad Value(s)')
         }
 
-        const filtered = (formData['stakePools'] || []).filter((str) => !!str)
+        const filtered = poolIds.filter((str) => !!str)
 
         callback({
           withDelegators: !!filtered.length,
