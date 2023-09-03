@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Modal from '../Modal'
 import ErrorNotConnected from './steps/ErrorNotConnected'
@@ -37,24 +37,23 @@ const PollJourney = (props: { open: boolean; onClose: () => void }) => {
   const [step, setStep] = useState(1)
   const [settings, setSettings] = useState<Partial<PollSettings>>(defaultSettings)
 
-  useEffect(() => {
-    if (!open) {
-      setStep(1)
-      setSettings(defaultSettings)
-    }
-  }, [open])
+  const handleClose = () => {
+    setStep(1)
+    setSettings(defaultSettings)
+    onClose()
+  }
 
   if (!user) {
     return (
-      <Modal open={open} onClose={onClose}>
-        <ErrorNotConnected onClose={onClose} />
+      <Modal open={open} onClose={handleClose}>
+        <ErrorNotConnected onClose={handleClose} />
       </Modal>
     )
   }
 
   // if (user && !user.isTokenGateHolder) {
   //   return (
-  //     <Modal open={open} onClose={onClose}>
+  //     <Modal open={open} onClose={handleClose}>
   //       <ErrorNotTokenGateHolder />
   //     </Modal>
   //   )
@@ -64,7 +63,7 @@ const PollJourney = (props: { open: boolean; onClose: () => void }) => {
   const decrement = () => setStep((prev) => prev - 1)
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={handleClose}>
       {step === 1 ? (
         <PollClassification
           defaultData={{
