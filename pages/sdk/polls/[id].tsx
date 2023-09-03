@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import getPolls from '@/functions/storage/polls/getPolls'
-// import PollEnter from '@/components/PollEnter'
+import PollEnter from '@/components/PollEnter'
 import BackButton from '@/components/sdk/BackButton'
 import Loader from '@/components/Loader'
 import type { Poll } from '@/@types'
@@ -47,10 +47,7 @@ const Page: NextPage = () => {
   return (
     <>
       <BackButton />
-      {
-        !item ? <div className='flex items-center justify-center'>Poll does not exist...</div> : null
-        // <PollEnter poll={item} />
-      }
+      {!item ? <div className='flex items-center justify-center'>Poll does not exist...</div> : <PollEnter poll={item} isSdk />}
     </>
   )
 }

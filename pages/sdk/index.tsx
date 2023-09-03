@@ -4,7 +4,7 @@ import { badApi } from '@/utils/badApi'
 import { useAuth } from '@/contexts/AuthContext'
 import getPolls from '@/functions/storage/polls/getPolls'
 import getGiveaways from '@/functions/storage/giveaways/getGiveaways'
-// import PollCard from '@/components/cards/PollCard'
+import PollCard from '@/components/cards/PollCard'
 import GiveawayCard from '@/components/cards/GiveawayCard'
 import Loader from '@/components/Loader'
 import type { Giveaway, Poll } from '@/@types'
@@ -106,18 +106,20 @@ const Page = () => {
             <br />
             {cKey}
           </p>
-        ) : // polls.map((poll) => (
-        //   <PollCard
-        //     key={`poll-${poll.id}`}
-        //     navToPage={`/sdk/${poll.id}?voter_stake_key=${uKey}`}
-        //     active={poll.active}
-        //     endAt={poll.endAt}
-        //     question={poll.question}
-        //     allowPublicView={poll.allowPublicView}
-        //     className='m-1 p-4 text-sm hover:text-gray-200 bg-gray-800 hover:bg-gray-700 rounded-xl border hover:border border-gray-700 hover:border-gray-500 select-none cursor-pointer'
-        //   />
-        // ))
-        null
+        ) : (
+          polls.map(({ id, endAt, active, isClassified, question, options, topSerial }) => (
+            <PollCard
+              key={`poll-${id}`}
+              onClick={(_id) => router.push(`/sdk/${product}/${_id}`)}
+              id={id}
+              active={active}
+              endAt={endAt}
+              isClassified={isClassified}
+              question={question}
+              topOption={active ? undefined : options.find(({ serial }) => serial === topSerial)}
+            />
+          ))
+        )
       ) : product === 'giveaways' ? (
         !giveaways.length ? (
           <p className='text-sm text-center'>
@@ -129,7 +131,7 @@ const Page = () => {
           giveaways.map(({ id, active, endAt, thumb, isToken, tokenName, tokenAmount, otherTitle, otherAmount }) => (
             <GiveawayCard
               key={`giveaway-${id}`}
-              onClick={(_id) => router.push(`/sdk/${product}/${id}`)}
+              onClick={(_id) => router.push(`/sdk/${product}/${_id}`)}
               id={id}
               active={active}
               endAt={endAt}
