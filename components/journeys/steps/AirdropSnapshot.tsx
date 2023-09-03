@@ -98,8 +98,6 @@ const AirdropSnapshot = (props: {
             pool: { ...prev.pool, current: prev.pool.current + 1, max: stakePools.length },
           }))
         }
-
-        return
       }
 
       setProgress((prev) => ({
