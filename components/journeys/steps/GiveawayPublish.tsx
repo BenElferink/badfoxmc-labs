@@ -4,7 +4,7 @@ import { Transaction } from '@meshsdk/core'
 import { useWallet } from '@meshsdk/react'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import { firestore } from '@/utils/firebase'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import txConfirmation from '@/functions/txConfirmation'
@@ -12,7 +12,7 @@ import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
 import GiveawayViewer from '@/components/GiveawayViewer'
-import type { BadApiBaseToken, BadApiTokenOwners, FungibleTokenHolderWithPoints, Giveaway, GiveawaySettings, StakeKey } from '@/@types'
+import type { ApiBaseToken, ApiTokenOwners, FungibleTokenHolderWithPoints, Giveaway, GiveawaySettings, StakeKey } from '@/@types'
 import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
 
 const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void; back?: () => void }) => {
@@ -61,7 +61,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
 
       const updatedHolderPolicies = [...holderPolicies]
       const delegators: StakeKey[] = []
-      const fungibleTokens: (BadApiBaseToken & { policyId: string })[] = []
+      const fungibleTokens: (ApiBaseToken & { policyId: string })[] = []
       const fungibleHolders: FungibleTokenHolderWithPoints[] = []
 
       setProgress((prev) => ({
@@ -72,7 +72,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
 
       for (let pIdx = 0; pIdx < updatedHolderPolicies.length; pIdx++) {
         const { policyId } = updatedHolderPolicies[pIdx]
-        const { tokens: policyTokens } = await badApi.policy.getData(policyId, { allTokens: true })
+        const { tokens: policyTokens } = await api.policy.getData(policyId, { allTokens: true })
 
         for (const token of policyTokens) {
           if (token.isFungible) {
@@ -104,7 +104,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
             }))
 
             for await (const poolId of stakePools) {
-              const fetched = await badApi.stakePool.getData(poolId, { withDelegators: true })
+              const fetched = await api.stakePool.getData(poolId, { withDelegators: true })
 
               delegators.push(...(fetched.delegators || []))
 
@@ -136,12 +136,12 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
 
             // token not blacklisted
             if (!withBlacklist || (withBlacklist && !blacklistTokens.find((str) => str === tokenId))) {
-              const tokenOwners: BadApiTokenOwners['owners'] = []
+              const tokenOwners: ApiTokenOwners['owners'] = []
 
               for (let page = 1; true; page++) {
                 if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
 
-                const fetched = await badApi.token.getOwners(tokenId, { page })
+                const fetched = await api.token.getOwners(tokenId, { page })
 
                 if (!fetched.owners.length) break
                 tokenOwners.push(...fetched.owners)

@@ -1,16 +1,16 @@
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import Loader from '@/components/Loader'
 import ProgressBar from '@/components/ProgressBar'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type {
-  BadApiPolicy,
-  BadApiPopulatedToken,
-  BadApiRankedToken,
-  BadApiTokenOwners,
+  ApiPolicy,
+  ApiPopulatedToken,
+  ApiRankedToken,
+  ApiTokenOwners,
   PayoutHolder,
   AirdropSettings,
   SnapshotHolder,
@@ -64,8 +64,8 @@ const AirdropSnapshot = (props: {
       const delegators: StakeKey[] = []
       const holders: SnapshotHolder[] = []
 
-      const fetchedTokens: Record<string, BadApiPopulatedToken[]> = {}
-      const fetchedRankedTokens: Record<string, BadApiPolicy['tokens']> = {}
+      const fetchedTokens: Record<string, ApiPopulatedToken[]> = {}
+      const fetchedRankedTokens: Record<string, ApiPolicy['tokens']> = {}
 
       const includedTokenCounts: Record<string, number> = {}
 
@@ -76,7 +76,7 @@ const AirdropSnapshot = (props: {
         }))
 
         for await (const poolId of stakePools) {
-          const fetched = await badApi.stakePool.getData(poolId, { withDelegators: true })
+          const fetched = await api.stakePool.getData(poolId, { withDelegators: true })
 
           delegators.push(...(fetched.delegators || []))
 
@@ -97,7 +97,7 @@ const AirdropSnapshot = (props: {
 
         includedTokenCounts[policyId] = 0
 
-        const { tokens: policyTokens } = await badApi.policy.getData(policyId, { allTokens: true, withRanks })
+        const { tokens: policyTokens } = await api.policy.getData(policyId, { allTokens: true, withRanks })
 
         if (withRanks) {
           if (fetchedRankedTokens[policyId]) {
@@ -118,13 +118,13 @@ const AirdropSnapshot = (props: {
           // token not blacklisted
           if (!withBlacklist || (withBlacklist && !blacklistTokens.find((str) => str === tokenId))) {
             if (tokenAmount.onChain !== 0) {
-              const fetchedToken = await badApi.token.getData(tokenId)
-              const tokenOwners: BadApiTokenOwners['owners'] = []
+              const fetchedToken = await api.token.getData(tokenId)
+              const tokenOwners: ApiTokenOwners['owners'] = []
 
               for (let page = 1; true; page++) {
                 if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
 
-                const fetched = await badApi.token.getOwners(tokenId, { page })
+                const fetched = await api.token.getOwners(tokenId, { page })
 
                 if (!fetched.owners.length) break
                 tokenOwners.push(...fetched.owners)
@@ -220,8 +220,8 @@ const AirdropSnapshot = (props: {
               amountForAssets += humanAmount * sharePerToken * policyWeight
 
               if (policySetting?.withTraits && !!policySetting.traitOptions?.length) {
-                const asset = fetchedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as BadApiPopulatedToken
-                const attributes: BadApiPopulatedToken['attributes'] = asset.attributes
+                const asset = fetchedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as ApiPopulatedToken
+                const attributes: ApiPopulatedToken['attributes'] = asset.attributes
 
                 policySetting.traitOptions.forEach(({ category, trait, amount }) => {
                   if (
@@ -237,7 +237,7 @@ const AirdropSnapshot = (props: {
               }
 
               if (policySetting?.withRanks && !!policySetting.rankOptions?.length) {
-                const asset = fetchedRankedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as BadApiRankedToken
+                const asset = fetchedRankedTokens[heldPolicyId].find((asset) => asset.tokenId === tokenId) as ApiRankedToken
 
                 policySetting.rankOptions.forEach(({ minRange, maxRange, amount }) => {
                   if (asset?.rarityRank && asset.rarityRank >= minRange && asset.rarityRank <= maxRange) {

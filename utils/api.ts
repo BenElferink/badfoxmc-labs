@@ -1,11 +1,11 @@
 import axios from 'axios'
-import type { BadApiMarket, BadApiPolicy, BadApiPool, BadApiPopulatedToken, BadApiTokenOwners, BadApiTransaction, BadApiWallet } from '@/@types'
+import type { ApiMarket, ApiPolicy, ApiPool, ApiPopulatedToken, ApiTokenOwners, ApiTransaction, ApiWallet } from '@/@types'
 
-export class BadApi {
+class Api {
   baseUrl: string
 
   constructor() {
-    this.baseUrl = 'https://api.badfoxmc.com/api'
+    this.baseUrl = '/api/cardano'
   }
 
   private getQueryStringFromQueryOptions = (options: Record<string, any> = {}): string => {
@@ -34,14 +34,14 @@ export class BadApi {
         withStakePool?: boolean
         withTokens?: boolean
       }
-    ): Promise<BadApiWallet> => {
+    ): Promise<ApiWallet> => {
       const uri = `${this.baseUrl}/wallet/${walletId}` + this.getQueryStringFromQueryOptions(queryOptions)
 
       return new Promise(async (resolve, reject) => {
         try {
           console.log('Fetching wallet:', walletId)
 
-          const { data } = await axios.get<BadApiWallet>(uri)
+          const { data } = await axios.get<ApiWallet>(uri)
 
           console.log('Fetched wallet:', data.stakeKey)
 
@@ -61,14 +61,14 @@ export class BadApi {
         withBurned?: boolean
         withRanks?: boolean
       }
-    ): Promise<BadApiPolicy> => {
+    ): Promise<ApiPolicy> => {
       const uri = `${this.baseUrl}/policy/${policyId}` + this.getQueryStringFromQueryOptions(queryOptions)
 
       return new Promise(async (resolve, reject) => {
         try {
           console.log('Fetching policy tokens:', policyId)
 
-          const { data } = await axios.get<BadApiPolicy>(uri)
+          const { data } = await axios.get<ApiPolicy>(uri)
 
           console.log('Fetched policy tokens:', data.tokens.length)
 
@@ -80,14 +80,14 @@ export class BadApi {
     },
 
     market: {
-      getData: (policyId: string): Promise<BadApiMarket> => {
+      getData: (policyId: string): Promise<ApiMarket> => {
         const uri = `${this.baseUrl}/policy/${policyId}/market`
 
         return new Promise(async (resolve, reject) => {
           try {
             console.log('Fetching policy market data:', policyId)
 
-            const { data } = await axios.get<BadApiMarket>(uri)
+            const { data } = await axios.get<ApiMarket>(uri)
 
             console.log('Fetched policy market data:', data.items.length)
 
@@ -97,14 +97,14 @@ export class BadApi {
           }
         })
       },
-      getActivity: (policyId: string): Promise<BadApiMarket> => {
+      getActivity: (policyId: string): Promise<ApiMarket> => {
         const uri = `${this.baseUrl}/policy/${policyId}/market/activity`
 
         return new Promise(async (resolve, reject) => {
           try {
             console.log('Fetching policy market activity:', policyId)
 
-            const { data } = await axios.get<BadApiMarket>(uri)
+            const { data } = await axios.get<ApiMarket>(uri)
 
             console.log('Fetched policy market activity:', data.items.length)
 
@@ -123,14 +123,14 @@ export class BadApi {
       queryOptions?: {
         populateMintTx?: boolean
       }
-    ): Promise<BadApiPopulatedToken> => {
+    ): Promise<ApiPopulatedToken> => {
       const uri = `${this.baseUrl}/token/${tokenId}` + this.getQueryStringFromQueryOptions(queryOptions)
 
       return new Promise(async (resolve, reject) => {
         try {
           console.log('Fetching token:', tokenId)
 
-          const { data } = await axios.get<BadApiPopulatedToken>(uri)
+          const { data } = await axios.get<ApiPopulatedToken>(uri)
 
           console.log('Fetched token:', data.fingerprint)
 
@@ -145,14 +145,14 @@ export class BadApi {
       queryOptions?: {
         page?: number
       }
-    ): Promise<BadApiTokenOwners> => {
+    ): Promise<ApiTokenOwners> => {
       const uri = `${this.baseUrl}/token/${tokenId}/owners` + this.getQueryStringFromQueryOptions(queryOptions)
 
       return new Promise(async (resolve, reject) => {
         try {
           console.log('Fetching token owners:', tokenId)
 
-          const { data } = await axios.get<BadApiTokenOwners>(uri)
+          const { data } = await axios.get<ApiTokenOwners>(uri)
 
           console.log('Fetched token owners:', data.owners.length)
 
@@ -164,14 +164,14 @@ export class BadApi {
     },
 
     market: {
-      getData: (tokenId: string): Promise<BadApiMarket> => {
+      getData: (tokenId: string): Promise<ApiMarket> => {
         const uri = `${this.baseUrl}/token/${tokenId}/market`
 
         return new Promise(async (resolve, reject) => {
           try {
             console.log('Fetching token market data:', tokenId)
 
-            const { data } = await axios.get<BadApiMarket>(uri)
+            const { data } = await axios.get<ApiMarket>(uri)
 
             console.log('Fetched token market data:', data.items.length)
 
@@ -181,14 +181,14 @@ export class BadApi {
           }
         })
       },
-      getActivity: (tokenId: string): Promise<BadApiMarket> => {
+      getActivity: (tokenId: string): Promise<ApiMarket> => {
         const uri = `${this.baseUrl}/token/${tokenId}/market/activity`
 
         return new Promise(async (resolve, reject) => {
           try {
             console.log('Fetching token market activity:', tokenId)
 
-            const { data } = await axios.get<BadApiMarket>(uri)
+            const { data } = await axios.get<ApiMarket>(uri)
 
             console.log('Fetched token market activity:', data.items.length)
 
@@ -207,14 +207,14 @@ export class BadApi {
       queryOptions?: {
         withDelegators?: boolean
       }
-    ): Promise<BadApiPool> => {
+    ): Promise<ApiPool> => {
       const uri = `${this.baseUrl}/pool/${poolId}` + this.getQueryStringFromQueryOptions(queryOptions)
 
       return new Promise(async (resolve, reject) => {
         try {
           console.log('Fetching stake pool:', poolId)
 
-          const { data } = await axios.get<BadApiPool>(uri)
+          const { data } = await axios.get<ApiPool>(uri)
 
           console.log('Fetched stake pool:', data.ticker)
 
@@ -232,14 +232,14 @@ export class BadApi {
       queryOptions?: {
         withUtxos?: boolean
       }
-    ): Promise<BadApiTransaction> => {
+    ): Promise<ApiTransaction> => {
       const uri = `${this.baseUrl}/transaction/${transactionId}` + this.getQueryStringFromQueryOptions(queryOptions)
 
       return new Promise(async (resolve, reject) => {
         try {
           console.log('Fetching transaction:', transactionId)
 
-          const { data } = await axios.get<BadApiTransaction>(uri)
+          const { data } = await axios.get<ApiTransaction>(uri)
 
           console.log('Fetched transaction:', data.block)
 
@@ -252,4 +252,6 @@ export class BadApi {
   }
 }
 
-export const badApi = new BadApi()
+const api = new Api()
+
+export default api

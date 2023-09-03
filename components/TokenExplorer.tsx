@@ -5,15 +5,15 @@ import MediaViewer from './MediaViewer'
 import TextFrown from './TextFrown'
 import Loader from './Loader'
 import Input from './form/Input'
-import type { BadApiPopulatedToken } from '@/@types'
+import type { ApiPopulatedToken } from '@/@types'
 
 type Collection = {
   policyId: string
-  tokens: BadApiPopulatedToken[]
+  tokens: ApiPopulatedToken[]
 }[]
 
 const TokenExplorer = (props: {
-  callback: (_payload: BadApiPopulatedToken) => void
+  callback: (_payload: ApiPopulatedToken) => void
   selectedTokenId?: string
   showTokenAmounts?: boolean
   withAda?: boolean

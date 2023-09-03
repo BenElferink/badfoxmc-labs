@@ -2,13 +2,13 @@
 import axios from 'axios'
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import { firebase, firestore } from '@/utils/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import GiveawayViewer from './GiveawayViewer'
 import Loader from './Loader'
 import Button from './form/Button'
-import type { BadApiRankedToken, Giveaway, User } from '@/@types'
+import type { ApiRankedToken, Giveaway, User } from '@/@types'
 import type { FetchedTimestampResponse } from '@/pages/api/timestamp'
 
 const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
@@ -67,7 +67,7 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
 
         let votePoints = 0
         const usedUnits: string[] = []
-        const rankedAssets: Record<string, BadApiRankedToken[]> = {}
+        const rankedAssets: Record<string, ApiRankedToken[]> = {}
         const foundFungibleHolder = giveaway.fungibleHolders?.find((obj) => obj.stakeKey === stakeKey)
 
         // this is because points across all policies are counted collectively once, so we don't want the program to keep adding more points on each loop
@@ -100,7 +100,7 @@ const GiveawayEnter = (props: { giveaway: Giveaway; isSdk?: boolean }) => {
 
                   if (withRanks) {
                     if (!rankedAssets[policyId] || !rankedAssets[policyId].length) {
-                      const { tokens } = await badApi.policy.getData(policyId, { withRanks: true })
+                      const { tokens } = await api.policy.getData(policyId, { withRanks: true })
                       rankedAssets[policyId] = tokens
                     }
 

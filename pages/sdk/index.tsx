@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import { useAuth } from '@/contexts/AuthContext'
 import getPolls from '@/functions/storage/polls/getPolls'
 import getGiveaways from '@/functions/storage/giveaways/getGiveaways'
@@ -34,7 +34,7 @@ const Page = () => {
 
         if (!creatorKey) {
           try {
-            const { stakeKey } = await badApi.wallet.getData(creatorStakeKey as string)
+            const { stakeKey } = await api.wallet.getData(creatorStakeKey as string)
             setCKey(stakeKey)
             creatorKey = stakeKey
           } catch (error: any) {
@@ -47,7 +47,7 @@ const Page = () => {
 
         if (!user) {
           try {
-            const { stakeKey } = await badApi.wallet.getData(userStakeKey as string)
+            const { stakeKey } = await api.wallet.getData(userStakeKey as string)
             if (!user) await getAndSetUser(stakeKey)
           } catch (error: any) {
             const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'

@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useWallet } from '@meshsdk/react'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import getUser from '@/functions/storage/users/getUser'
 import { BFMC_BANKER_CARD_TOKEN_IDS, POLICY_IDS } from '@/constants'
 import type { User } from '@/@types'
@@ -50,14 +50,14 @@ export const AuthProvider = (props: PropsWithChildren) => {
           lovelaces = Number(await wallet.getLovelace())
         }
 
-        const { addresses, poolId, tokens } = await badApi.wallet.getData(sKey, {
+        const { addresses, poolId, tokens } = await api.wallet.getData(sKey, {
           withStakePool: true,
           withTokens: true,
         })
 
         const populatedTokens = await Promise.all(
           tokens?.map(async (ownedToken) => {
-            const fetchedToken = await badApi.token.getData(ownedToken.tokenId)
+            const fetchedToken = await api.token.getData(ownedToken.tokenId)
 
             return {
               ...fetchedToken,

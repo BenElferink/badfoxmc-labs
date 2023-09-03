@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import getAirdrops from '@/functions/storage/airdrops/getAirdrops'
-import resolveMonthName from '@/functions/formatters/resolveMonthName'
+import resolveMonthName from '@/functions/resolvers/resolveMonthName'
 import Loader from '@/components/Loader'
 import AirdropCard from '@/components/cards/AirdropCard'
 import AirdropJourney from '@/components/journeys/AirdropJourney'

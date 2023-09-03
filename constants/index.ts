@@ -88,3 +88,7 @@ export const MEDIA_TYPES: Record<MediaType, MediaType> = {
   VIDEO: 'VIDEO',
   AUDIO: 'AUDIO',
 }
+
+export const ERROR_TYPES = {
+  INVALID_WALLET_IDENTIFIER: 'INVALID_WALLET_IDENTIFIER',
+}

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Fragment, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { PlusCircleIcon } from '@heroicons/react/24/solid'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import Input from '@/components/form/Input'
 import Button from '@/components/form/Button'
@@ -64,7 +64,7 @@ const HolderPolicies = (props: {
 
           for await (const { policyId } of formData['holderPolicies']) {
             try {
-              if (!!policyId) await badApi.policy.getData(policyId)
+              if (!!policyId) await api.policy.getData(policyId)
 
               setFormErrors((prev) => ({ ...prev, [policyId]: false }))
             } catch (error) {

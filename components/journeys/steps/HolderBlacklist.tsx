@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
@@ -59,7 +59,7 @@ const HolderBlacklist = (props: {
       }))
 
       for (const { policyId, blockHeight: policyBlockHeight, isAfter: policyBlockHeightIsAfter } of filtered) {
-        const { tokens: policyTokens } = await badApi.policy.getData(policyId, { allTokens: true })
+        const { tokens: policyTokens } = await api.policy.getData(policyId, { allTokens: true })
 
         setProgress((prev) => ({
           ...prev,
@@ -70,7 +70,7 @@ const HolderBlacklist = (props: {
           const { tokenId, tokenAmount } = policyTokens[aIdx]
 
           if (tokenAmount.onChain !== 0) {
-            const { mintBlockHeight } = await badApi.token.getData(tokenId, { populateMintTx: true })
+            const { mintBlockHeight } = await api.token.getData(tokenId, { populateMintTx: true })
 
             if (policyBlockHeightIsAfter) {
               if ((mintBlockHeight as number) > policyBlockHeight) {
@@ -140,7 +140,7 @@ const HolderBlacklist = (props: {
           for await (const walletId of formData['blacklistWallets']) {
             try {
               if (!!walletId) {
-                const { stakeKey: id } = await badApi.wallet.getData(walletId)
+                const { stakeKey: id } = await api.wallet.getData(walletId)
 
                 if (!id) throw new Error(`No stake key for wallet ID: ${walletId}`)
 
@@ -163,7 +163,7 @@ const HolderBlacklist = (props: {
             for await (const tokenId of formData['blacklistTokens']) {
               try {
                 if (!!tokenId) {
-                  const { tokenId: id } = await badApi.token.getData(tokenId)
+                  const { tokenId: id } = await api.token.getData(tokenId)
                   blacklistTokenIds.push(id)
                 }
 

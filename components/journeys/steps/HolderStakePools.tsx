@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import Input from '@/components/form/Input'
@@ -32,7 +32,7 @@ const HolderStakePools = (props: {
 
           for await (const poolId of formData['stakePools'] || []) {
             try {
-              if (!!poolId) await badApi.stakePool.getData(poolId)
+              if (!!poolId) await api.stakePool.getData(poolId)
 
               setFormErrors((prev) => ({ ...prev, [poolId]: false }))
             } catch (error) {

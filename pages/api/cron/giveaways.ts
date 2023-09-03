@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { AppWallet, BlockfrostProvider, Transaction } from '@meshsdk/core'
 import { firebase, firestore } from '@/utils/firebase'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import txConfirmation from '@/functions/txConfirmation'
 import { API_KEYS, WALLET_KEYS } from '@/constants'
 import type { Giveaway, GiveawayWinner, TokenId, TransactionId } from '@/@types'
@@ -143,7 +143,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             if (alreadyWon) {
               i--
             } else {
-              const wallet = await badApi.wallet.getData(thisStakeKey)
+              const wallet = await api.wallet.getData(thisStakeKey)
               const { address } = wallet.addresses[0]
 
               winners.push({

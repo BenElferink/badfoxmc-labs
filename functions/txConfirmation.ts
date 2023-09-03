@@ -1,10 +1,10 @@
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import sleep from './sleep'
-import type { BadApiTransaction } from '@/@types'
+import type { ApiTransaction } from '@/@types'
 
-const txConfirmation = async (_txHash: string): Promise<BadApiTransaction> => {
+const txConfirmation = async (_txHash: string): Promise<ApiTransaction> => {
   try {
-    const data = await badApi.transaction.getData(_txHash)
+    const data = await api.transaction.getData(_txHash)
 
     if (data.block) {
       return data

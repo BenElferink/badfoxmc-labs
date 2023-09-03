@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { read, utils } from 'xlsx'
-import { badApi } from '@/utils/badApi'
-import { CheckBadgeIcon } from '@heroicons/react/24/solid'
+import api from '@/utils/api'
+import { useWallet } from '@meshsdk/react'
 import { useAuth } from '@/contexts/AuthContext'
+import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import Loader from '@/components/Loader'
 import ProgressBar from '@/components/ProgressBar'
@@ -18,6 +19,7 @@ const AirdropCustomList = (props: {
 }) => {
   const { payoutHolders, settings, callback, next, back } = props
   const { user } = useAuth()
+  const { wallet } = useWallet()
 
   const [ended, setEnded] = useState(!!payoutHolders.length)
   const [progress, setProgress] = useState({
@@ -65,7 +67,7 @@ const AirdropCustomList = (props: {
 
           if (key === 'wallet') {
             try {
-              const { stakeKey, addresses } = await badApi.wallet.getData(keyVal)
+              const { stakeKey, addresses } = await api.wallet.getData(keyVal)
 
               if (addresses[0].address.indexOf('addr1') !== 0) {
                 setProgress((prev) => ({
@@ -127,7 +129,9 @@ const AirdropCustomList = (props: {
     }
 
     const userOwnedOnChain =
-      user?.tokens?.find((token) => token.tokenId === settings.tokenId)?.tokenAmount.onChain || 0
+      settings.tokenId === 'lovelace'
+        ? Number(await wallet.getLovelace())
+        : user?.tokens?.find((token) => token.tokenId === settings.tokenId)?.tokenAmount.onChain || 0
 
     if (totalAmountOnChain > userOwnedOnChain) {
       setProgress((prev) => ({
@@ -136,10 +140,7 @@ const AirdropCustomList = (props: {
         msg: `Woopsies! The total amount on-file (${formatTokenAmount.fromChain(
           totalAmountOnChain,
           settings.tokenAmount.decimals
-        )}), is greater than the amount you own (${formatTokenAmount.fromChain(
-          userOwnedOnChain,
-          settings.tokenAmount.decimals
-        )}).`,
+        )}), is greater than the amount you own (${formatTokenAmount.fromChain(userOwnedOnChain, settings.tokenAmount.decimals)}).`,
       }))
       return
     }
@@ -185,28 +186,20 @@ const AirdropCustomList = (props: {
         <tbody>
           <tr>
             <td className='pt-1 px-4 text-start text-xs text-zinc-400 border-r border-t border-zinc-600'>11.5</td>
-            <td className='pt-1 px-4 text-start text-xs text-zinc-400 border-l border-t border-zinc-600'>
-              addr1 / stake1 / $handle
-            </td>
+            <td className='pt-1 px-4 text-start text-xs text-zinc-400 border-l border-t border-zinc-600'>addr1 / stake1 / $handle</td>
           </tr>
           <tr>
             <td className='px-4 text-start text-zinc-400 text-xs border-r border-zinc-600'>69</td>
-            <td className='px-4 text-start text-zinc-400 text-xs border-l border-zinc-600'>
-              addr1 / stake1 / $handle
-            </td>
+            <td className='px-4 text-start text-zinc-400 text-xs border-l border-zinc-600'>addr1 / stake1 / $handle</td>
           </tr>
           <tr>
             <td className='px-4 text-start text-zinc-400 text-xs border-r border-zinc-600'>420</td>
-            <td className='px-4 text-start text-zinc-400 text-xs border-l border-zinc-600'>
-              addr1 / stake1 / $handle
-            </td>
+            <td className='px-4 text-start text-zinc-400 text-xs border-l border-zinc-600'>addr1 / stake1 / $handle</td>
           </tr>
         </tbody>
       </table>
 
-      {!ended && progress.row.max ? (
-        <ProgressBar label='Table Rows' max={progress.row.max} current={progress.row.current} />
-      ) : null}
+      {!ended && progress.row.max ? <ProgressBar label='Table Rows' max={progress.row.max} current={progress.row.current} /> : null}
 
       {progress.loading ? (
         <Loader withLabel label={progress.msg} />

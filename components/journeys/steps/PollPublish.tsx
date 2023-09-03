@@ -3,14 +3,14 @@ import { toast } from 'react-hot-toast'
 import { useWallet } from '@meshsdk/react'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
-import { badApi } from '@/utils/badApi'
+import api from '@/utils/api'
 import { firestore } from '@/utils/firebase'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
 import PollViewer from '@/components/PollViewer'
-import type { BadApiBaseToken, BadApiTokenOwners, FungibleTokenHolderWithPoints, Poll, PollSettings, StakeKey } from '@/@types'
+import type { ApiBaseToken, ApiTokenOwners, FungibleTokenHolderWithPoints, Poll, PollSettings, StakeKey } from '@/@types'
 
 const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: () => void }) => {
   const { settings, next, back } = props
@@ -54,7 +54,7 @@ const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: 
 
       const updatedHolderPolicies = [...holderPolicies]
       const delegators: StakeKey[] = []
-      const fungibleTokens: (BadApiBaseToken & { policyId: string })[] = []
+      const fungibleTokens: (ApiBaseToken & { policyId: string })[] = []
       const fungibleHolders: FungibleTokenHolderWithPoints[] = []
 
       setProgress((prev) => ({
@@ -65,7 +65,7 @@ const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: 
 
       for (let pIdx = 0; pIdx < updatedHolderPolicies.length; pIdx++) {
         const { policyId } = updatedHolderPolicies[pIdx]
-        const { tokens: policyTokens } = await badApi.policy.getData(policyId, { allTokens: true })
+        const { tokens: policyTokens } = await api.policy.getData(policyId, { allTokens: true })
 
         for (const token of policyTokens) {
           if (token.isFungible) {
@@ -97,7 +97,7 @@ const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: 
             }))
 
             for await (const poolId of stakePools) {
-              const fetched = await badApi.stakePool.getData(poolId, { withDelegators: true })
+              const fetched = await api.stakePool.getData(poolId, { withDelegators: true })
 
               delegators.push(...(fetched.delegators || []))
 
@@ -129,12 +129,12 @@ const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: 
 
             // token not blacklisted
             if (!withBlacklist || (withBlacklist && !blacklistTokens.find((str) => str === tokenId))) {
-              const tokenOwners: BadApiTokenOwners['owners'] = []
+              const tokenOwners: ApiTokenOwners['owners'] = []
 
               for (let page = 1; true; page++) {
                 if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
 
-                const fetched = await badApi.token.getOwners(tokenId, { page })
+                const fetched = await api.token.getOwners(tokenId, { page })
 
                 if (!fetched.owners.length) break
                 tokenOwners.push(...fetched.owners)

@@ -27,14 +27,14 @@ type TokenName = {
   display: string
 }
 
-export interface BadApiBaseToken {
+export interface ApiBaseToken {
   tokenId: TokenId
   isFungible: boolean
   tokenAmount: TokenAmount
   tokenName?: TokenName
 }
 
-export interface BadApiMarketToken {
+export interface ApiMarketToken {
   tokenId: string
   signingAddress?: string
   price: number
@@ -45,11 +45,11 @@ export interface BadApiMarketToken {
   bundledTokens?: string[]
 }
 
-export interface BadApiRankedToken extends BadApiBaseToken {
+export interface ApiRankedToken extends ApiBaseToken {
   rarityRank?: number
 }
 
-export interface BadApiPopulatedToken extends BadApiRankedToken {
+export interface ApiPopulatedToken extends ApiRankedToken {
   fingerprint: string
   policyId: PolicyId
   serialNumber?: number
@@ -69,17 +69,17 @@ export interface BadApiPopulatedToken extends BadApiRankedToken {
   }
 }
 
-export interface BadApiPolicy {
+export interface ApiPolicy {
   policyId: PolicyId
-  tokens: BadApiBaseToken[] | BadApiRankedToken[]
+  tokens: ApiBaseToken[] | ApiRankedToken[]
 }
 
-export interface BadApiMarket {
+export interface ApiMarket {
   tokenId: string
-  items: BadApiMarketToken[]
+  items: ApiMarketToken[]
 }
 
-export interface BadApiTokenOwners {
+export interface ApiTokenOwners {
   tokenId: string
   page: number
   owners: {
@@ -89,13 +89,13 @@ export interface BadApiTokenOwners {
   }[]
 }
 
-export interface BadApiPool {
+export interface ApiPool {
   poolId: PoolId
   ticker: string
   delegators?: StakeKey[]
 }
 
-export interface BadApiUtxo {
+export interface ApiUtxo {
   address: {
     from: string
     to: string
@@ -108,26 +108,26 @@ export interface BadApiUtxo {
   }[]
 }
 
-export interface BadApiTransaction {
+export interface ApiTransaction {
   transactionId: TransactionId
   block: string
   blockHeight: number
-  utxos?: BadApiUtxo[]
+  utxos?: ApiUtxo[]
 }
 
-export interface BadApiWallet {
+export interface ApiWallet {
   stakeKey: StakeKey
   addresses: Address[]
   poolId?: PoolId
-  tokens?: BadApiBaseToken[]
+  tokens?: ApiBaseToken[]
 }
 
-export interface User extends BadApiWallet {
+export interface User extends ApiWallet {
   lovelaces?: number
   username?: string
   profilePicture?: string
   isTokenGateHolder?: boolean
-  tokens?: BadApiPopulatedToken[]
+  tokens?: ApiPopulatedToken[]
 }
 
 export interface SnapshotHolder {

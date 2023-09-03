@@ -66,6 +66,7 @@ const MusicPlayer = (props: { src: string }) => {
         setMounted(false)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [waveRef, visualRef, userClicked, src])
 
   return (
