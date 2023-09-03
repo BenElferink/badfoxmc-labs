@@ -39,7 +39,7 @@ const Sidebar = (props: { open: boolean }) => {
               label: 'Governance',
               Icon: (props) => <ChartBarIcon {...props} />,
               path: '/polls',
-              tags: ['Soon'],
+              tags: ['Free'],
             },
             {
               label: 'Giveaways',
