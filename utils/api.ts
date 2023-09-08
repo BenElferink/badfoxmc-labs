@@ -5,7 +5,7 @@ class Api {
   baseUrl: string
 
   constructor() {
-    this.baseUrl = '/api/cardano'
+    this.baseUrl = 'https://labs.badfoxmc.com/api/cardano'
   }
 
   private getQueryStringFromQueryOptions = (options: Record<string, any> = {}): string => {
