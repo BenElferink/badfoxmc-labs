@@ -80,13 +80,13 @@ export interface ApiMarket {
 }
 
 export interface TokenOwner {
-  quantity: number
-  stakeKey: string
+  quantity: number // on-chain value (if using decimals)
+  stakeKey: StakeKey
   addresses: Address[]
 }
 
 export interface ApiTokenOwners {
-  tokenId: string
+  tokenId: TokenId
   page: number
   owners: TokenOwner[]
 }
