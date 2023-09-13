@@ -27,7 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TokenResponse>)
   try {
     switch (method) {
       case 'GET': {
-        console.log('Fetching token:', tokenId)
+        console.log('Fetching token with Token ID:', tokenId)
 
         const {
           policy_id: policyId,
@@ -45,10 +45,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TokenResponse>)
         const tokenAmountOnChain = Number(quantity)
         let tokenAmountDecimals = 0
 
-        const isFungible = tokenAmountOnChain > 1
         const tokenNameOnChain = formatHex.fromHex(asset_name || tokenId.replace(policyId, ''))
         const tokenNameDisplay = onchain_metadata?.name?.toString() || metadata?.name?.toString() || ''
         let tokenNameTicker = ''
+
+        const isFungible = tokenAmountOnChain > 1
 
         if (isFungible) {
           const { decimals, ticker } = await resolveTokenRegisteredMetadata(tokenId, metadata)
@@ -95,7 +96,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TokenResponse>)
           fingerprint,
           isFungible,
           policyId,
-          serialNumber: Number(tokenNameOnChain.match(/\d+/g)?.join('')) || undefined,
+          serialNumber: Number(tokenNameDisplay.match(/\d+/g)?.join('')) || Number(tokenNameOnChain.match(/\d+/g)?.join('')) || undefined,
           mintTransactionId: initial_mint_tx_hash,
           mintBlockHeight: undefined,
           tokenAmount: {

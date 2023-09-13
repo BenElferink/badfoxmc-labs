@@ -23,7 +23,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TokenOwnersResp
   try {
     switch (method) {
       case 'GET': {
-        console.log('Fetching addresses:', tokenId)
+        console.log('Fetching addresses of Token ID:', tokenId)
 
         const assetAddresses = await blockfrost.assetsAddresses(tokenId, {
           count: 100,
@@ -36,14 +36,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TokenOwnersResp
         const payload: TokenOwner[] = []
 
         for await (const { address, quantity } of assetAddresses) {
-          console.log('Fetching wallet:', address)
+          console.log('Fetching wallet of address:', address)
 
           const wallet = await blockfrost.addresses(address)
           const stakeKey = wallet.stake_address || ''
 
           console.log('Fetched wallet:', stakeKey)
 
-          payload.push({
+          const owner: TokenOwner = {
             quantity: Number(quantity),
             stakeKey,
             addresses: [
@@ -52,7 +52,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TokenOwnersResp
                 isScript: wallet.script,
               },
             ],
-          })
+          }
+
+          payload.push(owner)
         }
 
         return res.status(200).json({

@@ -36,13 +36,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PolicyResponse>
           const fetched = await cnftTools.getPolicyRanks(policyId)
 
           if (!fetched) {
-            return res.status(400).end(`ApiPolicy ID does not have ranks on cnft.tools: ${policyId}`)
+            return res.status(400).end(`Policy ID does not have ranks on cnft.tools: ${policyId}`)
           }
 
           rankedAssets = fetched
         }
 
-        console.log('Fetching tokens:', policyId)
+        console.log('Fetching tokens of Policy ID:', policyId)
 
         const fetchedTokens = allTokens ? await blockfrost.assetsPolicyByIdAll(policyId) : await blockfrost.assetsPolicyById(policyId)
 
@@ -108,7 +108,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PolicyResponse>
     console.error(error)
 
     if (['The requested component has not been found.', 'Invalid or malformed policy format.'].includes(error?.message)) {
-      return res.status(400).end(`${error.message} ${policyId}`)
+      return res.status(404).end(`Policy not found: ${policyId}`)
     }
 
     return res.status(500).end()
