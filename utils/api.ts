@@ -136,7 +136,7 @@ class Api {
 
           return resolve(data)
         } catch (error: any) {
-          return await this.handleError(error, reject, async () => await this.token.getData(tokenId))
+          return await this.handleError(error, reject, async () => await this.token.getData(tokenId, queryOptions))
         }
       })
     },
