@@ -138,19 +138,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const randomIdx = Math.floor(Math.random() * enteredStakeKeys.length)
             const thisStakeKey = enteredStakeKeys[randomIdx]
 
-            const alreadyWon = winners.find((obj) => obj.stakeKey === thisStakeKey)
+            if (thisStakeKey) {
+              const alreadyWon = winners.find((obj) => obj.stakeKey === thisStakeKey)
 
-            if (alreadyWon) {
-              i--
-            } else {
-              const wallet = await api.wallet.getData(thisStakeKey)
-              const { address } = wallet.addresses[0]
+              if (alreadyWon) {
+                i--
+              } else {
+                const wallet = await api.wallet.getData(thisStakeKey)
+                const { address } = wallet.addresses[0]
 
-              winners.push({
-                stakeKey: thisStakeKey,
-                address,
-                amount: amountPerWinner,
-              })
+                winners.push({
+                  stakeKey: thisStakeKey,
+                  address,
+                  amount: amountPerWinner,
+                })
+              }
             }
 
             enteredStakeKeys.splice(randomIdx, 1)
