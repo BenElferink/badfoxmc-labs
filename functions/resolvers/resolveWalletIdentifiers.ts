@@ -1,13 +1,23 @@
-import blockfrost from '@/utils/blockfrost'
 import * as cardanoSerialization from '@emurgo/cardano-serialization-lib-nodejs'
-import { resolveAddressFromHandle } from './resolveAddressFromHandle'
-import { ERROR_TYPES } from '@/constants'
+import blockfrost from '@/utils/blockfrost'
+import formatHex from '../formatters/formatHex'
+import type { Address, StakeKey } from '@/@types'
+import { ERROR_TYPES, POLICY_IDS } from '@/constants'
+
+const resolveAddressFromHandle = async (adaHandle: string): Promise<Address['address']> => {
+  const assetId = `${POLICY_IDS['ADA_HANDLE']}${formatHex.fromHex(adaHandle.replace('$', ''))}`
+
+  const data = await blockfrost.assetsAddresses(assetId)
+  const walletAddress = data[0]?.address || ''
+
+  return walletAddress
+}
 
 const resolveWalletIdentifiersFromCborString = async (
   walletIdentifier: string
 ): Promise<{
-  stakeKey: string
-  addresses: string[]
+  stakeKey: StakeKey
+  addresses: Address['address'][]
 } | null> => {
   let stringFromCbor = ''
 
@@ -33,7 +43,7 @@ const resolveWalletIdentifiersFromCborString = async (
     stakeKey = data?.stake_address || ''
   }
 
-  const addresses = (await blockfrost.accountsAddressesAll(stakeKey)).map((obj) => obj.address)
+  const addresses = stakeKey ? (await blockfrost.accountsAddressesAll(stakeKey)).map((obj) => obj.address) : [walletAddress]
 
   return {
     stakeKey,
@@ -44,8 +54,8 @@ const resolveWalletIdentifiersFromCborString = async (
 const resolveWalletIdentifiers = async (
   walletIdentifier: string
 ): Promise<{
-  stakeKey: string
-  addresses: string[]
+  stakeKey: StakeKey
+  addresses: Address['address'][]
 }> => {
   let stakeKey = walletIdentifier.indexOf('stake1') === 0 ? walletIdentifier : ''
   let walletAddress = walletIdentifier.indexOf('addr1') === 0 ? walletIdentifier : ''
@@ -70,7 +80,7 @@ const resolveWalletIdentifiers = async (
     stakeKey = data?.stake_address || ''
   }
 
-  const addresses = (await blockfrost.accountsAddressesAll(stakeKey)).map((obj) => obj.address)
+  const addresses = stakeKey ? (await blockfrost.accountsAddressesAll(stakeKey)).map((obj) => obj.address) : [walletAddress]
 
   return {
     stakeKey,

@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
   try {
     switch (method) {
       case 'GET': {
-        console.log('Fetching wallet:', walletId)
+        console.log('Fetching wallet with identifier:', walletId)
 
         const { stakeKey, addresses } = await resolveWalletIdentifiers(walletId)
 
@@ -57,22 +57,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
         }
 
         if (withStakePool) {
-          console.log('Fetching wallet stake pool:', stakeKey)
+          console.log('Fetching stake pool of wallet:', stakeKey)
 
           const account = await blockfrost.accounts(stakeKey)
           const poolId = account.pool_id || ''
 
-          console.log('Fetched wallet stake pool:', poolId)
+          console.log('Fetched stake pool:', poolId)
 
           wallet.poolId = poolId
         }
 
         if (withTokens) {
-          console.log('Fetching wallet tokens:', stakeKey)
+          console.log('Fetching tokens of wallet:', stakeKey)
 
           const fetchedTokens = await blockfrost.accountsAddressesAssetsAll(stakeKey)
 
-          console.log('Fetched wallet tokens:', fetchedTokens.length)
+          console.log('Fetched tokens:', fetchedTokens.length)
 
           wallet.tokens = []
 
@@ -135,7 +135,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
         'Invalid or malformed stake address format.',
       ].includes(error?.message)
     ) {
-      return res.status(404).end(`ApiWallet not found: ${walletId}`)
+      return res.status(404).end(`Wallet not found: ${walletId}`)
     }
 
     return res.status(500).end()

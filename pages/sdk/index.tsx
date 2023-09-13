@@ -35,6 +35,7 @@ const Page = () => {
         if (!creatorKey) {
           try {
             const { stakeKey } = await api.wallet.getData(creatorStakeKey as string)
+            if (!stakeKey) throw new Error('Creator Stake Key is invalid')
             setCKey(stakeKey)
             creatorKey = stakeKey
           } catch (error: any) {
@@ -48,6 +49,7 @@ const Page = () => {
         if (!user) {
           try {
             const { stakeKey } = await api.wallet.getData(userStakeKey as string)
+            if (!stakeKey) throw new Error('User Stake Key is invalid')
             if (!user) await getAndSetUser(stakeKey)
           } catch (error: any) {
             const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
