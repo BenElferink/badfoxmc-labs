@@ -246,8 +246,8 @@ const PollEnter = (props: { poll: Poll; isSdk?: boolean }) => {
   )
 
   useEffect(() => {
-    if (pollActive && !!user?.stakeKey) processPoints(user)
-  }, [pollActive, user, processPoints])
+    if (!!user?.stakeKey) processPoints(user)
+  }, [user, processPoints])
 
   return (
     <div className='w-[80vw] md:w-[555px] mx-auto'>
