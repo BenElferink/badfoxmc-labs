@@ -33,7 +33,7 @@ const resolveWalletIdentifiers = async (
 
   if (!stakeKey) {
     if (!walletAddress) {
-      walletAddress = await adaHandle.resolveHandleAddress(handle)
+      walletAddress = (await adaHandle.resolveHandle(handle)).address
 
       if (!walletAddress) throw new Error(ERROR_TYPES['INVALID_WALLET_IDENTIFIER'])
     }

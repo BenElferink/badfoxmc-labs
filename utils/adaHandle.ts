@@ -8,19 +8,24 @@ class AdaHandle {
     this.baseUrl = 'https://api.handle.me'
   }
 
-  resolveHandleAddress = (handle: string): Promise<Address['address']> => {
+  resolveHandle = (
+    handle: string
+  ): Promise<{
+    holder: StakeKey | Address['address']
+    address: Address['address']
+  }> => {
     const uri = `${this.baseUrl}/handles/${handle.replace('$', '')}`
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Fetching handle owner:', handle)
+        console.log('Resolving handle:', handle)
 
         const { data } = await axios.get<{
           hex: string
           name: string
           image: string // ipfs
           standard_image: string // ipfs
-          holder: StakeKey
+          holder: StakeKey | Address['address']
           length: number
           og_number: number
           rarity: string
@@ -47,9 +52,50 @@ class AdaHandle {
           },
         })
 
-        const payload = data.resolved_addresses.ada
+        const payload = {
+          holder: data.holder,
+          address: data.resolved_addresses.ada,
+        }
 
-        console.log('Fetched handle owner:', payload)
+        console.log('Resolved handle:', payload)
+
+        return resolve(payload)
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          return resolve({
+            holder: '',
+            address: '',
+          })
+        }
+
+        return reject(error)
+      }
+    })
+  }
+
+  resolveWalletHandle = (stakeKey: StakeKey): Promise<string> => {
+    const uri = `${this.baseUrl}/holders/${stakeKey}`
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log('Resolving wallet handle:', stakeKey)
+
+        const { data } = await axios.get<{
+          total_handles: number
+          default_handle: string
+          manually_set: boolean
+          address: StakeKey
+          known_owner_name: string
+          type: string
+        }>(uri, {
+          headers: {
+            'Accept-Encoding': 'application/json',
+          },
+        })
+
+        const payload = data.default_handle
+
+        console.log('Resolved wallet handle:', payload)
 
         return resolve(payload)
       } catch (error: any) {
