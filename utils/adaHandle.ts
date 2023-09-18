@@ -1,0 +1,68 @@
+import { Address, StakeKey } from '@/@types'
+import axios from 'axios'
+
+class AdaHandle {
+  baseUrl: string
+
+  constructor() {
+    this.baseUrl = 'https://api.handle.me'
+  }
+
+  resolveHandleAddress = (handle: string): Promise<Address['address']> => {
+    const uri = `${this.baseUrl}/handles/${handle.replace('$', '')}`
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log('Fetching handle owner:', handle)
+
+        const { data } = await axios.get<{
+          hex: string
+          name: string
+          image: string // ipfs
+          standard_image: string // ipfs
+          holder: StakeKey
+          length: number
+          og_number: number
+          rarity: string
+          utxo: string
+          characters: string
+          numeric_modifiers: string
+          default_in_wallet: string
+          pfp_image: string // ipfs
+          pfp_asset: string
+          bg_image: string // ipfs
+          bg_asset: string
+          resolved_addresses: {
+            ada: Address['address']
+          }
+          created_slot_number: number
+          updated_slot_number: number
+          has_datum: boolean
+          svg_version: string
+          image_hash: string
+          standard_image_hash: string
+        }>(uri, {
+          headers: {
+            'Accept-Encoding': 'application/json',
+          },
+        })
+
+        const payload = data.resolved_addresses.ada
+
+        console.log('Fetched handle owner:', payload)
+
+        return resolve(payload)
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          return resolve('')
+        }
+
+        return reject(error)
+      }
+    })
+  }
+}
+
+const adaHandle = new AdaHandle()
+
+export default adaHandle
