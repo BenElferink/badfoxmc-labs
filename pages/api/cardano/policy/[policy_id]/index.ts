@@ -4,6 +4,7 @@ import cnftTools from '@/utils/cnftTools'
 import formatHex from '@/functions/formatters/formatHex'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import resolveTokenRegisteredMetadata from '@/functions/resolvers/resolveTokenRegisteredMetadata'
+import splitTokenId from '@/functions/resolvers/splitTokenId'
 import type { ApiBaseToken, ApiPolicy, ApiRankedToken } from '@/@types'
 import type { PolicyRanked } from '@/utils/cnftTools'
 
@@ -56,7 +57,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PolicyResponse>
           let tokenAmountDecimals = 0
 
           const isFungible = tokenAmountOnChain > 1
-          const tokenNameOnChain = formatHex.fromHex(tokenId.replace(policyId, ''))
+          const tokenNameOnChain = formatHex.fromHex(splitTokenId(tokenId, policyId).tokenName)
           let tokenNameTicker = ''
 
           if (tokenAmountOnChain > 0 || withBurned) {
@@ -83,7 +84,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PolicyResponse>
             }
 
             if (withRanks) {
-              const tokenName = formatHex.fromHex(tokenId.replace(policyId, ''))
+              const tokenName = formatHex.fromHex(splitTokenId(tokenId, policyId).tokenName)
               const rarityRank = Number(rankedAssets[tokenName] || 0)
 
               ;(token as ApiRankedToken).rarityRank = rarityRank

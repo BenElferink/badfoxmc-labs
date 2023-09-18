@@ -1,9 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import blockfrost from '@/utils/blockfrost'
+import formatHex from '@/functions/formatters/formatHex'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import resolveTokenRegisteredMetadata from '@/functions/resolvers/resolveTokenRegisteredMetadata'
 import resolveWalletIdentifiers from '@/functions/resolvers/resolveWalletIdentifiers'
-import { ERROR_TYPES } from '@/constants'
+import splitTokenId from '@/functions/resolvers/splitTokenId'
+import { ERROR_TYPES, POLICY_IDS } from '@/constants'
 import type { ApiBaseToken, ApiWallet } from '@/@types'
 
 export const config = {
@@ -74,6 +76,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
 
           console.log('Fetched tokens:', fetchedTokens.length)
 
+          wallet.handles = []
           wallet.tokens = []
 
           for await (const obj of fetchedTokens) {
@@ -111,6 +114,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
 
             wallet.tokens.push(token)
           }
+
+          wallet.handles.push(
+            ...wallet.tokens
+              .filter(({ tokenId }) => tokenId.indexOf(POLICY_IDS['ADA_HANDLE']) === 0)
+              .map(({ tokenId }) => `$${formatHex.fromHex(splitTokenId(tokenId, POLICY_IDS['ADA_HANDLE']).tokenName)}`)
+          )
         }
 
         return res.status(200).json(wallet)

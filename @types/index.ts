@@ -126,6 +126,7 @@ export interface ApiWallet {
   stakeKey: StakeKey
   addresses: Address[]
   poolId?: PoolId
+  handles?: string[]
   tokens?: ApiBaseToken[]
 }
 
