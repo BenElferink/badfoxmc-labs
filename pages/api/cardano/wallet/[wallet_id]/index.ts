@@ -77,43 +77,43 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
           console.log('Fetched tokens:', fetchedTokens.length)
 
           wallet.handles = []
-          wallet.tokens = []
+          wallet.tokens = await Promise.all(
+            fetchedTokens.map(async ({ unit, quantity }) => {
+              const tokenId = unit
+              const tokenAmountOnChain = Number(quantity)
+              let tokenAmountDecimals = 0
 
-          for await (const obj of fetchedTokens) {
-            const tokenId = obj.unit
-            const tokenAmountOnChain = Number(obj.quantity)
-            let tokenAmountDecimals = 0
+              const isFungible = tokenAmountOnChain > 1
+              let tokenNameTicker = ''
 
-            const isFungible = tokenAmountOnChain > 1
-            let tokenNameTicker = ''
+              if (isFungible) {
+                const { decimals, ticker } = await resolveTokenRegisteredMetadata(tokenId)
 
-            if (isFungible) {
-              const { decimals, ticker } = await resolveTokenRegisteredMetadata(tokenId)
-
-              tokenAmountDecimals = decimals
-              tokenNameTicker = ticker
-            }
-
-            const token: ApiBaseToken = {
-              tokenId,
-              isFungible,
-              tokenAmount: {
-                onChain: tokenAmountOnChain,
-                decimals: tokenAmountDecimals,
-                display: formatTokenAmount.fromChain(tokenAmountOnChain, tokenAmountDecimals),
-              },
-            }
-
-            if (isFungible) {
-              token.tokenName = {
-                onChain: '',
-                ticker: tokenNameTicker,
-                display: '',
+                tokenAmountDecimals = decimals
+                tokenNameTicker = ticker
               }
-            }
 
-            wallet.tokens.push(token)
-          }
+              const token: ApiBaseToken = {
+                tokenId,
+                isFungible,
+                tokenAmount: {
+                  onChain: tokenAmountOnChain,
+                  decimals: tokenAmountDecimals,
+                  display: formatTokenAmount.fromChain(tokenAmountOnChain, tokenAmountDecimals),
+                },
+              }
+
+              if (isFungible) {
+                token.tokenName = {
+                  onChain: '',
+                  ticker: tokenNameTicker,
+                  display: '',
+                }
+              }
+
+              return token
+            })
+          )
 
           wallet.handles.push(
             ...wallet.tokens
