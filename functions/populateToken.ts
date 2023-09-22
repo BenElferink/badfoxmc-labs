@@ -62,33 +62,37 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
     src: formatIpfsReference(Array.isArray(file.src) ? file.src.join('') : file.src.toString()).ipfs,
   }))
 
+  const forbiddenAttributeKeys = [
+    'project',
+    'collection',
+    'name',
+    'description',
+    'logo',
+    'image',
+    'mediatype',
+    'files',
+    'decimals',
+    'ticker',
+    'link',
+    'links',
+    'url',
+    'website',
+    'twitter',
+    'discord',
+  ]
+
   const attributes: ApiPopulatedToken['attributes'] = {}
 
   Object.entries(onchain_metadata?.attributes || onchain_metadata || metadata || {}).forEach(([key, val]) => {
-    if (
-      ![
-        'project',
-        'collection',
-        'name',
-        'description',
-        'logo',
-        'image',
-        'mediatype',
-        'files',
-        'decimals',
-        'ticker',
-        'url',
-        'website',
-        'twitter',
-        'discord',
-      ].includes(key.toLowerCase())
-    ) {
+    if (!forbiddenAttributeKeys.includes(key.toLowerCase())) {
       if (onchain_metadata_standard === 'CIP68v1') {
         attributes[key] = formatHex.fromHex(val?.toString() || 'X').slice(1)
       } else {
         if (typeof val === 'object' && !Array.isArray(val)) {
           Object.entries(val).forEach(([subKey, subVal]) => {
-            attributes[subKey] = subVal?.toString()
+            if (!forbiddenAttributeKeys.includes(subKey.toLowerCase())) {
+              attributes[subKey] = subVal?.toString()
+            }
           })
         } else {
           attributes[key] = val?.toString()
