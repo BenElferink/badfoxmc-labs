@@ -57,7 +57,15 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
         }
       : formatIpfsReference(thumb.replaceAll(',', ''))
 
-  const files = ((onchain_metadata?.files as ApiPopulatedToken['files']) || []).map((file) => ({
+  const files = (
+    !!onchain_metadata?.files
+      ? Array.isArray(onchain_metadata.files)
+        ? onchain_metadata.files
+        : typeof onchain_metadata.files === 'object'
+        ? [onchain_metadata.files]
+        : []
+      : []
+  ).map((file) => ({
     ...file,
     src: formatIpfsReference(Array.isArray(file.src) ? file.src.join('') : file.src.toString()).ipfs,
   }))
