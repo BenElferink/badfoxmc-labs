@@ -93,11 +93,22 @@ class AdaHandle {
           },
         })
 
-        const payload = data.default_handle
+        let handle = data.default_handle || ''
 
-        console.log('Resolved wallet handle:', payload)
+        if (handle) {
+          const { holder } = await adaHandle.resolveHandle(handle)
 
-        return resolve(payload)
+          if (holder !== stakeKey) {
+            console.log('Resolved with incorrect wallet handle:', handle)
+            return resolve('')
+          }
+
+          handle = `$${handle}`
+        }
+
+        console.log('Resolved wallet handle:', handle)
+
+        return resolve(handle)
       } catch (error: any) {
         if (error?.response?.status === 404) {
           return resolve('')

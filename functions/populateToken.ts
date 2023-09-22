@@ -57,13 +57,32 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
         }
       : formatIpfsReference(thumb.replaceAll(',', ''))
 
-  const files = (onchain_metadata?.files as ApiPopulatedToken['files']) || []
+  const files = ((onchain_metadata?.files as ApiPopulatedToken['files']) || []).map((file) => ({
+    ...file,
+    src: formatIpfsReference(Array.isArray(file.src) ? file.src.join('') : file.src.toString()).ipfs,
+  }))
 
-  const ignoreKeys = ['project', 'collection', 'name', 'description', 'logo', 'image', 'mediatype', 'files', 'decimals', 'ticker', 'url', 'website']
   const attributes: ApiPopulatedToken['attributes'] = {}
 
   Object.entries(onchain_metadata?.attributes || onchain_metadata || metadata || {}).forEach(([key, val]) => {
-    if (!ignoreKeys.includes(key.toLowerCase())) {
+    if (
+      ![
+        'project',
+        'collection',
+        'name',
+        'description',
+        'logo',
+        'image',
+        'mediatype',
+        'files',
+        'decimals',
+        'ticker',
+        'url',
+        'website',
+        'twitter',
+        'discord',
+      ].includes(key.toLowerCase())
+    ) {
       if (onchain_metadata_standard === 'CIP68v1') {
         attributes[key] = formatHex.fromHex(val?.toString() || 'X').slice(1)
       } else {
