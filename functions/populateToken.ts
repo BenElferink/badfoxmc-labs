@@ -86,7 +86,13 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
       if (onchain_metadata_standard === 'CIP68v1') {
         attributes[key] = formatHex.fromHex(val?.toString() || 'X').slice(1)
       } else {
-        attributes[key] = val?.toString()
+        if (typeof val === 'object' && !Array.isArray(val)) {
+          Object.entries(val).forEach(([subKey, subVal]) => {
+            attributes[subKey] = subVal?.toString()
+          })
+        } else {
+          attributes[key] = val?.toString()
+        }
       }
     }
   })
