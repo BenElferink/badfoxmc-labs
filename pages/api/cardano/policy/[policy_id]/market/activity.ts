@@ -22,7 +22,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PolicyMarketAct
         const recentSales = await jpgStore.getRecents(policyId, { sold: true })
         const recentListings = await jpgStore.getRecents(policyId, { sold: false })
 
-        const sorted = recentSales.concat(recentListings).sort((a, b) => b.date.getTime() - a.date.getTime())
+        const sorted = recentSales
+          .concat(recentListings)
+          .sort((a, b) => a.tokenId.localeCompare(b.tokenId))
+          .sort((a, b) => b.date.getTime() - a.date.getTime())
+
         const payload: typeof sorted = []
 
         const checkIsObjectDuplicate = (obj1: Record<string, any>, obj2?: Record<string, any>) => {
