@@ -3,8 +3,6 @@ import {
   BanknotesIcon,
   ChartBarIcon,
   // CodeBracketIcon,
-  // FingerPrintIcon,
-  // FireIcon,
   GiftIcon,
   HomeIcon,
 } from '@heroicons/react/24/solid'
@@ -51,18 +49,6 @@ const Sidebar = (props: { open: boolean }) => {
               // path: '/swap',
               tags: ['SOON'],
             },
-            // {
-            //   label: 'Mint Tokens',
-            //   Icon: (props) => <FingerPrintIcon {...props} />,
-            //   path: '/mint',
-            //   tags: ['Pro'],
-            // },
-            // {
-            //   label: 'Burn Tokens',
-            //   Icon: (props) => <FireIcon {...props} />,
-            //   path: '/burn',
-            //   tags: ['Pro'],
-            // },
             // {
             //   label: 'Developers',
             //   Icon: (props) => <CodeBracketIcon {...props} />,
