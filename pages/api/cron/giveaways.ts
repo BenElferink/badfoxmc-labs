@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { AppWallet, BlockfrostProvider, Transaction } from '@meshsdk/core'
 import { firebase, firestore } from '@/utils/firebase'
 import api from '@/utils/api'
-import txConfirmation from '@/functions/txConfirmation'
-import { API_KEYS, WALLET_KEYS } from '@/constants'
+// import txConfirmation from '@/functions/txConfirmation'
 import type { Giveaway, GiveawayWinner, TokenId, TransactionId } from '@/@types'
+import { API_KEYS, WALLET_KEYS } from '@/constants'
 
 interface PayTo extends GiveawayWinner {
   tokenId: TokenId
@@ -57,9 +57,9 @@ const sendToWallets = async (payTo: PayTo[], difference?: number): Promise<PayTo
       const txHash = await wallet.submitTx(signedTx)
       console.log('TX submitted!', txHash)
 
-      console.log('Awaiting network confirmation...', txHash)
-      await txConfirmation(txHash)
-      console.log('Confirmed!', txHash)
+      // console.log('Awaiting network confirmation...', txHash)
+      // await txConfirmation(txHash)
+      // console.log('Confirmed!', txHash)
 
       payTo = payTo.map((item) =>
         batch.some(({ stakeKey }) => stakeKey === item.stakeKey)
@@ -118,7 +118,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const payTo: PayTo[] = []
         const batch = firestore.batch()
 
-        for await (const doc of docsThatNeedToRaffleWinners) {
+        // Note on slice(0, 1) : only process one at a time until scaling solution has been provided
+        for await (const doc of docsThatNeedToRaffleWinners.slice(0, 1)) {
           const { id, stakeKey, isToken, tokenId, tokenAmount, otherAmount, numOfWinners, entries } = doc
 
           const winners: GiveawayWinner[] = []
