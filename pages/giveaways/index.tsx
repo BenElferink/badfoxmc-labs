@@ -11,6 +11,9 @@ import GiveawayJourney from '@/components/journeys/GiveawayJourney'
 import GiveawayEnter from '@/components/GiveawayEnter'
 import type { Giveaway } from '@/@types'
 
+export const GIVEAWAY_DESCRIPTION =
+  "The giveaway tool is responsible for running weighted giveaways, it weighs the holder's assets and influences their entry points."
+
 const Page = () => {
   const { query } = useRouter()
   const { user } = useAuth()
@@ -49,9 +52,7 @@ const Page = () => {
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
       <div className='w-full mb-2 flex flex-wrap'>
-        <p className='w-full m-1'>
-          The giveaway tool is responsible for running weighted giveaways, it weighs the holder&apos;s assets and influences their entry points.
-        </p>
+        <p className='w-full m-1'>{GIVEAWAY_DESCRIPTION}</p>
 
         <button
           className='w-full m-1 p-4 flex items-center justify-center text-center rounded-lg border border-transparent hover:border-green-500 bg-green-900 hover:bg-green-800'

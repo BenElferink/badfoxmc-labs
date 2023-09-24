@@ -1,4 +1,5 @@
 import {
+  ArrowPathIcon,
   BanknotesIcon,
   ChartBarIcon,
   // CodeBracketIcon,
@@ -27,25 +28,28 @@ const Sidebar = (props: { open: boolean }) => {
               label: 'Home',
               Icon: (props) => <HomeIcon {...props} />,
               path: '/',
-              tags: ['Soon'],
             },
             {
               label: 'Airdrops',
               Icon: (props) => <BanknotesIcon {...props} />,
               path: '/airdrops',
-              tags: ['Pro'],
+              tags: ['PRO'],
             },
             {
               label: 'Governance',
               Icon: (props) => <ChartBarIcon {...props} />,
               path: '/polls',
-              tags: ['Free'],
             },
             {
               label: 'Giveaways',
               Icon: (props) => <GiftIcon {...props} />,
               path: '/giveaways',
-              tags: ['Free'],
+            },
+            {
+              label: 'NFT Swap',
+              Icon: (props) => <ArrowPathIcon {...props} />,
+              // path: '/swap',
+              tags: ['SOON'],
             },
             // {
             //   label: 'Mint Tokens',

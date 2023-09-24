@@ -20,10 +20,7 @@ const SingleLink = (props: LinkListItem) => {
   return (
     <Link
       href={path as string}
-      className={
-        'w-full p-2 flex items-center rounded-lg hover:bg-zinc-700 ' +
-        (router.asPath === path ? 'bg-zinc-700' : '')
-      }
+      className={'w-full p-2 flex items-center rounded-lg hover:bg-zinc-700 ' + (router.asPath === path ? 'bg-zinc-700' : '')}
     >
       {Icon ? <Icon className='w-6 h-6 text-zinc-400' /> : <div className='w-6 h-6' />}
       <span className='ml-3 mr-auto truncate'>{label}</span>
@@ -44,10 +41,7 @@ const SingleButton = (props: LinkListItem) => {
   const { label, Icon, tags, onClick } = props
 
   return (
-    <button
-      onClick={() => (onClick ? onClick() : null)}
-      className='w-full p-2 flex items-center rounded-lg hover:bg-zinc-700'
-    >
+    <button onClick={() => (onClick ? onClick() : null)} className='w-full p-2 flex items-center rounded-lg hover:bg-zinc-700'>
       {Icon ? <Icon className='w-6 h-6 text-zinc-400' /> : <div className='w-6 h-6' />}
       <span className='ml-3 mr-auto truncate'>{label}</span>
 
@@ -75,13 +69,7 @@ const DropdownLinks = (props: LinkListItem) => {
         <ul className='py-2 space-y-2'>
           {nested?.map((item) => (
             <li key={`nav-${item.label}`}>
-              {nested?.length ? (
-                <DropdownLinks {...item} />
-              ) : path ? (
-                <SingleLink {...item} />
-              ) : onClick ? (
-                <SingleButton {...item} />
-              ) : null}
+              {nested?.length ? <DropdownLinks {...item} /> : path ? <SingleLink {...item} /> : onClick ? <SingleButton {...item} /> : null}
             </li>
           ))}
         </ul>
@@ -106,7 +94,9 @@ const LinkList = (props: { items: LinkListItem[] }) => {
               <SingleLink {...item} />
             ) : onClick ? (
               <SingleButton {...item} />
-            ) : null}
+            ) : (
+              <SingleButton {...item} />
+            )}
           </li>
         )
       })}

@@ -13,6 +13,9 @@ interface AirdropTimeline {
   }
 }
 
+export const AIRDROP_DESCRIPTION =
+  "The airdrop tool utilizes Cardano's Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy ID(s)."
+
 const Page = () => {
   const [loading, setLoading] = useState(false)
   const [openJourney, setOpenJourney] = useState(false)
@@ -53,10 +56,7 @@ const Page = () => {
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
       <div className='w-full mb-4 flex flex-wrap'>
-        <p className='w-full m-1'>
-          The airdrop tool utilizes Cardano&apos;s Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy
-          ID(s).
-        </p>
+        <p className='w-full m-1'>{AIRDROP_DESCRIPTION}</p>
 
         <button
           className='w-full m-1 p-4 flex items-center justify-center text-center rounded-lg border border-transparent hover:border-green-600 bg-green-900 hover:bg-green-800'

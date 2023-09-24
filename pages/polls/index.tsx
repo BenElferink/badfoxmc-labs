@@ -11,6 +11,9 @@ import PollJourney from '@/components/journeys/PollJourney'
 import PollEnter from '@/components/PollEnter'
 import type { Poll } from '@/@types'
 
+export const POLL_DESCRIPTION =
+  "The governance tool is responsible for running weighted polls, it weighs the holder's assets and influences their voting power."
+
 const Page = () => {
   const { query } = useRouter()
   const { user } = useAuth()
@@ -47,9 +50,7 @@ const Page = () => {
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
       <div className='w-full mb-2 flex flex-wrap'>
-        <p className='w-full m-1'>
-          The governance tool is responsible for running weighted polls, it weighs the holder&apos;s assets and influences their voting power.
-        </p>
+        <p className='w-full m-1'>{POLL_DESCRIPTION}</p>
 
         <button
           className='w-full m-1 p-4 flex items-center justify-center text-center rounded-lg border border-transparent hover:border-green-600 bg-green-900 hover:bg-green-800'
