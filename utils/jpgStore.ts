@@ -73,9 +73,14 @@ interface FetchedTokenActivity {
 
 class JpgStore {
   baseUrl: string
+  headers: Record<string, string>
 
   constructor() {
     this.baseUrl = 'https://server.jpgstoreapis.com'
+    this.headers = {
+      'Accept-Encoding': 'application/json',
+      'X-Jpgstore-Csrf-Protection': '1',
+    }
   }
 
   private formatListingOrSale = (activityType: ActivityType, items: FetchedListingOrSale[]): ApiMarketToken[] => {
@@ -116,9 +121,7 @@ class JpgStore {
           const { data } = await axios.get<{ nextPageCursor: string | null; listings: FetchedListingOrSale[] }>(
             `${uri}${cursor ? `?cursor=${cursor}` : ''}`,
             {
-              headers: {
-                'Accept-Encoding': 'application/json',
-              },
+              headers: this.headers,
             }
           )
 
@@ -155,9 +158,7 @@ class JpgStore {
         console.log(`Fetching recent ${pathType} at page ${page}`, policyId)
 
         const { data } = await axios.get<FetchedListingOrSale[]>(uri, {
-          headers: {
-            'Accept-Encoding': 'application/json',
-          },
+          headers: this.headers,
         })
 
         // @ts-ignore (data["listings"] exists only for pathType = "/listings")
@@ -182,9 +183,7 @@ class JpgStore {
         console.log('Fetching token', tokenId)
 
         const { data } = await axios.get<FetchedToken>(uri, {
-          headers: {
-            'Accept-Encoding': 'application/json',
-          },
+          headers: this.headers,
         })
 
         console.log('Fetched token', data.display_name)
@@ -227,9 +226,7 @@ class JpgStore {
           count: number
           txs: FetchedTokenActivity[]
         }>(uri, {
-          headers: {
-            'Accept-Encoding': 'application/json',
-          },
+          headers: this.headers,
         })
 
         console.log('Fetched token activity', data.txs.length)
