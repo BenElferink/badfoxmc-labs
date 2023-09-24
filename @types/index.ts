@@ -74,6 +74,14 @@ export interface ApiPolicy {
   tokens: ApiBaseToken[] | ApiRankedToken[]
 }
 
+export interface ApiPolicyMarketDetails {
+  policyId: PolicyId
+  name: string
+  description: string
+  pfpUrl: string
+  bannerUrl: string
+}
+
 export interface ApiMarket {
   tokenId: string
   items: ApiMarketToken[]

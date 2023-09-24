@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
 import type { Poll } from '@/@types'
+import api from '@/utils/api'
 
 const WhoHolders = (props: {
   label?: string
@@ -9,12 +11,26 @@ const WhoHolders = (props: {
   stakePools: Poll['stakePools']
 }) => {
   const { label = 'Who can participate?', holderPolicies, withDelegators, stakePools } = props
+  const [refinedHolderPolicies, setRefinedHolderPolicies] = useState(holderPolicies)
+
+  useEffect(() => {
+    ;(async () => {
+      const paylaod = await Promise.all(
+        holderPolicies.map(async (item) => ({
+          ...item,
+          name: (await api.policy.market.getDetails(item.policyId)).name,
+        }))
+      )
+
+      setRefinedHolderPolicies(paylaod)
+    })()
+  }, [holderPolicies])
 
   return (
     <div className='my-2 text-xs text-start flex flex-col items-center justify-center'>
       <h6 className='w-full text-center text-lg'>{label}</h6>
 
-      {holderPolicies.map((setting) => (
+      {refinedHolderPolicies.map((setting) => (
         <div key={`holderPolicies-${setting.policyId}`} className='w-full mt-2'>
           <p className='text-zinc-400'>Policy ID ({setting.weight} points)</p>
 
@@ -24,7 +40,8 @@ const WhoHolders = (props: {
             rel='noopener noreferrer'
             className='flex items-center text-blue-400 hover:underline'
           >
-            {setting.policyId}
+            {/* @ts-ignore */}
+            {setting.name || setting.policyId}
             <ArrowTopRightOnSquareIcon className='w-4 h-4 ml-1' />
           </Link>
 

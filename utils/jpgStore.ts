@@ -1,6 +1,6 @@
 import axios from 'axios'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import type { ActivityType, ApiMarketToken, PolicyId, StakeKey, TokenId, TransactionId } from '@/@types'
+import type { ActivityType, Address, ApiMarketToken, ApiPolicyMarketDetails, PolicyId, StakeKey, TokenId, TransactionId } from '@/@types'
 
 interface FetchedListingOrSale {
   asset_id: TokenId
@@ -71,6 +71,74 @@ interface FetchedTokenActivity {
   bundled_assets_count: string
 }
 
+interface FetchedCollectionDetails {
+  collection: {
+    policy_id: PolicyId
+    display_name: string
+    description: string
+
+    supply: string
+    views: string
+    floor: string
+    jpg_floor_lovelace: string
+    global_floor_lovelace: string
+    jpg_volume_lovelace_24h: string
+    global_volume_lovelace_all_time: string
+
+    state_of_project: string
+    url: string
+    hero_image: string
+    banner_image: string
+    source: string
+    optimized_source: string
+    categories: string[]
+    royalties: {
+      pct: string
+      addr: Address['address']
+    }
+    traits: {
+      [category: string]: {
+        [trait_name: string]: number
+      }
+    }
+    social_links: {
+      website?: string
+      twitter?: string
+      discord?: string
+    }
+
+    to_sync: boolean
+    nsfw: boolean
+    is_minting: boolean
+    is_verified: boolean
+    is_taken_down: boolean
+    is_rugpull: boolean
+    is_derivative: boolean
+    is_hidden: boolean
+    is_inactive: boolean
+    is_eligible_for_xp: boolean
+
+    files: {}
+    likes: null
+    reports: null
+    owners: null
+    mediatype: null
+    guild_id: null
+    thumbnail: null
+    optimized_hero_image: null
+    optimized_banner_image: null
+
+    created_at: Date
+    updated_at: Date
+  }
+  stats: {
+    assetHolders: number
+    global_volume_lovelace_all_time: number
+    updated_at: Date
+    jpg_floor_lovelace: string
+  }
+}
+
 class JpgStore {
   baseUrl: string
   headers: Record<string, string>
@@ -103,7 +171,7 @@ class JpgStore {
     })
   }
 
-  getListings = (policyId: string, options: { withAll?: boolean } = {}): Promise<ApiMarketToken[]> => {
+  getListings = (policyId: PolicyId, options: { withAll?: boolean } = {}): Promise<ApiMarketToken[]> => {
     const withAll = options.withAll ?? false
     const uri = `${this.baseUrl}/policy/${policyId}/listings`
 
@@ -144,7 +212,7 @@ class JpgStore {
     })
   }
 
-  getRecents = (policyId: string, options: { sold?: boolean; page?: number } = {}): Promise<ApiMarketToken[]> => {
+  getRecents = (policyId: PolicyId, options: { sold?: boolean; page?: number } = {}): Promise<ApiMarketToken[]> => {
     const sold = options.sold ?? false
     const activityType = sold ? 'SELL' : 'LIST'
 
@@ -175,7 +243,7 @@ class JpgStore {
     })
   }
 
-  getToken = (tokenId: string): Promise<ApiMarketToken[]> => {
+  getToken = (tokenId: TokenId): Promise<ApiMarketToken[]> => {
     const uri = `${this.baseUrl}/token/${tokenId}`
 
     return new Promise(async (resolve, reject) => {
@@ -215,7 +283,7 @@ class JpgStore {
     })
   }
 
-  getTokenActivity = (tokenId: string): Promise<ApiMarketToken[]> => {
+  getTokenActivity = (tokenId: TokenId): Promise<ApiMarketToken[]> => {
     const uri = `${this.baseUrl}/token/${tokenId}/tx-history?limit=50&offset=0`
 
     return new Promise(async (resolve, reject) => {
@@ -250,6 +318,36 @@ class JpgStore {
             return item
           })
           .sort((a, b) => b.date.getTime() - a.date.getTime())
+
+        return resolve(payload)
+      } catch (error) {
+        return reject(error)
+      }
+    })
+  }
+
+  getCollectionDetails = (policyId: PolicyId): Promise<ApiPolicyMarketDetails> => {
+    const uri = `${this.baseUrl}/collection/${policyId}/detail`
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log('Fetching collection', policyId)
+
+        const {
+          data: { collection },
+        } = await axios.get<FetchedCollectionDetails>(uri, {
+          headers: this.headers,
+        })
+
+        console.log('Fetched collection', collection.display_name)
+
+        const payload: ApiPolicyMarketDetails = {
+          policyId,
+          name: collection.display_name,
+          description: collection.description,
+          pfpUrl: collection.hero_image,
+          bannerUrl: collection.banner_image,
+        }
 
         return resolve(payload)
       } catch (error) {

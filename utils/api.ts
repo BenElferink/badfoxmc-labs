@@ -1,11 +1,21 @@
 import axios from 'axios'
-import type { ApiMarket, ApiPolicy, ApiPool, ApiPoolDelegators, ApiPopulatedToken, ApiTokenOwners, ApiTransaction, ApiWallet } from '@/@types'
+import type {
+  ApiMarket,
+  ApiPolicy,
+  ApiPolicyMarketDetails,
+  ApiPool,
+  ApiPoolDelegators,
+  ApiPopulatedToken,
+  ApiTokenOwners,
+  ApiTransaction,
+  ApiWallet,
+} from '@/@types'
 
 class Api {
   baseUrl: string
 
   constructor() {
-    this.baseUrl = 'https://labs.badfoxmc.com/api/cardano'
+    this.baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000/api/cardano' : 'https://labs.badfoxmc.com/api/cardano'
   }
 
   private getQueryStringFromQueryOptions = (options: Record<string, any> = {}): string => {
@@ -107,6 +117,23 @@ class Api {
             const { data } = await axios.get<ApiMarket>(uri)
 
             console.log('Fetched policy market activity:', data.items.length)
+
+            return resolve(data)
+          } catch (error: any) {
+            return await this.handleError(error, reject, async () => await this.policy.market.getActivity(policyId))
+          }
+        })
+      },
+      getDetails: (policyId: string): Promise<ApiPolicyMarketDetails> => {
+        const uri = `${this.baseUrl}/policy/${policyId}/market/details`
+
+        return new Promise(async (resolve, reject) => {
+          try {
+            console.log('Fetching policy market details:', policyId)
+
+            const { data } = await axios.get<ApiPolicyMarketDetails>(uri)
+
+            console.log('Fetched policy market details:', data.name)
 
             return resolve(data)
           } catch (error: any) {
