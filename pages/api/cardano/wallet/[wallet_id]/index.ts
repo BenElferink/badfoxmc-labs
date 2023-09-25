@@ -35,13 +35,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
         console.log('Fetched wallet:', stakeKey)
 
         const populatedAddresses = []
+        const ownedUnits = []
 
         for (let idx = 0; idx < addresses.length; idx++) {
           const addr = addresses[idx]
 
           console.log('Fetching address:', addr)
 
-          const { type, script } = await blockfrost.addresses(addr)
+          const { type, script, amount } = await blockfrost.addresses(addr)
 
           console.log('Fetched address:', type)
 
@@ -49,6 +50,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
             address: addr,
             isScript: script,
           })
+
+          ownedUnits.push(...amount)
 
           if (!allAddresses) break
         }
@@ -58,7 +61,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
           addresses: populatedAddresses,
         }
 
-        if (withStakePool) {
+        if (withStakePool && stakeKey) {
           console.log('Fetching stake pool of wallet:', stakeKey)
 
           const account = await blockfrost.accounts(stakeKey)
@@ -70,15 +73,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
         }
 
         if (withTokens) {
-          console.log('Fetching tokens of wallet:', stakeKey)
+          const units = []
 
-          const fetchedTokens = await blockfrost.accountsAddressesAssetsAll(stakeKey)
+          if (stakeKey) {
+            console.log('Fetching tokens of wallet:', stakeKey)
 
-          console.log('Fetched tokens:', fetchedTokens.length)
+            const fetchedUnits = await blockfrost.accountsAddressesAssetsAll(stakeKey)
+
+            console.log('Fetched tokens:', fetchedUnits.length)
+
+            units.push(...fetchedUnits)
+          } else {
+            units.push(...ownedUnits)
+          }
 
           wallet.handles = []
           wallet.tokens = await Promise.all(
-            fetchedTokens.map(async ({ unit, quantity }) => {
+            units.map(async ({ unit, quantity }) => {
               const tokenId = unit
               const tokenAmountOnChain = Number(quantity)
               let tokenAmountDecimals = 0
