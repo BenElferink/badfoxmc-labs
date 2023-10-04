@@ -135,7 +135,7 @@ export interface ApiWallet {
   addresses: Address[]
   poolId?: PoolId
   handles?: string[]
-  tokens?: ApiBaseToken[]
+  tokens?: ApiBaseToken[] | ApiPopulatedToken[]
 }
 
 export interface User extends ApiWallet {

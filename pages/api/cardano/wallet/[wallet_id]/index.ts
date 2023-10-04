@@ -7,6 +7,7 @@ import resolveWalletIdentifiers from '@/functions/resolvers/resolveWalletIdentif
 import splitTokenId from '@/functions/resolvers/splitTokenId'
 import { ERROR_TYPES, POLICY_IDS } from '@/constants'
 import type { ApiBaseToken, ApiWallet } from '@/@types'
+import populateToken from '@/functions/populateToken'
 
 export const config = {
   maxDuration: 300,
@@ -25,6 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
   const allAddresses = !!query.all_addresses && query.all_addresses == 'true'
   const withStakePool = !!query.with_stake_pool && query.with_stake_pool == 'true'
   const withTokens = !!query.with_tokens && query.with_tokens == 'true'
+  const populateTokens = !!query.populate_tokens && query.populate_tokens == 'true'
 
   try {
     switch (method) {
@@ -36,7 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
         console.log('Fetched wallet:', stakeKey)
 
         const populatedAddresses = []
-        const ownedUnits = []
+        const ownedUnitsByAddress = []
 
         for (let idx = 0; idx < addresses.length; idx++) {
           const addr = addresses[idx]
@@ -52,7 +54,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
             isScript: script,
           })
 
-          ownedUnits.push(...amount)
+          ownedUnitsByAddress.push(...amount)
 
           if (!allAddresses) break
         }
@@ -79,18 +81,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
           if (stakeKey) {
             console.log('Fetching tokens of wallet:', stakeKey)
 
-            const fetchedUnits = await blockfrost.accountsAddressesAssetsAll(stakeKey)
+            const ownedUnitsByStake = await blockfrost.accountsAddressesAssetsAll(stakeKey)
 
-            console.log('Fetched tokens:', fetchedUnits.length)
+            console.log('Fetched tokens:', ownedUnitsByStake.length)
 
-            units.push(...fetchedUnits)
+            units.push(...ownedUnitsByStake)
           } else {
-            units.push(...ownedUnits)
+            units.push(...ownedUnitsByAddress)
           }
 
           wallet.handles = []
           wallet.tokens = await Promise.all(
             units.map(async ({ unit, quantity }) => {
+              if (populateTokens) {
+                return await populateToken(unit)
+              }
+
               const tokenId = unit
               const tokenAmountOnChain = Number(quantity)
               let tokenAmountDecimals = 0

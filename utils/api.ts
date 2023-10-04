@@ -43,6 +43,7 @@ class Api {
       queryOptions?: {
         withStakePool?: boolean
         withTokens?: boolean
+        populateTokens?: boolean
       }
     ): Promise<ApiWallet> => {
       const uri = `${this.baseUrl}/wallet/${walletId}` + this.getQueryStringFromQueryOptions(queryOptions)
