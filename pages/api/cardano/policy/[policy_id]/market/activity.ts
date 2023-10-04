@@ -2,6 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import jpgStore from '@/utils/jpgStore'
 import type { ApiMarketToken } from '@/@types'
 
+export const config = {
+  maxDuration: 300,
+  api: {
+    responseLimit: false,
+  },
+}
+
 export interface PolicyMarketActivityResponse {
   policyId: string
   items: ApiMarketToken[]

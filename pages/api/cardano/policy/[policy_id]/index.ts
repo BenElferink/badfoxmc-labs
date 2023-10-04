@@ -9,6 +9,7 @@ import type { ApiBaseToken, ApiPolicy, ApiRankedToken } from '@/@types'
 import type { PolicyRanked } from '@/utils/cnftTools'
 
 export const config = {
+  maxDuration: 300,
   api: {
     responseLimit: false,
   },

@@ -3,6 +3,7 @@ import populateToken from '@/functions/populateToken'
 import type { ApiPopulatedToken } from '@/@types'
 
 export const config = {
+  maxDuration: 300,
   api: {
     responseLimit: false,
   },

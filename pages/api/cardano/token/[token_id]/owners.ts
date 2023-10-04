@@ -3,6 +3,7 @@ import blockfrost from '@/utils/blockfrost'
 import type { ApiTokenOwners, TokenOwner } from '@/@types'
 
 export const config = {
+  maxDuration: 300,
   api: {
     responseLimit: false,
   },

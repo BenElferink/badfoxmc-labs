@@ -6,6 +6,13 @@ import api from '@/utils/api'
 import type { Giveaway, GiveawayWinner, TokenId, TransactionId } from '@/@types'
 import { API_KEYS, WALLET_KEYS } from '@/constants'
 
+export const config = {
+  maxDuration: 300,
+  api: {
+    responseLimit: false,
+  },
+}
+
 interface PayTo extends GiveawayWinner {
   tokenId: TokenId
   transactionId?: TransactionId

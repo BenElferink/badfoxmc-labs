@@ -9,6 +9,7 @@ import { ERROR_TYPES, POLICY_IDS } from '@/constants'
 import type { ApiBaseToken, ApiWallet } from '@/@types'
 
 export const config = {
+  maxDuration: 300,
   api: {
     responseLimit: false,
   },

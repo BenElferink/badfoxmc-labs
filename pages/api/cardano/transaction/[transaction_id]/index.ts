@@ -3,6 +3,7 @@ import blockfrost from '@/utils/blockfrost'
 import type { ApiTransaction, ApiUtxo } from '@/@types'
 
 export const config = {
+  maxDuration: 300,
   api: {
     responseLimit: false,
   },

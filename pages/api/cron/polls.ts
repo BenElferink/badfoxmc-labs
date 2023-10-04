@@ -2,6 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { firestore } from '@/utils/firebase'
 import type { Poll } from '@/@types'
 
+export const config = {
+  maxDuration: 300,
+  api: {
+    responseLimit: false,
+  },
+}
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req
 
