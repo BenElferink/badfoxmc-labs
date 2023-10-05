@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PlusIcon } from '@heroicons/react/24/solid'
-import getAirdrops from '@/functions/storage/airdrops/getAirdrops'
 import resolveMonthName from '@/functions/resolvers/resolveMonthName'
 import Loader from '@/components/Loader'
 import AirdropCard from '@/components/cards/AirdropCard'
 import AirdropJourney from '@/components/journeys/AirdropJourney'
 import type { Airdrop } from '@/@types'
+import { useData } from '@/contexts/DataContext'
 
 interface AirdropTimeline {
   [year: string]: {
@@ -17,41 +17,35 @@ export const AIRDROP_DESCRIPTION =
   "The airdrop tool utilizes Cardano's Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy ID(s)."
 
 const Page = () => {
-  const [loading, setLoading] = useState(false)
+  const { airdrops, refetchAirdrops } = useData()
   const [openJourney, setOpenJourney] = useState(false)
   const [airdropTimeline, setAirdropTimeline] = useState<AirdropTimeline | null>(null)
 
-  const getAndSetAirdrops = useCallback(() => {
-    setLoading(true)
-    getAirdrops()
-      .then((data) => {
-        const payload: AirdropTimeline = {}
-
-        data.forEach((item) => {
-          const date = new Date(item.timestamp)
-          const y = date.getFullYear().toString()
-          const m = date.getMonth().toString()
-
-          if (payload[y]) {
-            if (payload[y][m]) {
-              payload[y][m].push(item)
-            } else {
-              payload[y][m] = [item]
-            }
-          } else {
-            payload[y] = { [m]: [item] }
-          }
-        })
-
-        setAirdropTimeline(payload)
-      })
-      .catch((error) => console.error(error.message))
-      .finally(() => setLoading(false))
-  }, [])
-
   useEffect(() => {
-    getAndSetAirdrops()
-  }, [getAndSetAirdrops])
+    if (!airdrops.length) {
+      refetchAirdrops()
+    } else {
+      const payload: AirdropTimeline = {}
+
+      airdrops.forEach((item) => {
+        const date = new Date(item.timestamp)
+        const y = date.getFullYear().toString()
+        const m = date.getMonth().toString()
+
+        if (payload[y]) {
+          if (payload[y][m]) {
+            payload[y][m].push(item)
+          } else {
+            payload[y][m] = [item]
+          }
+        } else {
+          payload[y] = { [m]: [item] }
+        }
+      })
+
+      setAirdropTimeline(payload)
+    }
+  }, [airdrops])
 
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
@@ -67,7 +61,9 @@ const Page = () => {
       </div>
 
       <div className='flex flex-col-reverse'>
-        {!!airdropTimeline ? (
+        {!airdropTimeline ? (
+          <Loader />
+        ) : (
           Object.entries(airdropTimeline).map(([year, months]) =>
             Object.entries(months).map(([month, drops]) => (
               <div key={`year-${year}-month-${month}`} className='my-2'>
@@ -89,16 +85,14 @@ const Page = () => {
               </div>
             ))
           )
-        ) : loading ? (
-          <Loader />
-        ) : null}
+        )}
       </div>
 
       <AirdropJourney
         open={openJourney}
         onClose={() => {
           setOpenJourney(false)
-          getAndSetAirdrops()
+          refetchAirdrops()
         }}
       />
     </div>

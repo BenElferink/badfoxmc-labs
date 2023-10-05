@@ -50,10 +50,11 @@ export const AuthProvider = (props: PropsWithChildren) => {
           lovelaces = Number(await wallet.getLovelace())
         }
 
+        const user = await getUser(sKey)
+
         const { addresses, poolId, tokens } = await api.wallet.getData(sKey, {
           withStakePool: true,
           withTokens: true,
-          // populateTokens: true,
         })
 
         const populatedTokens = await Promise.all(
@@ -71,8 +72,6 @@ export const AuthProvider = (props: PropsWithChildren) => {
           ({ tokenId }) => tokenId.indexOf(POLICY_IDS['BAD_KEY']) == 0 || BFMC_BANKER_CARD_TOKEN_IDS.includes(tokenId)
         )
 
-        const user = await getUser(sKey)
-
         setUser({
           stakeKey: sKey,
           addresses,
@@ -81,7 +80,6 @@ export const AuthProvider = (props: PropsWithChildren) => {
           profilePicture: user?.profilePicture || '',
           poolId,
           isTokenGateHolder,
-          // tokens: tokens as ApiPopulatedToken[],
           tokens: populatedTokens,
         })
 

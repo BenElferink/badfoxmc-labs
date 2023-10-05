@@ -4,6 +4,8 @@ import { FetchedTimestampResponse } from '@/pages/api/timestamp'
 import type { Giveaway, StakeKey } from '@/@types'
 
 const getGiveaways = async (id?: string, stakeKey?: StakeKey) => {
+  console.log('fetching giveaway(s) from db')
+
   const collection = firestore.collection('giveaways')
   const docs: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>[] = []
 
@@ -34,6 +36,8 @@ const getGiveaways = async (id?: string, stakeKey?: StakeKey) => {
     })
     .sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0))
     .sort((a, b) => (!a.active ? b.endAt - a.endAt : a.endAt - b.endAt))
+
+  console.log(`succesfully fetched ${docs.length} giveaway(s) from db`)
 
   return payload
 }

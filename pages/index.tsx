@@ -1,33 +1,19 @@
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 import { LoaderIcon } from 'react-hot-toast'
-import getAirdrops from '@/functions/storage/airdrops/getAirdrops'
-import getGiveaways from '@/functions/storage/giveaways/getGiveaways'
-import getPolls from '@/functions/storage/polls/getPolls'
-import type { Airdrop, Giveaway, Poll } from '@/@types'
+import { useData } from '@/contexts/DataContext'
 import { AIRDROP_DESCRIPTION } from './airdrops'
 import { POLL_DESCRIPTION } from './polls'
 import { GIVEAWAY_DESCRIPTION } from './giveaways'
+import { useEffect } from 'react'
 
 const Page = () => {
-  const [airdrops, setAirdrops] = useState<Airdrop[]>([])
-  const [polls, setPolls] = useState<Poll[]>([])
-  const [giveaways, setGiveaways] = useState<Giveaway[]>([])
+  const { airdrops, refetchAirdrops, polls, refetchPolls, giveaways, refetchGiveaways } = useData()
 
   useEffect(() => {
-    ;(async () =>
-      await Promise.all([
-        getAirdrops()
-          .then((data) => setAirdrops(data))
-          .catch((error) => console.error(error.message)),
-        getPolls()
-          .then((data) => setPolls(data))
-          .catch((error) => console.error(error.message)),
-        getGiveaways()
-          .then((data) => setGiveaways(data))
-          .catch((error) => console.error(error.message)),
-      ]))()
-  }, [])
+    if (!airdrops.length) refetchAirdrops()
+    if (!polls.length) refetchPolls()
+    if (!giveaways.length) refetchGiveaways()
+  }, [airdrops, polls, giveaways])
 
   return (
     <div className='w-full flex flex-col items-center'>

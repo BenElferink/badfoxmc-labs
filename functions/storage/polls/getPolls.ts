@@ -4,6 +4,8 @@ import { FetchedTimestampResponse } from '@/pages/api/timestamp'
 import type { Poll, StakeKey } from '@/@types'
 
 const getPolls = async (id?: string, stakeKey?: StakeKey) => {
+  console.log('fetching polls(s) from db')
+
   const collection = firestore.collection('polls')
   const docs: firebase.firestore.DocumentSnapshot<firebase.firestore.DocumentData>[] = []
 
@@ -50,6 +52,8 @@ const getPolls = async (id?: string, stakeKey?: StakeKey) => {
     })
     .sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0))
     .sort((a, b) => (!a.active ? b.endAt - a.endAt : a.endAt - b.endAt))
+
+  console.log(`succesfully fetched ${docs.length} polls(s) from db`)
 
   return payload
 }

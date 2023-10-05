@@ -1,8 +1,7 @@
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
-import getGiveaways from '@/functions/storage/giveaways/getGiveaways'
 import DropDown from '@/components/form/DropDown'
 import Loader from '@/components/Loader'
 import Modal from '@/components/Modal'
@@ -10,6 +9,7 @@ import GiveawayCard from '@/components/cards/GiveawayCard'
 import GiveawayJourney from '@/components/journeys/GiveawayJourney'
 import GiveawayEnter from '@/components/GiveawayEnter'
 import type { Giveaway } from '@/@types'
+import { useData } from '@/contexts/DataContext'
 
 export const GIVEAWAY_DESCRIPTION =
   "The giveaway tool is responsible for running weighted giveaways, it weighs the holder's assets and influences their entry points."
@@ -17,27 +17,18 @@ export const GIVEAWAY_DESCRIPTION =
 const Page = () => {
   const { query } = useRouter()
   const { user } = useAuth()
+  const { giveaways, refetchGiveaways } = useData()
 
-  const [loading, setLoading] = useState(false)
+  useEffect(() => {
+    if (!giveaways.length) refetchGiveaways()
+  }, [giveaways])
+
   const [openJourney, setOpenJourney] = useState(false)
-  const [giveaways, setGiveaways] = useState<Giveaway[]>([])
   const [selectedId, setSelectedId] = useState(query.id)
 
   useEffect(() => {
     if (query.id) setSelectedId(query.id)
   }, [query])
-
-  const getAndSetGiveaways = useCallback(() => {
-    setLoading(true)
-    getGiveaways()
-      .then((data) => setGiveaways(data))
-      .catch((error) => console.error(error.message))
-      .finally(() => setLoading(false))
-  }, [])
-
-  useEffect(() => {
-    getAndSetGiveaways()
-  }, [getAndSetGiveaways])
 
   const [filters, setFilters] = useState<{
     who: 'everyone' | 'me'
@@ -96,7 +87,9 @@ const Page = () => {
       </div>
 
       <div className='w-full flex flex-wrap justify-center sm:justify-start'>
-        {giveaways.length ? (
+        {!giveaways.length ? (
+          <Loader />
+        ) : (
           giveaways.map(
             ({
               id,
@@ -152,16 +145,14 @@ const Page = () => {
               )
             }
           )
-        ) : loading ? (
-          <Loader />
-        ) : null}
+        )}
       </div>
 
       <GiveawayJourney
         open={openJourney}
         onClose={() => {
           setOpenJourney(false)
-          getAndSetGiveaways()
+          refetchGiveaways()
         }}
       />
 
@@ -169,7 +160,7 @@ const Page = () => {
         open={!!selectedId && !!giveaways.length}
         onClose={() => {
           setSelectedId('')
-          getAndSetGiveaways()
+          refetchGiveaways()
         }}
       >
         <GiveawayEnter giveaway={giveaways.find(({ id }) => id === selectedId) as Giveaway} />
