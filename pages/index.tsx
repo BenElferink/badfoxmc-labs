@@ -10,9 +10,11 @@ const Page = () => {
   const { airdrops, refetchAirdrops, polls, refetchPolls, giveaways, refetchGiveaways } = useData()
 
   useEffect(() => {
-    if (!airdrops.length) refetchAirdrops()
-    if (!polls.length) refetchPolls()
-    if (!giveaways.length) refetchGiveaways()
+    ;(async () => {
+      if (!airdrops.length) await refetchAirdrops()
+      if (!polls.length) await refetchPolls()
+      if (!giveaways.length) await refetchGiveaways()
+    })()
   }, [airdrops, polls, giveaways])
 
   return (
