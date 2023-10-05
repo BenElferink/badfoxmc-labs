@@ -3,8 +3,10 @@ import { toast } from 'react-hot-toast'
 import { useWallet } from '@meshsdk/react'
 import api from '@/utils/api'
 import getUser from '@/functions/storage/users/getUser'
+import eachLimit from '@/functions/eachLimit'
+import chunk from '@/functions/chunk'
+import type { ApiBaseToken, ApiPopulatedToken, User } from '@/@types'
 import { BFMC_BANKER_CARD_TOKEN_IDS, POLICY_IDS } from '@/constants'
-import type { User } from '@/@types'
 
 interface AuthContext {
   user: User | null
@@ -36,7 +38,7 @@ export const AuthProvider = (props: PropsWithChildren) => {
   const getAndSetUser = useCallback(
     async (forceStakeKey?: string): Promise<void> => {
       toast.dismiss()
-      toast.loading('Loading Profile')
+      toast.loading('Loading Wallet')
 
       try {
         let sKey = ''
@@ -57,16 +59,26 @@ export const AuthProvider = (props: PropsWithChildren) => {
           withTokens: true,
         })
 
-        const populatedTokens = await Promise.all(
-          tokens?.map(async (ownedToken) => {
-            const fetchedToken = await api.token.getData(ownedToken.tokenId)
+        const populatedTokens: ApiPopulatedToken[] = []
 
-            return {
-              ...fetchedToken,
-              tokenAmount: ownedToken.tokenAmount,
+        await eachLimit<ApiBaseToken[]>(chunk<ApiBaseToken>(tokens || [], 10), 10, async (items) => {
+          for await (const { tokenId, tokenAmount } of items) {
+            try {
+              const fetchedToken = await api.token.getData(tokenId)
+
+              populatedTokens.push({
+                ...fetchedToken,
+                tokenAmount,
+              })
+            } catch (error: any) {
+              if (error.code === 'ECONNRESET') {
+                console.error('Connection reset error.')
+              } else {
+                console.error(error.message)
+              }
             }
-          }) || []
-        )
+          }
+        })
 
         const isTokenGateHolder = !!tokens?.find(
           ({ tokenId }) => tokenId.indexOf(POLICY_IDS['BAD_KEY']) == 0 || BFMC_BANKER_CARD_TOKEN_IDS.includes(tokenId)
@@ -80,11 +92,11 @@ export const AuthProvider = (props: PropsWithChildren) => {
           profilePicture: user?.profilePicture || '',
           poolId,
           isTokenGateHolder,
-          tokens: populatedTokens,
+          tokens: populatedTokens.filter((x) => !!x),
         })
 
         toast.dismiss()
-        toast.success('Profile Loaded')
+        toast.success('Wallet Loaded')
       } catch (error: any) {
         setUser(null)
         disconnect()
