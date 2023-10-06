@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
-import type { Poll } from '@/@types'
 import api from '@/utils/api'
+import type { Poll } from '@/@types'
 
 const WhoHolders = (props: {
   label?: string
