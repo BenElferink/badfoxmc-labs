@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
+import { useData } from '@/contexts/DataContext'
 import DropDown from '@/components/form/DropDown'
 import Loader from '@/components/Loader'
 import Modal from '@/components/Modal'
@@ -9,7 +10,6 @@ import GiveawayCard from '@/components/cards/GiveawayCard'
 import GiveawayJourney from '@/components/journeys/GiveawayJourney'
 import GiveawayEnter from '@/components/GiveawayEnter'
 import type { Giveaway } from '@/@types'
-import { useData } from '@/contexts/DataContext'
 
 export const GIVEAWAY_DESCRIPTION =
   "The giveaway tool is responsible for running weighted giveaways, it weighs the holder's assets and influences their entry points."

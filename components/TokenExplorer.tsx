@@ -6,6 +6,7 @@ import TextFrown from './TextFrown'
 import Loader from './Loader'
 import Input from './form/Input'
 import type { ApiPopulatedToken } from '@/@types'
+import { DECIMALS, POPULATED_LOVELACE } from '@/constants'
 
 type Collection = {
   policyId: string
@@ -35,30 +36,14 @@ const TokenExplorer = (props: {
 
       if (withAda) {
         const lovelaces = user.lovelaces || 0
-        const lovelaceDecimals = 6
 
         const adaBalance = {
-          tokenId: 'lovelace',
-          fingerprint: 'lovelace',
-          policyId: 'lovelace',
-          isFungible: true,
-          mintTransactionId: '',
-          tokenName: {
-            onChain: 'lovelace',
-            ticker: 'ADA',
-            display: 'ADA',
-          },
+          ...POPULATED_LOVELACE,
           tokenAmount: {
             onChain: lovelaces,
-            display: formatTokenAmount.fromChain(lovelaces, lovelaceDecimals),
-            decimals: lovelaceDecimals,
+            display: formatTokenAmount.fromChain(lovelaces, DECIMALS['ADA']),
+            decimals: DECIMALS['ADA'],
           },
-          image: {
-            ipfs: '',
-            url: 'https://labs.badfoxmc.com/media/ada.png',
-          },
-          files: [],
-          attributes: {},
         }
 
         payload.push({

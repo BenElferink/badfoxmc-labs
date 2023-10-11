@@ -1,13 +1,29 @@
-import type { ApiPopulatedToken, TokenId } from '@/@types'
 import blockfrost from '@/utils/blockfrost'
 import splitTokenId from './resolvers/splitTokenId'
+import resolveTokenRegisteredMetadata from './resolvers/resolveTokenRegisteredMetadata'
 import formatHex from './formatters/formatHex'
 import formatTokenAmount from './formatters/formatTokenAmount'
 import formatIpfsReference from './formatters/formatIpfsReference'
-import resolveTokenRegisteredMetadata from './resolvers/resolveTokenRegisteredMetadata'
 import numbersFromString from './formatters/numbersFromString'
+import type { ApiPopulatedToken, TokenId } from '@/@types'
+import { DECIMALS, POPULATED_LOVELACE } from '@/constants'
 
-const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: boolean }): Promise<ApiPopulatedToken> => {
+const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: boolean; quantity?: string }): Promise<ApiPopulatedToken> => {
+  if (tokenId === 'lovelace') {
+    const lovelaces = options?.quantity ? Number(options.quantity) : 0
+
+    const payload = {
+      ...POPULATED_LOVELACE,
+      tokenAmount: {
+        onChain: lovelaces,
+        display: formatTokenAmount.fromChain(lovelaces, DECIMALS['ADA']),
+        decimals: DECIMALS['ADA'],
+      },
+    }
+
+    return payload
+  }
+
   const populateMintTx = options?.populateMintTx || false
 
   console.log('Fetching token with Token ID:', tokenId)

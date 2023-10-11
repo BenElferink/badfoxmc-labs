@@ -347,6 +347,7 @@ class JpgStore {
           description: collection.description,
           pfpUrl: collection.hero_image,
           bannerUrl: collection.banner_image,
+          floorPrice: Number(collection.floor),
         }
 
         return resolve(payload)

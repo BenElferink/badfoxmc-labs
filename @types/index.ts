@@ -80,6 +80,7 @@ export interface ApiPolicyMarketDetails {
   description: string
   pfpUrl: string
   bannerUrl: string
+  floorPrice: number
 }
 
 export interface ApiMarket {

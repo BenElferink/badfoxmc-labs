@@ -93,9 +93,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
           wallet.handles = []
           wallet.tokens = await Promise.all(
             units.map(async ({ unit, quantity }) => {
-              if (populateTokens) {
-                return await populateToken(unit)
-              }
+              if (populateTokens) return await populateToken(unit, { quantity })
 
               const tokenId = unit
               const tokenAmountOnChain = Number(quantity)

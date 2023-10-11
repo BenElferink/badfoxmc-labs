@@ -1,4 +1,4 @@
-import type { MediaType } from '@/@types'
+import type { ApiPopulatedToken, MediaType } from '@/@types'
 
 export const API_KEYS = {
   FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,14 +15,8 @@ export const WALLET_KEYS = {
   GIVEAWAY_APP_MNEMONIC: Array.isArray(process.env.GIVEAWAY_APP_MNEMONIC)
     ? process.env.GIVEAWAY_APP_MNEMONIC
     : process.env.GIVEAWAY_APP_MNEMONIC?.split(',') || [],
-}
 
-export const POLICY_IDS = {
-  ADA_HANDLE: 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a',
-  BAD_KEY: '80e3ccc66f4dfeff6bc7d906eb166a984a1fc6d314e33721ad6add14',
-  BAD_FOX_2D: 'fa669150ad134964e86b2fa7275a12072f61b438d0d44204d3a2f967',
-  BAD_FOX_3D: '8804474d85430846883b804375b26b17c563df2338ea9b46652c3164',
-  BAD_MOTORCYCLE_2D: 'ab662f7402af587e64d217995e20f95ac3ae3ff8417d9158b04fbba8',
+  SWAP_APP_MNEMONIC: Array.isArray(process.env.SWAP_APP_MNEMONIC) ? process.env.SWAP_APP_MNEMONIC : process.env.SWAP_APP_MNEMONIC?.split(',') || [],
 }
 
 export const WALLET_ADDRESSES = {
@@ -34,6 +28,16 @@ export const WALLET_ADDRESSES = {
   MINT_BAD_KEY: 'addr1v9tce86r8v9larevjr7el7d5ua3eruz2cn4d93mqmt8w4agmy2leh',
 
   GIVEAWAY_APP: 'addr1v9qxndxhkl2g5qsz5mdv0w07zau5gpp5vttw0perr2py9ugrr25fs',
+  SWAP_APP: 'addr1v8sle94z2pyxvza9aj9rd0wln4rctc390y5us700vs4h88qphhn2x',
+}
+
+export const POLICY_IDS = {
+  ADA_HANDLE: 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a',
+  BAD_KEY: '80e3ccc66f4dfeff6bc7d906eb166a984a1fc6d314e33721ad6add14',
+  BAD_FOX_2D: 'fa669150ad134964e86b2fa7275a12072f61b438d0d44204d3a2f967',
+  BAD_FOX_3D: '8804474d85430846883b804375b26b17c563df2338ea9b46652c3164',
+  BAD_MOTORCYCLE_2D: 'ab662f7402af587e64d217995e20f95ac3ae3ff8417d9158b04fbba8',
+  BAD_MOTORCYCLE_3D: '',
 }
 
 export const BFMC_BANKER_CARD_TOKEN_IDS = [
@@ -91,4 +95,28 @@ export const MEDIA_TYPES: Record<MediaType, MediaType> = {
 
 export const ERROR_TYPES = {
   INVALID_WALLET_IDENTIFIER: 'INVALID_WALLET_IDENTIFIER',
+}
+
+export const POPULATED_LOVELACE: ApiPopulatedToken = {
+  tokenId: 'lovelace',
+  fingerprint: 'lovelace',
+  policyId: 'lovelace',
+  isFungible: true,
+  mintTransactionId: '',
+  tokenName: {
+    onChain: 'lovelace',
+    ticker: 'ADA',
+    display: 'ADA',
+  },
+  tokenAmount: {
+    onChain: 0,
+    display: 0,
+    decimals: DECIMALS['ADA'],
+  },
+  image: {
+    ipfs: '',
+    url: 'https://labs.badfoxmc.com/media/ada.png',
+  },
+  files: [],
+  attributes: {},
 }
