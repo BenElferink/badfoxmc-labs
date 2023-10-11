@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Modal from '../Modal'
 import ErrorNotConnected from './steps/ErrorNotConnected'
-// import ErrorNotTokenGateHolder from './steps/ErrorNotTokenGateHolder'
+import ErrorNotTokenGateHolder from './steps/ErrorNotTokenGateHolder'
 import HolderPolicies from './steps/HolderPolicies'
 import HolderStakePools from './steps/HolderStakePools'
 import HolderBlacklist from './steps/HolderBlacklist'
@@ -51,13 +51,13 @@ const PollJourney = (props: { open: boolean; onClose: () => void }) => {
     )
   }
 
-  // if (user && !user.isTokenGateHolder) {
-  //   return (
-  //     <Modal open={open} onClose={handleClose}>
-  //       <ErrorNotTokenGateHolder />
-  //     </Modal>
-  //   )
-  // }
+  if (user && !user.isTokenGateHolder) {
+    return (
+      <Modal open={open} onClose={handleClose}>
+        <ErrorNotTokenGateHolder />
+      </Modal>
+    )
+  }
 
   const increment = () => setStep((prev) => prev + 1)
   const decrement = () => setStep((prev) => prev - 1)
