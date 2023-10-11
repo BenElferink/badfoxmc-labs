@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useMemo, ReactNode, useEffect, useCallback } from 'react'
+import { createContext, useState, useContext, useMemo, ReactNode, useCallback } from 'react'
 import getAirdrops from '@/functions/storage/airdrops/getAirdrops'
 import getPolls from '@/functions/storage/polls/getPolls'
 import getGiveaways from '@/functions/storage/giveaways/getGiveaways'
@@ -6,18 +6,18 @@ import type { Airdrop, Giveaway, Poll } from '@/@types'
 
 const ctxInit: {
   airdrops: Airdrop[]
-  refetchAirdrops: () => Promise<void>
+  fetchAirdrops: () => Promise<void>
   polls: Poll[]
-  refetchPolls: () => Promise<void>
+  fetchPolls: () => Promise<void>
   giveaways: Giveaway[]
-  refetchGiveaways: () => Promise<void>
+  fetchGiveaways: () => Promise<void>
 } = {
   airdrops: [],
-  refetchAirdrops: async () => {},
+  fetchAirdrops: async () => {},
   polls: [],
-  refetchPolls: async () => {},
+  fetchPolls: async () => {},
   giveaways: [],
-  refetchGiveaways: async () => {},
+  fetchGiveaways: async () => {},
 }
 
 const DataContext = createContext(ctxInit)
@@ -31,7 +31,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [polls, setPolls] = useState(ctxInit.polls)
   const [giveaways, setGiveaways] = useState(ctxInit.giveaways)
 
-  const refetchAirdrops = useCallback(async () => {
+  const fetchAirdrops = useCallback(async () => {
     try {
       const data = await getAirdrops()
       setAirdrops(data)
@@ -40,7 +40,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  const refetchPolls = useCallback(async () => {
+  const fetchPolls = useCallback(async () => {
     try {
       const data = await getPolls()
       setPolls(data)
@@ -49,7 +49,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  const refetchGiveaways = useCallback(async () => {
+  const fetchGiveaways = useCallback(async () => {
     try {
       const data = await getGiveaways()
       setGiveaways(data)
@@ -61,13 +61,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const memoedValue = useMemo(
     () => ({
       airdrops,
-      refetchAirdrops,
+      fetchAirdrops,
       polls,
-      refetchPolls,
+      fetchPolls,
       giveaways,
-      refetchGiveaways,
+      fetchGiveaways,
     }),
-    [airdrops, refetchAirdrops, polls, refetchPolls, giveaways, refetchGiveaways]
+    [airdrops, fetchAirdrops, polls, fetchPolls, giveaways, fetchGiveaways]
   )
 
   return <DataContext.Provider value={memoedValue}>{children}</DataContext.Provider>

@@ -1,19 +1,19 @@
 import Link from 'next/link'
+import { useEffect } from 'react'
 import { LoaderIcon } from 'react-hot-toast'
 import { useData } from '@/contexts/DataContext'
 import { AIRDROP_DESCRIPTION } from './airdrops'
 import { POLL_DESCRIPTION } from './polls'
 import { GIVEAWAY_DESCRIPTION } from './giveaways'
-import { useEffect } from 'react'
 
 const Page = () => {
-  const { airdrops, refetchAirdrops, polls, refetchPolls, giveaways, refetchGiveaways } = useData()
+  const { airdrops, fetchAirdrops, polls, fetchPolls, giveaways, fetchGiveaways } = useData()
 
   useEffect(() => {
     ;(async () => {
-      if (!airdrops.length) await refetchAirdrops()
-      if (!polls.length) await refetchPolls()
-      if (!giveaways.length) await refetchGiveaways()
+      if (!airdrops.length) await fetchAirdrops()
+      if (!polls.length) await fetchPolls()
+      if (!giveaways.length) await fetchGiveaways()
     })()
   }, [airdrops, polls, giveaways])
 

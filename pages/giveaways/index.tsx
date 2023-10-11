@@ -17,10 +17,10 @@ export const GIVEAWAY_DESCRIPTION =
 const Page = () => {
   const { query } = useRouter()
   const { user } = useAuth()
-  const { giveaways, refetchGiveaways } = useData()
+  const { giveaways, fetchGiveaways } = useData()
 
   useEffect(() => {
-    if (!giveaways.length) refetchGiveaways()
+    if (!giveaways.length) fetchGiveaways()
   }, [giveaways])
 
   const [openJourney, setOpenJourney] = useState(false)
@@ -152,7 +152,7 @@ const Page = () => {
         open={openJourney}
         onClose={() => {
           setOpenJourney(false)
-          refetchGiveaways()
+          fetchGiveaways()
         }}
       />
 
@@ -160,7 +160,7 @@ const Page = () => {
         open={!!selectedId && !!giveaways.length}
         onClose={() => {
           setSelectedId('')
-          refetchGiveaways()
+          fetchGiveaways()
         }}
       >
         <GiveawayEnter giveaway={giveaways.find(({ id }) => id === selectedId) as Giveaway} />

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { PlusIcon } from '@heroicons/react/24/solid'
+import { useData } from '@/contexts/DataContext'
 import resolveMonthName from '@/functions/resolvers/resolveMonthName'
 import Loader from '@/components/Loader'
 import AirdropCard from '@/components/cards/AirdropCard'
 import AirdropJourney from '@/components/journeys/AirdropJourney'
 import type { Airdrop } from '@/@types'
-import { useData } from '@/contexts/DataContext'
 
 interface AirdropTimeline {
   [year: string]: {
@@ -17,13 +17,13 @@ export const AIRDROP_DESCRIPTION =
   "The airdrop tool utilizes Cardano's Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy ID(s)."
 
 const Page = () => {
-  const { airdrops, refetchAirdrops } = useData()
+  const { airdrops, fetchAirdrops } = useData()
   const [openJourney, setOpenJourney] = useState(false)
   const [airdropTimeline, setAirdropTimeline] = useState<AirdropTimeline | null>(null)
 
   useEffect(() => {
     if (!airdrops.length) {
-      refetchAirdrops()
+      fetchAirdrops()
     } else {
       const payload: AirdropTimeline = {}
 
@@ -92,7 +92,7 @@ const Page = () => {
         open={openJourney}
         onClose={() => {
           setOpenJourney(false)
-          refetchAirdrops()
+          fetchAirdrops()
         }}
       />
     </div>

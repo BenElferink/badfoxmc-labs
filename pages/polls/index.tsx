@@ -17,10 +17,10 @@ export const POLL_DESCRIPTION =
 const Page = () => {
   const { query } = useRouter()
   const { user } = useAuth()
-  const { polls, refetchPolls } = useData()
+  const { polls, fetchPolls } = useData()
 
   useEffect(() => {
-    if (!polls.length) refetchPolls()
+    if (!polls.length) fetchPolls()
   }, [polls])
 
   const [openJourney, setOpenJourney] = useState(false)
@@ -131,7 +131,7 @@ const Page = () => {
         open={openJourney}
         onClose={() => {
           setOpenJourney(false)
-          refetchPolls()
+          fetchPolls()
         }}
       />
 
@@ -139,7 +139,7 @@ const Page = () => {
         open={!!selectedId && !!polls.length}
         onClose={() => {
           setSelectedId('')
-          refetchPolls()
+          fetchPolls()
         }}
       >
         <PollEnter poll={polls.find(({ id }) => id === selectedId) as Poll} />
