@@ -128,71 +128,74 @@ const AirdropSnapshot = (props: {
         for (let tIdx = 0; tIdx < policyTokens.length; tIdx++) {
           const { tokenId, isFungible, tokenAmount } = policyTokens[tIdx]
 
-          // token not blacklisted
-          if (!withBlacklist || (withBlacklist && !blacklistTokens.find((str) => str === tokenId))) {
-            if (tokenAmount.onChain !== 0) {
-              const fetchedToken = await api.token.getData(tokenId)
-              const tokenOwners: ApiTokenOwners['owners'] = []
+          if (tokenId !== policyId) {
+            // token not blacklisted
+            if (!withBlacklist || (withBlacklist && !blacklistTokens.find((str) => str === tokenId))) {
+              // token not burned
+              if (tokenAmount.onChain !== 0) {
+                const fetchedToken = await api.token.getData(tokenId)
+                const tokenOwners: ApiTokenOwners['owners'] = []
 
-              for (let page = 1; true; page++) {
+                for (let page = 1; true; page++) {
+                  if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
+
+                  const fetched = await api.token.getOwners(tokenId, { page })
+
+                  if (!fetched.owners.length) break
+                  tokenOwners.push(...fetched.owners)
+
+                  if (fetched.owners.length < 100) break
+                }
+
                 if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
 
-                const fetched = await api.token.getOwners(tokenId, { page })
+                for (const owner of tokenOwners) {
+                  const { quantity, stakeKey, addresses } = owner
+                  const { address, isScript } = addresses[0]
 
-                if (!fetched.owners.length) break
-                tokenOwners.push(...fetched.owners)
+                  const isOnCardano = address.indexOf('addr1') === 0
+                  const isBlacklisted = withBlacklist && !!blacklistWallets.find((str) => str === stakeKey)
+                  const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
 
-                if (fetched.owners.length < 100) break
-              }
-
-              if (isFungible) setProgress((prev) => ({ ...prev, msg: `Processing Token Holders (${tokenOwners.length})` }))
-
-              for (const owner of tokenOwners) {
-                const { quantity, stakeKey, addresses } = owner
-                const { address, isScript } = addresses[0]
-
-                const isOnCardano = address.indexOf('addr1') === 0
-                const isBlacklisted = withBlacklist && !!blacklistWallets.find((str) => str === stakeKey)
-                const isDelegator = !withDelegators || (withDelegators && delegators.includes(stakeKey))
-
-                if (isOnCardano && !!stakeKey && !isScript && !isBlacklisted && isDelegator) {
-                  if (fetchedTokens[policyId]) {
-                    fetchedTokens[policyId].push(fetchedToken)
-                  } else {
-                    fetchedTokens[policyId] = [fetchedToken]
-                  }
-
-                  const humanAmount = formatTokenAmount.fromChain(quantity, fetchedToken.tokenAmount.decimals)
-
-                  const holderItem = {
-                    tokenId,
-                    isFungible,
-                    humanAmount,
-                  }
-
-                  const foundHolderIndex = holders.findIndex((item) => item.stakeKey === stakeKey)
-
-                  if (foundHolderIndex === -1) {
-                    holders.push({
-                      stakeKey,
-                      addresses: [address],
-                      assets: {
-                        [policyId]: [holderItem],
-                      },
-                    })
-                  } else {
-                    if (!holders.find((item) => item.addresses.includes(address))) {
-                      holders[foundHolderIndex].addresses.push(address)
-                    }
-
-                    if (Array.isArray(holders[foundHolderIndex].assets[policyId])) {
-                      holders[foundHolderIndex].assets[policyId].push(holderItem)
+                  if (isOnCardano && !!stakeKey && !isScript && !isBlacklisted && isDelegator) {
+                    if (fetchedTokens[policyId]) {
+                      fetchedTokens[policyId].push(fetchedToken)
                     } else {
-                      holders[foundHolderIndex].assets[policyId] = [holderItem]
+                      fetchedTokens[policyId] = [fetchedToken]
                     }
-                  }
 
-                  includedTokenCounts[policyId] += humanAmount
+                    const humanAmount = formatTokenAmount.fromChain(quantity, fetchedToken.tokenAmount.decimals)
+
+                    const holderItem = {
+                      tokenId,
+                      isFungible,
+                      humanAmount,
+                    }
+
+                    const foundHolderIndex = holders.findIndex((item) => item.stakeKey === stakeKey)
+
+                    if (foundHolderIndex === -1) {
+                      holders.push({
+                        stakeKey,
+                        addresses: [address],
+                        assets: {
+                          [policyId]: [holderItem],
+                        },
+                      })
+                    } else {
+                      if (!holders.find((item) => item.addresses.includes(address))) {
+                        holders[foundHolderIndex].addresses.push(address)
+                      }
+
+                      if (Array.isArray(holders[foundHolderIndex].assets[policyId])) {
+                        holders[foundHolderIndex].assets[policyId].push(holderItem)
+                      } else {
+                        holders[foundHolderIndex].assets[policyId] = [holderItem]
+                      }
+                    }
+
+                    includedTokenCounts[policyId] += humanAmount
+                  }
                 }
               }
             }
