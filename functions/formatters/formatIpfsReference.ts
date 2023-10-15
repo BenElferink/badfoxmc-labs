@@ -1,4 +1,4 @@
-const formatIpfsReference = (str: string, options: { hasRank?: boolean } = {}) => {
+const formatIpfsReference = (str: string) => {
   if (!str) {
     return {
       ipfs: '',
@@ -6,12 +6,8 @@ const formatIpfsReference = (str: string, options: { hasRank?: boolean } = {}) =
     }
   }
 
-  const { hasRank } = options
-
   const ipfs = str.indexOf('ipfs://') === 0 ? str : `ipfs://${str}`
-  const url = hasRank
-    ? ipfs.replace('ipfs://', 'https://images.cnft.tools/ipfs/')
-    : ipfs.replace('ipfs://', 'https://image-optimizer.jpgstoreapis.com/')
+  const url = ipfs.replace('ipfs://', 'https://ipfs.blockfrost.dev/ipfs/')
 
   return {
     ipfs,
