@@ -10,12 +10,12 @@ export const config = {
   },
 }
 
-export interface WalletGeneratwResponse {
+export interface WalletGenerateResponse {
   address: Address['address']
   mnemonic: string[]
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse<WalletGeneratwResponse>) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<WalletGenerateResponse>) => {
   const { method } = req
 
   try {
