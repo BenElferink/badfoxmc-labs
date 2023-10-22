@@ -11,7 +11,7 @@ import type { Giveaway, Poll } from '@/@types'
 
 const Page = () => {
   const router = useRouter()
-  const { product, creator_stake_key: creatorStakeKey, user_stake_key: userStakeKey } = router.query
+  const { product, creator_stake_key: creatorStakeKey, other_stake_keys: otherStakeKeys, user_stake_key: userStakeKey } = router.query
 
   const [polls, setPolls] = useState<Poll[]>([])
   const [giveaways, setGiveaways] = useState<Giveaway[]>([])
@@ -60,15 +60,17 @@ const Page = () => {
         }
 
         try {
+          const otherStakeKeysArray = Array.isArray(otherStakeKeys) ? otherStakeKeys : otherStakeKeys?.split(',') || []
+
           switch (product) {
             case 'polls': {
-              const payload = await getPolls('', creatorKey)
+              const payload = await getPolls('', [creatorKey].concat(otherStakeKeysArray))
               setPolls(payload)
               break
             }
 
             case 'giveaways': {
-              const payload = await getGiveaways('', creatorKey)
+              const payload = await getGiveaways('', [creatorKey].concat(otherStakeKeysArray))
               setGiveaways(payload)
               break
             }
@@ -88,7 +90,7 @@ const Page = () => {
       })()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product, creatorStakeKey, userStakeKey])
+  }, [product, creatorStakeKey, otherStakeKeys, userStakeKey])
 
   if (isLoading || message) {
     return (

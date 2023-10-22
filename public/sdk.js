@@ -1,8 +1,8 @@
 class BadLabsSDK {
-  constructor({ product, creatorStakeKey, otherStakeKeys = [] }) {
+  constructor({ product, creatorStakeKey, otherStakeKeys }) {
     this.product = product
     this.creatorStakeKey = creatorStakeKey
-    this.otherStakeKeys = otherStakeKeys
+    this.otherStakeKeys = otherStakeKeys || ''
     this.frontUrl = 'https://labs.badfoxmc.com/sdk'
     this.supportedWallets = ['nami', 'eternl', 'lace', 'vespr', 'typhoncip30', 'gerowallet', 'flint', 'begin', 'nufi']
     // https://github.com/MeshJS/mesh/blob/73b6bb9bee532dc0bac17c14c2cd2f31ef0c071c/packages/module/src/common/constants.ts

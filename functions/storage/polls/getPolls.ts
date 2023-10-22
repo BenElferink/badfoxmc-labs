@@ -3,7 +3,7 @@ import { firebase, firestore } from '@/utils/firebase'
 import { FetchedTimestampResponse } from '@/pages/api/timestamp'
 import type { Poll, StakeKey } from '@/@types'
 
-const getPolls = async (id?: string, stakeKey?: StakeKey) => {
+const getPolls = async (id?: string, stakeKeys?: StakeKey[]) => {
   console.log('fetching polls(s) from db')
 
   const collection = firestore.collection('polls')
@@ -11,13 +11,15 @@ const getPolls = async (id?: string, stakeKey?: StakeKey) => {
 
   if (!!id) {
     const doc = await collection.doc(id).get()
-    docs.push(doc)
-  } else if (!!stakeKey) {
-    const collectionQuery = await collection.where('stakeKey', '==', stakeKey).get()
-    docs.push(...collectionQuery.docs)
+    if (!!doc) docs.push(doc)
+  } else if (!!stakeKeys?.length) {
+    for await (const stakeKey of stakeKeys) {
+      const collectionQuery = await collection.where('stakeKey', '==', stakeKey).get()
+      if (!!collectionQuery.docs.length) docs.push(...collectionQuery.docs)
+    }
   } else {
     const collectionQuery = await collection.get()
-    docs.push(...collectionQuery.docs)
+    if (!!collectionQuery.docs.length) docs.push(...collectionQuery.docs)
   }
 
   const {
