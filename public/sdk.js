@@ -1,9 +1,10 @@
 class BadLabsSDK {
-  constructor({ product, creatorStakeKey }) {
+  constructor({ product, creatorStakeKey, otherStakeKeys = [] }) {
     this.product = product
     this.creatorStakeKey = creatorStakeKey
+    this.otherStakeKeys = otherStakeKeys
     this.frontUrl = 'https://labs.badfoxmc.com/sdk'
-    this.supportedWallets = ['begin', 'eternl', 'flint', 'lace', 'nami', 'nufi', 'gerowallet', 'typhoncip30', 'vespr']
+    this.supportedWallets = ['nami', 'eternl', 'lace', 'vespr', 'typhoncip30', 'gerowallet', 'flint', 'begin', 'nufi']
     // https://github.com/MeshJS/mesh/blob/73b6bb9bee532dc0bac17c14c2cd2f31ef0c071c/packages/module/src/common/constants.ts
   }
 
@@ -83,7 +84,7 @@ class BadLabsSDK {
       throw new Error('400 BAD REQUEST; missing required params; sdk.start({ userStakeKey: "string" })')
     }
 
-    const query = `?product=${this.product}&creator_stake_key=${this.creatorStakeKey}&user_stake_key=${userStakeKey}`
+    const query = `?product=${this.product}&creator_stake_key=${this.creatorStakeKey}&other_stake_keys=${this.otherStakeKeys}&user_stake_key=${userStakeKey}`
     const src = this.frontUrl + query
     const isMobile = window.innerWidth <= 768
 
