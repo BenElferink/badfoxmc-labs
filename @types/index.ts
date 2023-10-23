@@ -296,4 +296,5 @@ export interface Poll extends PollSettings {
   // for poll results
   [vote_serial: string]: any // number >= 0
   topSerial?: number
+  totalEntries?: number
 }

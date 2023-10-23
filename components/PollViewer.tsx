@@ -53,7 +53,7 @@ const PollViewer = (props: PollViewerProps) => {
               const isActive = poll.active
               const isWinner = !isActive && poll.topSerial === obj.serial
               const pointValue = !isActive ? poll[`vote_${obj.serial}`] : 0
-              const percentValue = !isActive ? Math.round((100 / totalPoints) * pointValue) : 0
+              // const percentValue = !isActive ? Math.round((100 / totalPoints) * pointValue) : 0
 
               return (
                 <div
@@ -124,6 +124,7 @@ const PollViewer = (props: PollViewerProps) => {
             holderPolicies={poll.holderPolicies}
             withDelegators={poll.withDelegators}
             stakePools={poll.stakePools}
+            totalEntries={poll.totalEntries}
           />
         </div>
       ) : null}

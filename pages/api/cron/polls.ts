@@ -35,13 +35,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const batch = firestore.batch()
 
         for await (const doc of docsThatNeedToUpdate) {
-          const { id } = doc
+          const { id, entries } = doc
 
           const updateBody: Partial<Poll> = {
             active: false,
             fungibleHolders: [],
             nonFungibleUsedUnits: [],
             entries: [],
+            totalEntries: entries.length,
           }
 
           batch.update(collection.doc(id), updateBody)

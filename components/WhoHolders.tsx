@@ -9,8 +9,9 @@ const WhoHolders = (props: {
   holderPolicies: Poll['holderPolicies']
   withDelegators: Poll['withDelegators']
   stakePools: Poll['stakePools']
+  totalEntries?: number
 }) => {
-  const { label = 'Who can participate?', holderPolicies, withDelegators, stakePools } = props
+  const { label = 'Who can participate?', holderPolicies, withDelegators, stakePools, totalEntries } = props
   const [refinedHolderPolicies, setRefinedHolderPolicies] = useState(holderPolicies)
 
   useEffect(() => {
@@ -29,6 +30,8 @@ const WhoHolders = (props: {
   return (
     <div className='my-2 text-xs text-start flex flex-col items-center justify-center'>
       <h6 className='w-full text-center text-lg'>{label}</h6>
+
+      {totalEntries ? <p className='text-zinc-400'>{totalEntries} wallets</p> : null}
 
       {refinedHolderPolicies.map((setting) => (
         <div key={`holderPolicies-${setting.policyId}`} className='w-full mt-2'>
