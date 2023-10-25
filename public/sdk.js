@@ -35,31 +35,36 @@ class BadLabsSDK {
       }))
 
     const injectEl = document.getElementById(injectId)
-    injectEl.innerText = ''
 
-    const div = document.createElement('div')
-    wallets.forEach((obj) => {
-      const img = document.createElement('img')
-      img.src = obj.icon
-      img.style = 'width: 30px; height: 30px; margin: 0.5rem;'
+    if (injectEl?.children.length) {
+      injectEl.innerText = ''
+    } else {
+      injectEl.innerText = ''
 
-      const span = document.createElement('span')
-      span.innerText = obj.name
+      const div = document.createElement('div')
+      wallets.forEach((obj) => {
+        const img = document.createElement('img')
+        img.src = obj.icon
+        img.style = 'width: 30px; height: 30px; margin: 0.5rem;'
 
-      const btn = document.createElement('button')
-      btn.style = `width: 150px; margin: 0.1rem; white-space: nowrap; color: ${buttonTextColor}; background-color: ${buttonBackgroundColor}; border: none; border-radius: 0.5rem; display: flex; align-items: center;`
+        const span = document.createElement('span')
+        span.innerText = obj.name
 
-      btn.appendChild(img)
-      btn.appendChild(span)
-      btn.onclick = async () => {
-        await this.connectAndStart(obj.apiName)
-        injectEl.innerText = ''
-      }
+        const btn = document.createElement('button')
+        btn.style = `width: 150px; margin: 0.1rem; white-space: nowrap; text-transform: uppercase; color: ${buttonTextColor}; background-color: ${buttonBackgroundColor}; border: none; border-radius: 0.5rem; display: flex; align-items: center; justify-content: flex-start;`
 
-      div.appendChild(btn)
-    })
+        btn.appendChild(img)
+        btn.appendChild(span)
+        btn.onclick = async () => {
+          await this.connectAndStart(obj.apiName)
+          injectEl.innerText = ''
+        }
 
-    injectEl.appendChild(div)
+        div.appendChild(btn)
+      })
+
+      injectEl.appendChild(div)
+    }
   }
 
   connectAndStart = async (walletName) => {
