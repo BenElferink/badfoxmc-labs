@@ -322,8 +322,10 @@ export interface SwapSettings {
 }
 
 export interface Swap {
+  id?: string
   stakeKey: StakeKey
   timestamp: number
+
   isRefunded?: boolean
   withdraw: {
     txHash: TransactionId
