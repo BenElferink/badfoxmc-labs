@@ -16,6 +16,7 @@ const getSwaps = async () => {
         ...data,
       }
     })
+    .filter((x) => !!x.withdraw.txHash && !x.isRefunded)
     .sort((a, b) => b.timestamp - a.timestamp)
 
   console.log(`succesfully fetched ${docs.length} swaps from db`)
