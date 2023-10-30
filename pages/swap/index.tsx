@@ -21,7 +21,7 @@ const Page = () => {
   const { swapWallet, fetchSwapWallet, swaps, fetchSwaps } = useData()
 
   useEffect(() => {
-    fetchSwapWallet()
+    if (!Object.keys(swapWallet).length) fetchSwapWallet()
     if (!swaps.length) fetchSwaps()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
