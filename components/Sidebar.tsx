@@ -47,8 +47,7 @@ const Sidebar = (props: { open: boolean }) => {
             {
               label: 'NFT Swap',
               Icon: (props) => <ArrowPathIcon {...props} />,
-              // path: '/swap',
-              tags: ['SOON'],
+              path: '/swap',
             },
             // {
             //   label: 'Developers',
