@@ -6,6 +6,7 @@ import { useData } from '@/contexts/DataContext'
 import DropDown from '@/components/form/DropDown'
 import Loader from '@/components/Loader'
 import Modal from '@/components/Modal'
+import ErrorNotConnected from '@/components/journeys/steps/ErrorNotConnected'
 import PollCard from '@/components/cards/PollCard'
 import PollJourney from '@/components/journeys/PollJourney'
 import PollEnter from '@/components/PollEnter'
@@ -21,7 +22,7 @@ const Page = () => {
 
   useEffect(() => {
     if (!polls.length) fetchPolls()
-  }, [polls])
+  }, [])
 
   const [openJourney, setOpenJourney] = useState(false)
   const [selectedId, setSelectedId] = useState(query.id)
@@ -142,7 +143,7 @@ const Page = () => {
           fetchPolls()
         }}
       >
-        <PollEnter poll={polls.find(({ id }) => id === selectedId) as Poll} />
+        {!user ? <ErrorNotConnected onClose={() => setSelectedId('')} /> : <PollEnter poll={polls.find(({ id }) => id === selectedId) as Poll} />}
       </Modal>
     </div>
   )

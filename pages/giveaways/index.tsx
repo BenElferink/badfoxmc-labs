@@ -6,6 +6,7 @@ import { useData } from '@/contexts/DataContext'
 import DropDown from '@/components/form/DropDown'
 import Loader from '@/components/Loader'
 import Modal from '@/components/Modal'
+import ErrorNotConnected from '@/components/journeys/steps/ErrorNotConnected'
 import GiveawayCard from '@/components/cards/GiveawayCard'
 import GiveawayJourney from '@/components/journeys/GiveawayJourney'
 import GiveawayEnter from '@/components/GiveawayEnter'
@@ -21,7 +22,7 @@ const Page = () => {
 
   useEffect(() => {
     if (!giveaways.length) fetchGiveaways()
-  }, [giveaways])
+  }, [])
 
   const [openJourney, setOpenJourney] = useState(false)
   const [selectedId, setSelectedId] = useState(query.id)
@@ -163,7 +164,11 @@ const Page = () => {
           fetchGiveaways()
         }}
       >
-        <GiveawayEnter giveaway={giveaways.find(({ id }) => id === selectedId) as Giveaway} />
+        {!user ? (
+          <ErrorNotConnected onClose={() => setSelectedId('')} />
+        ) : (
+          <GiveawayEnter giveaway={giveaways.find(({ id }) => id === selectedId) as Giveaway} />
+        )}
       </Modal>
     </div>
   )
