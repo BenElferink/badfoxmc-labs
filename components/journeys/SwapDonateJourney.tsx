@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Modal from '../Modal'
 import ErrorNotConnected from './steps/ErrorNotConnected'
-import DonateMethod from './steps/DonateMethod'
 import TokenSelector from './steps/TokenSelector'
-import type { SwapDonateSettings, TokenId } from '@/@types'
+import DonateMethod from './steps/DonateMethod'
+import DonateManual from './steps/DonateManual'
 import DonateSign from './steps/DonateSign'
+import type { SwapDonateSettings, TokenId } from '@/@types'
 
 const defaultSettings: SwapDonateSettings = {
   donateMethod: 'BUILD_TX',
@@ -51,7 +52,7 @@ const SwapDonateJourney = (props: { open: boolean; onClose: () => void }) => {
             next={increment}
           />
         ) : (
-          <div>manual</div>
+          <DonateManual back={decrement} />
         )
       ) : step === 3 ? (
         <DonateSign defaultData={settings} back={decrement} />
