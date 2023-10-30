@@ -64,10 +64,10 @@ const Page = () => {
 
       <SwapDonateJourney
         open={openDonateJourney}
-        onClose={async () => {
+        onClose={() => {
           setOpenDonateJourney(false)
-          await getAndSetUser()
-          await fetchSwapWallet()
+          fetchSwapWallet()
+          getAndSetUser()
         }}
       />
 
@@ -79,10 +79,10 @@ const Page = () => {
           },
         ]}
         open={!!selectedId && !!swapWallet[selectedId]}
-        onClose={async () => {
+        onClose={() => {
           setSelectedId('')
-          await getAndSetUser()
-          await fetchSwapWallet()
+          fetchSwapWallet()
+          getAndSetUser()
         }}
       />
     </div>
