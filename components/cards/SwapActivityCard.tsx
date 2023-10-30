@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowPathIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
+import { ArrowPathIcon, ArrowTopRightOnSquareIcon, ArrowTrendingDownIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/solid'
 import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle'
 import MediaViewer from '../MediaViewer'
 import type { Swap } from '@/@types'
@@ -16,8 +16,14 @@ const SwapActivityCard = (props: {
     <div className='group w-[350px] sm:w-full m-1 p-0.5 rounded-lg bg-gradient-to-b from-purple-700 via-blue-700 to-green-700'>
       <div className='w-full h-full p-4 rounded-lg bg-zinc-800 flex flex-wrap sm:flex-nowrap items-start justify-center'>
         <div className='flex flex-col items-center'>
-          <MediaViewer mediaType='IMAGE' src={withdraw.thumb} size='w-[250px] h-[250px]' />
-          <p className='mt-2 truncate'>
+          <div className='flex items-center text-sm'>
+            <ArrowTrendingUpIcon className='w-8 h-8 mr-2 text-green-400' />
+            <span className='text-zinc-400'>Withdraw</span>
+          </div>
+
+          <MediaViewer mediaType='IMAGE' src={withdraw.thumb} size='w-[250px] h-[250px] m-2' />
+
+          <p className='truncate'>
             {1}&times;&nbsp;
             <span className='text-zinc-400'>{withdraw.displayName}</span>
           </p>
@@ -39,8 +45,14 @@ const SwapActivityCard = (props: {
         </div>
 
         <div className='flex flex-col items-center'>
-          <MediaViewer mediaType='IMAGE' src={deposit.thumb} size='w-[250px] h-[250px]' />
-          <p className='mt-2 truncate'>
+          <div className='flex items-center text-sm'>
+            <ArrowTrendingDownIcon className='w-8 h-8 mr-2 text-red-400' />
+            <span className='text-zinc-400'>Deposit</span>
+          </div>
+
+          <MediaViewer mediaType='IMAGE' src={deposit.thumb} size='w-[250px] h-[250px] m-2' />
+
+          <p className='truncate'>
             {1}&times;&nbsp;
             <span className='text-zinc-400'>{deposit.displayName}</span>
           </p>
