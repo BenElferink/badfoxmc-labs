@@ -21,8 +21,9 @@ const Page = () => {
   const { swapWallet, fetchSwapWallet, swaps, fetchSwaps } = useData()
 
   useEffect(() => {
-    if (!Object.keys(swapWallet).length) fetchSwapWallet()
+    fetchSwapWallet()
     if (!swaps.length) fetchSwaps()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const [openDonateJourney, setOpenDonateJourney] = useState(false)

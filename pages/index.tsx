@@ -17,6 +17,7 @@ const Page = () => {
       if (!giveaways.length) await fetchGiveaways()
       if (!swaps.length) await fetchSwaps()
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

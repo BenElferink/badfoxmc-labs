@@ -45,6 +45,7 @@ const Page = () => {
 
       setAirdropTimeline(payload)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [airdrops])
 
   return (

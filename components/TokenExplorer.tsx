@@ -86,7 +86,7 @@ const TokenExplorer = (props: {
 
   useEffect(() => {
     if (!collections.length && !forceCollections) getCollections()
-  }, [collections, getCollections])
+  }, [collections, forceCollections, getCollections])
 
   const [search, setSearch] = useState('')
 

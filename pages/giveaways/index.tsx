@@ -22,6 +22,7 @@ const Page = () => {
 
   useEffect(() => {
     if (!giveaways.length) fetchGiveaways()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const [openJourney, setOpenJourney] = useState(false)
