@@ -37,9 +37,6 @@ export const AuthProvider = (props: PropsWithChildren) => {
 
   const getAndSetUser = useCallback(
     async (forceStakeKey?: string): Promise<void> => {
-      toast.dismiss()
-      toast.loading('Loading Wallet')
-
       try {
         let sKey = ''
         let lovelaces = 0
@@ -94,9 +91,6 @@ export const AuthProvider = (props: PropsWithChildren) => {
           isTokenGateHolder,
           tokens: populatedTokens.filter((x) => !!x),
         })
-
-        toast.dismiss()
-        toast.success('Wallet Loaded')
       } catch (error: any) {
         setUser(null)
         disconnect()
@@ -105,24 +99,22 @@ export const AuthProvider = (props: PropsWithChildren) => {
         toast.error(error.message || error.toString())
       }
     },
-    [name, wallet, disconnect]
+    [name, wallet, user, disconnect]
   )
 
   useEffect(() => {
-    if (connecting) {
-      toast.loading('Connecting Wallet')
-    } else {
-      toast.dismiss()
-    }
-
-    if (connected) {
+    if (connected && !user) {
       toast.success(`Connected ${name}`)
+      toast.loading('Loading Wallet')
 
-      getAndSetUser()
-    } else {
+      getAndSetUser().then(() => {
+        toast.dismiss()
+        toast.success('Wallet Loaded')
+      })
+    } else if (!connected) {
       setUser(null)
     }
-  }, [connecting, connected, getAndSetUser])
+  }, [connecting, connected, user, getAndSetUser])
 
   return (
     <AuthContext.Provider

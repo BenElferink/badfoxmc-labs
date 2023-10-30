@@ -17,7 +17,7 @@ import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
 
 const SwapSelection = (props: { defaultData: Partial<SwapSettings>; next?: () => void; back?: () => void }) => {
   const { defaultData, next, back } = props
-  const { user, getAndSetUser } = useAuth()
+  const { user } = useAuth()
   const { wallet } = useWallet()
 
   const selectedBoth = useMemo(() => !!defaultData.withdraw?.tokenId && !!defaultData.deposit?.tokenId, [defaultData])
@@ -33,7 +33,7 @@ const SwapSelection = (props: { defaultData: Partial<SwapSettings>; next?: () =>
   })
 
   const buildTx = useCallback(async () => {
-    if (!wallet) return
+    if (!user || !wallet) return
     setProgress((prev) => ({ ...prev, loading: true, msg: 'Processing...', steps: { ...prev.steps, current: 1, max: 3 } }))
 
     try {
@@ -101,8 +101,6 @@ const SwapSelection = (props: { defaultData: Partial<SwapSettings>; next?: () =>
 
       setProgress((prev) => ({ ...prev, loading: false, msg: 'Swap Complete!' }))
       setDone(true)
-
-      await getAndSetUser()
     } catch (error: any) {
       console.error(error)
       const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'

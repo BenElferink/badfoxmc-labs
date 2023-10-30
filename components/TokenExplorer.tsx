@@ -5,7 +5,7 @@ import MediaViewer from './MediaViewer'
 import TextFrown from './TextFrown'
 import Loader from './Loader'
 import Input from './form/Input'
-import type { ApiPopulatedToken } from '@/@types'
+import type { ApiPopulatedToken, TokenId } from '@/@types'
 import { DECIMALS, POPULATED_LOVELACE } from '@/constants'
 
 export type TokenExplorerCollections = {
@@ -15,16 +15,24 @@ export type TokenExplorerCollections = {
 
 const TokenExplorer = (props: {
   callback: (_payload: ApiPopulatedToken) => void
-  selectedTokenId?: string
-  showTokenAmounts?: boolean
+  selectedTokenIds?: TokenId[]
   withAda?: boolean
   onlyFungible?: boolean
   onlyNonFungible?: boolean
+  showTokenAmounts?: boolean
   forceCollections?: TokenExplorerCollections
 }) => {
-  const { callback, selectedTokenId, showTokenAmounts, withAda, onlyFungible, onlyNonFungible, forceCollections } = props
-  const { user } = useAuth()
+  const {
+    callback,
+    selectedTokenIds = [],
+    withAda = false,
+    onlyFungible = false,
+    onlyNonFungible = false,
+    showTokenAmounts = false,
+    forceCollections,
+  } = props
 
+  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [collections, setCollections] = useState<TokenExplorerCollections>(!!forceCollections ? [...forceCollections] : [])
 
@@ -128,7 +136,7 @@ const TokenExplorer = (props: {
                   className={
                     (!!forceCollections ? 'w-[280px]' : 'w-[160px]') +
                     'group m-2 flex flex-col items-center ' +
-                    (selectedTokenId === t.tokenId ? 'border rounded-lg' : '')
+                    (selectedTokenIds.includes(t.tokenId) ? 'border rounded-lg' : '')
                   }
                 >
                   <MediaViewer
@@ -138,12 +146,20 @@ const TokenExplorer = (props: {
                   />
 
                   {showTokenAmounts ? (
-                    <p className={'m-0 p-0 px-2 text-xs ' + (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')}>
+                    <p
+                      className={
+                        'm-0 p-0 px-2 text-xs ' + (selectedTokenIds.includes(t.tokenId) ? 'text-white' : 'text-zinc-400 group-hover:text-white')
+                      }
+                    >
                       {t.tokenAmount.display.toLocaleString('en-US')}
                     </p>
                   ) : null}
 
-                  <p className={'m-0 p-0 px-2 text-sm ' + (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')}>
+                  <p
+                    className={
+                      'm-0 p-0 px-2 text-sm ' + (selectedTokenIds.includes(t.tokenId) ? 'text-white' : 'text-zinc-400 group-hover:text-white')
+                    }
+                  >
                     {t.tokenName?.ticker ? '$' : ''}
                     {t.tokenName?.ticker || t.tokenName?.display || t.tokenName?.onChain}
                   </p>

@@ -4,9 +4,9 @@ import { PlusIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
 import { useData } from '@/contexts/DataContext'
 import Loader from '@/components/Loader'
-import Modal from '@/components/Modal'
-import SwapCollectionCard from '@/components/cards/SwapCollectionCard'
 import SwapJourney from '@/components/journeys/SwapJourney'
+import SwapDonateJourney from '@/components/journeys/SwapDonateJourney'
+import SwapCollectionCard from '@/components/cards/SwapCollectionCard'
 import type { PolicyId } from '@/@types'
 
 export const SWAP_DESCRIPTION =
@@ -14,14 +14,14 @@ export const SWAP_DESCRIPTION =
 
 const Page = () => {
   const { query } = useRouter()
-  const { user } = useAuth()
+  const { user, getAndSetUser } = useAuth()
   const { swapWallet, fetchSwapWallet } = useData()
 
   useEffect(() => {
     if (!Object.keys(swapWallet).length) fetchSwapWallet()
   }, [])
 
-  const [openJourney, setOpenJourney] = useState(false)
+  const [openDonateJourney, setOpenDonateJourney] = useState(false)
   const [selectedId, setSelectedId] = useState<PolicyId>(query.id?.toString() || '')
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Page = () => {
 
         <button
           className='w-full m-1 p-4 flex items-center justify-center text-center rounded-lg border border-transparent hover:border-green-500 bg-green-900 hover:bg-green-800'
-          onClick={() => setOpenJourney(true)}
+          onClick={() => setOpenDonateJourney(true)}
         >
           <PlusIcon className='w-6 h-6 mr-2' /> Add to Swap Pool
         </button>
@@ -62,18 +62,14 @@ const Page = () => {
         )}
       </div>
 
-      <Modal
-        open={openJourney}
-        onClose={() => {
-          setOpenJourney(false)
-          // fetchSwapWallet()
+      <SwapDonateJourney
+        open={openDonateJourney}
+        onClose={async () => {
+          setOpenDonateJourney(false)
+          await getAndSetUser()
+          await fetchSwapWallet()
         }}
-      >
-        <h6 className='mb-20 text-xl text-center'>Swap</h6>
-        <div className='flex items-center justify-center'>
-          <p>By adding assets to the swap pool,</p>
-        </div>
-      </Modal>
+      />
 
       <SwapJourney
         collections={[
@@ -83,9 +79,10 @@ const Page = () => {
           },
         ]}
         open={!!selectedId && !!swapWallet[selectedId]}
-        onClose={() => {
+        onClose={async () => {
           setSelectedId('')
-          fetchSwapWallet()
+          await getAndSetUser()
+          await fetchSwapWallet()
         }}
       />
     </div>

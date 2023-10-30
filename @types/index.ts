@@ -338,3 +338,8 @@ export interface Swap {
     displayName: TokenName['display']
   }
 }
+
+export interface SwapDonateSettings {
+  donateMethod: 'BUILD_TX' | 'MANUAL_TX'
+  selectedTokenIds: TokenId[]
+}

@@ -5,7 +5,7 @@ import MediaViewer from '@/components/MediaViewer'
 import TokenExplorer, { TokenExplorerCollections } from '@/components/TokenExplorer'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import Input from '@/components/form/Input'
-import type { TokenSelectionSettings } from '@/@types'
+import type { TokenId, TokenSelectionSettings } from '@/@types'
 
 type AmountType = 'FIXED' | 'PERCENT'
 
@@ -173,65 +173,98 @@ const TokenAmount = (props: {
 }
 
 const TokenSelector = (props: {
-  defaultData: Partial<TokenSelectionSettings>
-  callback: (payload: Partial<TokenSelectionSettings>) => void
+  defaultData: Partial<TokenSelectionSettings> | TokenId[]
+  callback: (payload: Partial<TokenSelectionSettings> | TokenId[]) => void
   next?: () => void
   back?: () => void
+  multiSelect?: boolean
+  withAda?: boolean
   withAmount?: boolean
   onlyFungible?: boolean
   onlyNonFungible?: boolean
-  withAda?: boolean
   forceCollections?: TokenExplorerCollections
   forceTitle?: string
 }) => {
-  const { defaultData, callback, next, back, withAmount, onlyFungible, onlyNonFungible, withAda, forceCollections, forceTitle } = props
-  const [data, setData] = useState(defaultData)
+  const { defaultData, callback, next, back, multiSelect, withAda, withAmount, onlyFungible, onlyNonFungible, forceCollections, forceTitle } = props
+
+  const [data, setData] = useState<Partial<TokenSelectionSettings>>(multiSelect ? {} : (defaultData as TokenSelectionSettings))
+  const [dataForMultiSelect, setDataForMultiSelect] = useState<TokenId[]>(multiSelect ? (defaultData as TokenId[]) : [])
 
   useEffect(() => {
-    if (Object.keys(data).length) callback(data)
+    if (multiSelect) {
+      if (dataForMultiSelect.length) callback(dataForMultiSelect)
+    } else {
+      if (Object.keys(data).length) callback(data)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [multiSelect, data, dataForMultiSelect])
 
   const [selectAmount, setSelectAmount] = useState(false)
 
   if (selectAmount) {
-    return <TokenAmount defaultData={data} callback={(payload) => setData((prev) => ({ ...prev, ...payload }))} next={next} back={back} />
+    return (
+      <TokenAmount
+        defaultData={data as TokenSelectionSettings}
+        callback={(payload) => setData((prev) => ({ ...prev, ...payload }))}
+        next={next}
+        back={back}
+      />
+    )
   }
 
   return (
     <JourneyStepWrapper
-      disableNext={!data.tokenId}
+      disableNext={(!multiSelect && !data.tokenId) || (multiSelect && !dataForMultiSelect.length)}
+      back={back}
       next={() => {
         if (withAmount) setSelectAmount(true)
         else if (next) next()
       }}
-      back={back}
     >
-      <h6 className='text-xl text-center'>{forceTitle || 'Select a Token'}</h6>
+      <h6 className='text-xl text-center'>
+        {forceTitle || `Select ${onlyFungible ? 'Token' : onlyNonFungible ? 'NFT' : 'Asset'}${multiSelect ? 's' : ''}`}
+      </h6>
 
       <TokenExplorer
-        selectedTokenId={data.tokenId}
-        forceCollections={forceCollections}
+        selectedTokenIds={multiSelect ? dataForMultiSelect : data.tokenId ? [data.tokenId] : []}
+        withAda={withAda}
         onlyFungible={onlyFungible}
         onlyNonFungible={onlyNonFungible}
-        withAda={withAda}
         showTokenAmounts={withAmount}
+        forceCollections={forceCollections}
         callback={(payload) => {
-          const { isFungible } = payload
+          if (multiSelect) {
+            setDataForMultiSelect((prev) => {
+              const mutated = [...prev]
 
-          setData({
-            thumb: payload['image']['url'],
-            tokenId: payload['tokenId'],
-            tokenName: payload['tokenName'],
-            tokenAmount: {
-              onChain: withAmount && isFungible ? 0 : payload['tokenAmount']['onChain'],
-              display: withAmount && isFungible ? 0 : payload['tokenAmount']['display'],
-              decimals: payload['tokenAmount']['decimals'],
-            },
-          })
+              const tId = payload['tokenId']
+              const idx = mutated.findIndex((str) => str === tId)
 
-          if (withAmount) setTimeout(() => setSelectAmount(true), 0)
-          else if (next) setTimeout(() => next(), 0)
+              if (idx !== -1) {
+                mutated.splice(idx, 1)
+              } else {
+                mutated.push(tId)
+              }
+
+              return mutated
+            })
+          } else {
+            const { isFungible } = payload
+
+            setData({
+              thumb: payload['image']['url'],
+              tokenId: payload['tokenId'],
+              tokenName: payload['tokenName'],
+              tokenAmount: {
+                onChain: withAmount && isFungible ? 0 : payload['tokenAmount']['onChain'],
+                display: withAmount && isFungible ? 0 : payload['tokenAmount']['display'],
+                decimals: payload['tokenAmount']['decimals'],
+              },
+            })
+
+            if (withAmount) setTimeout(() => setSelectAmount(true), 0)
+            else if (next) setTimeout(() => next(), 0)
+          }
         }}
       />
     </JourneyStepWrapper>

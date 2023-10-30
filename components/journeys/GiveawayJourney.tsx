@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import Modal from '../Modal'
 import ErrorNotConnected from './steps/ErrorNotConnected'
-// import ErrorNotTokenGateHolder from './steps/ErrorNotTokenGateHolder'
 import TokenSelector from './steps/TokenSelector'
 import HolderPolicies from './steps/HolderPolicies'
 import HolderStakePools from './steps/HolderStakePools'
@@ -12,7 +11,7 @@ import GiveawayOtherPost from './steps/GiveawayOtherPost'
 import EndTime from './steps/EndTime'
 import GiveawayNumOfWinners from './steps/GiveawayNumOfWinners'
 import GiveawayPublish from './steps/GiveawayPublish'
-import type { GiveawaySettings } from '@/@types'
+import type { GiveawaySettings, TokenSelectionSettings } from '@/@types'
 
 const defaultSettings: GiveawaySettings = {
   isToken: true,
@@ -110,7 +109,11 @@ const GiveawayJourney = (props: { open: boolean; onClose: () => void }) => {
               setSettings((prev) => ({
                 ...prev,
                 ...payload,
-                numOfWinners: payload['tokenAmount']?.onChain === 1 && payload['tokenAmount']?.decimals === 0 ? 1 : prev['numOfWinners'],
+                numOfWinners:
+                  (payload as TokenSelectionSettings)['tokenAmount']?.onChain === 1 &&
+                  (payload as TokenSelectionSettings)['tokenAmount']?.decimals === 0
+                    ? 1
+                    : prev['numOfWinners'],
               }))
             }
             next={increment}
