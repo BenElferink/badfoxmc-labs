@@ -249,7 +249,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
       }
 
       if (isToken) {
-        const lovelaces = formatTokenAmount.toChain(numOfWinners * 1.5, DECIMALS['ADA'])
+        const lovelaces = formatTokenAmount.toChain(numOfWinners * 1, DECIMALS['ADA'])
 
         const tx = new Transaction({ initiator: wallet })
           .sendLovelace({ address: WALLET_ADDRESSES['GIVEAWAY_APP'] }, lovelaces.toString())

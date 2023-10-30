@@ -68,14 +68,6 @@ const GiveawayJourney = (props: { open: boolean; onClose: () => void }) => {
     )
   }
 
-  // if (user && !user.isTokenGateHolder) {
-  //   return (
-  //     <Modal open={open} onClose={handleClose}>
-  //       <ErrorNotTokenGateHolder />
-  //     </Modal>
-  //   )
-  // }
-
   const increment = () => setStep((prev) => prev + 1)
   const decrement = () => setStep((prev) => prev - 1)
 
