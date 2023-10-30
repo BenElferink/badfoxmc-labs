@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from '@/components/MediaViewer'
-import TokenExplorer from '@/components/TokenExplorer'
+import TokenExplorer, { TokenExplorerCollections } from '@/components/TokenExplorer'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import Input from '@/components/form/Input'
 import type { TokenSelectionSettings } from '@/@types'
@@ -181,8 +181,10 @@ const TokenSelector = (props: {
   onlyFungible?: boolean
   onlyNonFungible?: boolean
   withAda?: boolean
+  forceCollections?: TokenExplorerCollections
+  forceTitle?: string
 }) => {
-  const { defaultData, callback, next, back, withAmount, onlyFungible, onlyNonFungible, withAda } = props
+  const { defaultData, callback, next, back, withAmount, onlyFungible, onlyNonFungible, withAda, forceCollections, forceTitle } = props
   const [data, setData] = useState(defaultData)
 
   useEffect(() => {
@@ -205,14 +207,15 @@ const TokenSelector = (props: {
       }}
       back={back}
     >
-      <h6 className='text-xl text-center'>Select a Token</h6>
+      <h6 className='text-xl text-center'>{forceTitle || 'Select a Token'}</h6>
 
       <TokenExplorer
         selectedTokenId={data.tokenId}
+        forceCollections={forceCollections}
         onlyFungible={onlyFungible}
         onlyNonFungible={onlyNonFungible}
         withAda={withAda}
-        showTokenAmounts
+        showTokenAmounts={withAmount}
         callback={(payload) => {
           const { isFungible } = payload
 

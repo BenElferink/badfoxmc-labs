@@ -298,3 +298,43 @@ export interface Poll extends PollSettings {
   topSerial?: number
   totalEntries?: number
 }
+
+export interface SwapWallet {
+  [policyId: PolicyId]: {
+    name: string
+    thumb: string
+    floor: number
+    tokens: ApiPopulatedToken[]
+  }
+}
+
+export interface SwapSettings {
+  withdraw: {
+    tokenId: TokenSelectionSettings['tokenId']
+    thumb: TokenSelectionSettings['thumb']
+    tokenName: TokenSelectionSettings['tokenName']
+  }
+  deposit: {
+    tokenId: TokenSelectionSettings['tokenId']
+    thumb: TokenSelectionSettings['thumb']
+    tokenName: TokenSelectionSettings['tokenName']
+  }
+}
+
+export interface Swap {
+  stakeKey: StakeKey
+  timestamp: number
+  isRefunded?: boolean
+  withdraw: {
+    txHash: TransactionId
+    tokenId: SwapSettings['withdraw']['tokenId']
+    thumb: SwapSettings['withdraw']['thumb']
+    displayName: TokenName['display']
+  }
+  deposit: {
+    txHash: TransactionId
+    tokenId: SwapSettings['deposit']['tokenId']
+    thumb: SwapSettings['deposit']['thumb']
+    displayName: TokenName['display']
+  }
+}

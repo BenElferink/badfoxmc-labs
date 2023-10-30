@@ -8,7 +8,7 @@ import Input from './form/Input'
 import type { ApiPopulatedToken } from '@/@types'
 import { DECIMALS, POPULATED_LOVELACE } from '@/constants'
 
-type Collection = {
+export type TokenExplorerCollections = {
   policyId: string
   tokens: ApiPopulatedToken[]
 }[]
@@ -20,19 +20,20 @@ const TokenExplorer = (props: {
   withAda?: boolean
   onlyFungible?: boolean
   onlyNonFungible?: boolean
+  forceCollections?: TokenExplorerCollections
 }) => {
-  const { callback, selectedTokenId, showTokenAmounts, withAda, onlyFungible, onlyNonFungible } = props
+  const { callback, selectedTokenId, showTokenAmounts, withAda, onlyFungible, onlyNonFungible, forceCollections } = props
   const { user } = useAuth()
 
   const [loading, setLoading] = useState(false)
-  const [collections, setCollections] = useState<Collection>([])
+  const [collections, setCollections] = useState<TokenExplorerCollections>(!!forceCollections ? [...forceCollections] : [])
 
   const getCollections = useCallback(async () => {
     if (!user || loading) return
     setLoading(true)
 
     try {
-      const payload: Collection = []
+      const payload: TokenExplorerCollections = []
 
       if (withAda) {
         const lovelaces = user.lovelaces || 0
@@ -76,7 +77,7 @@ const TokenExplorer = (props: {
   }, [user, withAda])
 
   useEffect(() => {
-    if (!collections.length) getCollections()
+    if (!collections.length && !forceCollections) getCollections()
   }, [collections, getCollections])
 
   const [search, setSearch] = useState('')
@@ -86,11 +87,13 @@ const TokenExplorer = (props: {
       <Input placeholder='Search:' value={search} setValue={(v) => setSearch(v)} />
 
       <div className='flex flex-wrap items-start justify-center text-center'>
-        {!collections.length ? (
+        {!collections.filter((coll) => !!coll.tokens.length).length ? (
           loading ? (
             <Loader />
           ) : (
-            <TextFrown text='You have no tokens...' />
+            <div className='mt-10'>
+              <TextFrown text='You have no tokens...' />
+            </div>
           )
         ) : (
           collections.map((coll) =>
@@ -122,9 +125,17 @@ const TokenExplorer = (props: {
                   type='button'
                   disabled={loading}
                   onClick={() => callback(t)}
-                  className={'group w-[160px] m-2 flex flex-col items-center ' + (selectedTokenId === t.tokenId ? 'border rounded-lg' : '')}
+                  className={
+                    (!!forceCollections ? 'w-[280px]' : 'w-[160px]') +
+                    'group m-2 flex flex-col items-center ' +
+                    (selectedTokenId === t.tokenId ? 'border rounded-lg' : '')
+                  }
                 >
-                  <MediaViewer mediaType='IMAGE' src={t.image.url} size='w-[150px] h-[150px] m-[5px]' />
+                  <MediaViewer
+                    mediaType='IMAGE'
+                    src={t.image.url}
+                    size={!!forceCollections ? 'w-[270px] h-[270px] m-[5px]' : 'w-[150px] h-[150px] m-[5px]'}
+                  />
 
                   {showTokenAmounts ? (
                     <p className={'m-0 p-0 px-2 text-xs ' + (selectedTokenId === t.tokenId ? 'text-white' : 'text-zinc-400 group-hover:text-white')}>

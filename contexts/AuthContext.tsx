@@ -111,10 +111,11 @@ export const AuthProvider = (props: PropsWithChildren) => {
   useEffect(() => {
     if (connecting) {
       toast.loading('Connecting Wallet')
+    } else {
+      toast.dismiss()
     }
 
     if (connected) {
-      toast.dismiss()
       toast.success(`Connected ${name}`)
 
       getAndSetUser()

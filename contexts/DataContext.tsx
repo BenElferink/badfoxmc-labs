@@ -1,8 +1,12 @@
 import { createContext, useState, useContext, useMemo, ReactNode, useCallback } from 'react'
+import api from '@/utils/api'
 import getAirdrops from '@/functions/storage/airdrops/getAirdrops'
 import getPolls from '@/functions/storage/polls/getPolls'
 import getGiveaways from '@/functions/storage/giveaways/getGiveaways'
-import type { Airdrop, Giveaway, Poll } from '@/@types'
+import getSwaps from '@/functions/storage/swaps/getSwaps'
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
+import type { Airdrop, ApiPopulatedToken, Giveaway, Poll, Swap, SwapWallet } from '@/@types'
+import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
 
 const ctxInit: {
   airdrops: Airdrop[]
@@ -11,6 +15,10 @@ const ctxInit: {
   fetchPolls: () => Promise<void>
   giveaways: Giveaway[]
   fetchGiveaways: () => Promise<void>
+  swaps: Swap[]
+  fetchSwaps: () => Promise<void>
+  swapWallet: SwapWallet
+  fetchSwapWallet: () => Promise<void>
 } = {
   airdrops: [],
   fetchAirdrops: async () => {},
@@ -18,6 +26,10 @@ const ctxInit: {
   fetchPolls: async () => {},
   giveaways: [],
   fetchGiveaways: async () => {},
+  swaps: [],
+  fetchSwaps: async () => {},
+  swapWallet: {},
+  fetchSwapWallet: async () => {},
 }
 
 const DataContext = createContext(ctxInit)
@@ -30,6 +42,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [airdrops, setAirdrops] = useState(ctxInit.airdrops)
   const [polls, setPolls] = useState(ctxInit.polls)
   const [giveaways, setGiveaways] = useState(ctxInit.giveaways)
+  const [swaps, setSwaps] = useState(ctxInit.swaps)
+  const [swapWallet, setSwapWallet] = useState(ctxInit.swapWallet)
 
   const fetchAirdrops = useCallback(async () => {
     try {
@@ -58,6 +72,50 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
+  const fetchSwaps = useCallback(async () => {
+    try {
+      const data = await getSwaps()
+      setSwaps(data)
+    } catch (error: any) {
+      console.error(error.message)
+    }
+  }, [])
+
+  const fetchSwapWallet = useCallback(async () => {
+    const { tokens } = await api.wallet.getData(WALLET_ADDRESSES['SWAP_APP'], { withTokens: true, populateTokens: true })
+
+    const payload: SwapWallet = {}
+
+    for await (const { isFungible, policyId, ...token } of tokens as ApiPopulatedToken[]) {
+      if (!isFungible) {
+        if (payload[policyId]) {
+          payload[policyId].tokens.push({
+            ...token,
+            policyId,
+            isFungible,
+          })
+        } else {
+          const details = await api.policy.market.getDetails(policyId)
+
+          payload[policyId] = {
+            name: details.name || 'Unknown',
+            thumb: details.pfpUrl || token.image.url,
+            floor: formatTokenAmount.fromChain(details.floorPrice, DECIMALS['ADA']),
+            tokens: [
+              {
+                ...token,
+                policyId,
+                isFungible,
+              },
+            ],
+          }
+        }
+      }
+    }
+
+    setSwapWallet(payload)
+  }, [])
+
   const memoedValue = useMemo(
     () => ({
       airdrops,
@@ -66,8 +124,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       fetchPolls,
       giveaways,
       fetchGiveaways,
+      swaps,
+      fetchSwaps,
+      swapWallet,
+      fetchSwapWallet,
     }),
-    [airdrops, fetchAirdrops, polls, fetchPolls, giveaways, fetchGiveaways]
+    [airdrops, fetchAirdrops, polls, fetchPolls, giveaways, fetchGiveaways, swaps, fetchSwaps, swapWallet, fetchSwapWallet]
   )
 
   return <DataContext.Provider value={memoedValue}>{children}</DataContext.Provider>
