@@ -96,7 +96,7 @@ class AdaHandle {
         let handle = data.default_handle || ''
 
         if (handle) {
-          const { holder } = await adaHandle.resolveHandle(handle)
+          const { holder } = await this.resolveHandle(handle)
 
           if (holder !== stakeKey) {
             console.log('Resolved with incorrect wallet handle:', handle)
