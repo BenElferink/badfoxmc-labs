@@ -6,7 +6,7 @@ import { useData } from '@/contexts/DataContext'
 import DropDown from '@/components/form/DropDown'
 import Loader from '@/components/Loader'
 import Modal from '@/components/Modal'
-import ErrorNotConnected from '@/components/journeys/steps/ErrorNotConnected'
+// import ErrorNotConnected from '@/components/journeys/steps/ErrorNotConnected'
 import GiveawayCard from '@/components/cards/GiveawayCard'
 import GiveawayJourney from '@/components/journeys/GiveawayJourney'
 import GiveawayEnter from '@/components/GiveawayEnter'
@@ -165,11 +165,8 @@ const Page = () => {
           fetchGiveaways()
         }}
       >
-        {!user ? (
-          <ErrorNotConnected onClose={() => setSelectedId('')} />
-        ) : (
-          <GiveawayEnter giveaway={giveaways.find(({ id }) => id === selectedId) as Giveaway} />
-        )}
+        {/* {!user ? <ErrorNotConnected onClose={() => setSelectedId('')} /> : <GiveawayEnter giveaway={giveaways.find(({ id }) => id === selectedId) as Giveaway} />} */}
+        <GiveawayEnter giveaway={giveaways.find(({ id }) => id === selectedId) as Giveaway} />
       </Modal>
     </div>
   )

@@ -6,7 +6,7 @@ import { useData } from '@/contexts/DataContext'
 import DropDown from '@/components/form/DropDown'
 import Loader from '@/components/Loader'
 import Modal from '@/components/Modal'
-import ErrorNotConnected from '@/components/journeys/steps/ErrorNotConnected'
+// import ErrorNotConnected from '@/components/journeys/steps/ErrorNotConnected'
 import PollCard from '@/components/cards/PollCard'
 import PollJourney from '@/components/journeys/PollJourney'
 import PollEnter from '@/components/PollEnter'
@@ -144,7 +144,8 @@ const Page = () => {
           fetchPolls()
         }}
       >
-        {!user ? <ErrorNotConnected onClose={() => setSelectedId('')} /> : <PollEnter poll={polls.find(({ id }) => id === selectedId) as Poll} />}
+        {/* {!user ? <ErrorNotConnected onClose={() => setSelectedId('')} /> : <PollEnter poll={polls.find(({ id }) => id === selectedId) as Poll} />} */}
+        <PollEnter poll={polls.find(({ id }) => id === selectedId) as Poll} />
       </Modal>
     </div>
   )
