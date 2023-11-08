@@ -28,7 +28,7 @@ const defaultSettings: SwapSettings = {
   },
 }
 
-const SwapJourney = (props: { collections: TokenExplorerCollections; open: boolean; onClose: () => void }) => {
+const SwapJourney = (props: { collections: TokenExplorerCollections; open: boolean; onClose: (options?: { withRefetch?: boolean }) => void }) => {
   const { collections, open, onClose } = props
   const { user } = useAuth()
 
@@ -38,7 +38,7 @@ const SwapJourney = (props: { collections: TokenExplorerCollections; open: boole
   const handleClose = () => {
     setStep(1)
     setSettings(defaultSettings)
-    onClose()
+    onClose({ withRefetch: step === 5 })
   }
 
   if (!user) {

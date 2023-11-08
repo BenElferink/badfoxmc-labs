@@ -13,7 +13,7 @@ const defaultSettings: SwapDonateSettings = {
   selectedTokenIds: [],
 }
 
-const SwapDonateJourney = (props: { open: boolean; onClose: () => void }) => {
+const SwapDonateJourney = (props: { open: boolean; onClose: (options?: { withRefetch?: boolean }) => void }) => {
   const { open, onClose } = props
   const { user } = useAuth()
 
@@ -23,7 +23,7 @@ const SwapDonateJourney = (props: { open: boolean; onClose: () => void }) => {
   const handleClose = () => {
     setStep(1)
     setSettings(defaultSettings)
-    onClose()
+    onClose({ withRefetch: step === 3 || (step === 2 && settings['donateMethod'] === 'MANUAL_TX') })
   }
 
   if (!user) {

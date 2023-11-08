@@ -116,10 +116,13 @@ const Page = () => {
 
       <SwapDonateJourney
         open={openDonateJourney}
-        onClose={() => {
+        onClose={(options) => {
           setOpenDonateJourney(false)
-          fetchSwapWallet()
-          getAndSetUser()
+
+          if (options?.withRefetch) {
+            fetchSwapWallet()
+            getAndSetUser()
+          }
         }}
       />
 
@@ -131,10 +134,14 @@ const Page = () => {
           },
         ]}
         open={!!selectedId && !!swapWallet[selectedId]}
-        onClose={() => {
+        onClose={(options) => {
           setSelectedId('')
-          fetchSwapWallet()
-          getAndSetUser()
+
+          if (options?.withRefetch) {
+            fetchSwaps()
+            fetchSwapWallet()
+            getAndSetUser()
+          }
         }}
       />
     </div>
