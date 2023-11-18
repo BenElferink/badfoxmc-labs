@@ -84,36 +84,41 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const fetchSwapWallet = useCallback(async () => {
     const { tokens } = await api.wallet.getData(WALLET_ADDRESSES['SWAP_APP'], { withTokens: true, populateTokens: true })
 
-    const payload: SwapWallet = {}
+    const walletPayload: SwapWallet = {}
 
     for await (const { isFungible, policyId, ...token } of tokens as ApiPopulatedToken[]) {
       if (!isFungible) {
-        if (payload[policyId]) {
-          payload[policyId].tokens.push({
-            ...token,
-            policyId,
-            isFungible,
-          })
-        } else {
-          const details = await api.policy.market.getDetails(policyId)
+        const tokenPayload = {
+          ...token,
+          policyId,
+          isFungible,
+        }
 
-          payload[policyId] = {
-            name: details.name || 'Unknown',
-            thumb: details.pfpUrl || token.image.url,
-            floor: formatTokenAmount.fromChain(details.floorPrice, DECIMALS['ADA']),
-            tokens: [
-              {
-                ...token,
-                policyId,
-                isFungible,
-              },
-            ],
+        if (walletPayload[policyId]) {
+          walletPayload[policyId].tokens.push(tokenPayload)
+        } else {
+          try {
+            const details = await api.policy.market.getDetails(policyId)
+
+            walletPayload[policyId] = {
+              name: details.name || policyId,
+              thumb: details.pfpUrl || token.image.url,
+              floor: formatTokenAmount.fromChain(details.floorPrice, DECIMALS['ADA']),
+              tokens: [tokenPayload],
+            }
+          } catch (error) {
+            walletPayload[policyId] = {
+              name: policyId,
+              thumb: '',
+              floor: formatTokenAmount.fromChain(0, DECIMALS['ADA']),
+              tokens: [tokenPayload],
+            }
           }
         }
       }
     }
 
-    setSwapWallet(payload)
+    setSwapWallet(walletPayload)
   }, [])
 
   const memoedValue = useMemo(
