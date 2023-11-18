@@ -8,7 +8,7 @@ import setUser from '@/functions/storage/users/setUser'
 import Modal from './Modal'
 import Input from './form/Input'
 import Button from './form/Button'
-import LinkList from './LinkList'
+import LinkList, { LinkListItem } from './LinkList'
 import TextFrown from './TextFrown'
 import TokenExplorer from './TokenExplorer'
 import { Address, StakeKey } from '@/@types'
@@ -94,26 +94,34 @@ const Auth = () => {
             </div>
           )}
 
-          {user ? (
-            <div className='w-60 p-0.5 rounded-lg bg-gradient-to-b from-purple-500 via-blue-500 to-green-500 hidden group-hover:block absolute top-[100%] right-0'>
-              <div className='p-2 rounded-lg bg-zinc-800'>
-                <LinkList
-                  items={[
-                    {
-                      label: 'Profile',
-                      Icon: (props) => <UserIcon {...props} />,
-                      onClick: () => toggleProfileModal(true),
-                    },
-                    {
-                      label: 'Switch Wallet',
-                      Icon: (props) => <WalletIcon {...props} />,
-                      onClick: () => toggleConnectModal(true),
-                    },
-                  ]}
-                />
-              </div>
+          <div className='w-60 p-0.5 rounded-lg bg-gradient-to-b from-purple-500 via-blue-500 to-green-500 hidden group-hover:block absolute top-[100%] right-0'>
+            <div className='p-2 rounded-lg bg-zinc-800'>
+              <LinkList
+                items={
+                  user
+                    ? [
+                        {
+                          label: 'Profile',
+                          Icon: (props) => <UserIcon {...props} />,
+                          onClick: () => toggleProfileModal(true),
+                        },
+                        {
+                          label: 'Switch Wallet',
+                          Icon: (props) => <WalletIcon {...props} />,
+                          onClick: () => toggleConnectModal(true),
+                        },
+                      ]
+                    : [
+                        {
+                          label: 'Switch Wallet',
+                          Icon: (props) => <WalletIcon {...props} />,
+                          onClick: () => toggleConnectModal(true),
+                        },
+                      ]
+                }
+              />
             </div>
-          ) : null}
+          </div>
         </div>
       ) : (
         <div className='p-0.5 rounded-lg bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
