@@ -6,6 +6,13 @@ import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import type { Swap } from '@/@types'
 import { API_KEYS, DECIMALS, WALLET_ADDRESSES, WALLET_KEYS } from '@/constants'
 
+export const config = {
+  maxDuration: 300,
+  api: {
+    responseLimit: false,
+  },
+}
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, body } = req
 

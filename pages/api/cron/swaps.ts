@@ -4,6 +4,13 @@ import { firestore } from '@/utils/firebase'
 import sleep from '@/functions/sleep'
 import type { Swap } from '@/@types'
 
+export const config = {
+  maxDuration: 300,
+  api: {
+    responseLimit: false,
+  },
+}
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req
 
