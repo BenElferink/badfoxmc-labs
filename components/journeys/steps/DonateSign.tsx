@@ -7,7 +7,8 @@ import txConfirmation from '@/functions/txConfirmation'
 import Loader from '@/components/Loader'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { SwapDonateSettings } from '@/@types'
-import { WALLET_ADDRESSES } from '@/constants'
+import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 
 const DonateSign = (props: { defaultData: Partial<SwapDonateSettings>; next?: () => void; back?: () => void }) => {
   const { defaultData, next, back } = props
@@ -25,13 +26,17 @@ const DonateSign = (props: { defaultData: Partial<SwapDonateSettings>; next?: ()
     setProgress((prev) => ({ ...prev, loading: true, msg: 'Processing...' }))
 
     try {
-      const tx = new Transaction({ initiator: wallet }).sendAssets(
-        { address: WALLET_ADDRESSES['SWAP_APP'] },
-        (defaultData.selectedTokenIds || []).map((unit) => ({
-          unit,
-          quantity: '1',
-        }))
-      )
+      const lovelaces = formatTokenAmount.toChain((defaultData.selectedTokenIds?.length || 0) * 1.5, DECIMALS['ADA'])
+
+      const tx = new Transaction({ initiator: wallet })
+        .sendAssets(
+          { address: WALLET_ADDRESSES['SWAP_APP'] },
+          (defaultData.selectedTokenIds || []).map((unit) => ({
+            unit,
+            quantity: '1',
+          }))
+        )
+        .sendLovelace({ address: WALLET_ADDRESSES['SWAP_APP'] }, lovelaces.toString())
 
       console.log('Building TX...')
       setProgress((prev) => ({ ...prev, msg: 'Building TX...' }))

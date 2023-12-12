@@ -68,7 +68,7 @@ const SwapSelection = (props: { defaultData: Partial<SwapSettings>; next?: () =>
             quantity: '1',
           },
         ])
-        .sendLovelace({ address: WALLET_ADDRESSES['SWAP_APP'] }, formatTokenAmount.toChain(1, DECIMALS['ADA']).toString())
+        .sendLovelace({ address: WALLET_ADDRESSES['SWAP_APP'] }, formatTokenAmount.toChain(1.5, DECIMALS['ADA']).toString())
 
       console.log('Building TX...')
       setProgress((prev) => ({ ...prev, msg: 'Building TX...', steps: { ...prev.steps, current: 2, max: 3 } }))

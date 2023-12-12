@@ -249,16 +249,16 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
       }
 
       if (isToken) {
-        const lovelaces = formatTokenAmount.toChain(numOfWinners * 1, DECIMALS['ADA'])
+        const lovelaces = formatTokenAmount.toChain(numOfWinners * 1.5, DECIMALS['ADA'])
 
         const tx = new Transaction({ initiator: wallet })
-          .sendLovelace({ address: WALLET_ADDRESSES['GIVEAWAY_APP'] }, lovelaces.toString())
           .sendAssets({ address: WALLET_ADDRESSES['GIVEAWAY_APP'] }, [
             {
               unit: tokenId,
               quantity: tokenAmount.onChain.toString(),
             },
           ])
+          .sendLovelace({ address: WALLET_ADDRESSES['GIVEAWAY_APP'] }, lovelaces.toString())
 
         console.log('Building TX...')
         setProgress((prev) => ({ ...prev, msg: 'Building TX...' }))
