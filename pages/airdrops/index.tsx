@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { useData } from '@/contexts/DataContext'
 import resolveMonthName from '@/functions/resolvers/resolveMonthName'
+import formatIpfsReference from '@/functions/formatters/formatIpfsReference'
 import Loader from '@/components/Loader'
 import AirdropCard from '@/components/cards/AirdropCard'
 import AirdropJourney from '@/components/journeys/AirdropJourney'
@@ -77,7 +78,7 @@ const Page = () => {
                     <AirdropCard
                       key={`drop-${drop.id}`}
                       stakeKey={drop.stakeKey}
-                      thumb={drop.thumb}
+                      thumb={formatIpfsReference(drop.thumb).url}
                       tokenName={drop.tokenName}
                       tokenAmount={drop.tokenAmount}
                     />

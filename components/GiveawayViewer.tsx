@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Fragment } from 'react'
 import { useTimer } from 'react-timer-hook'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
+import formatIpfsReference from '@/functions/formatters/formatIpfsReference'
 import MediaViewer from './MediaViewer'
 import WhoHolders from './WhoHolders'
 import type { Giveaway } from '@/@types'
@@ -45,7 +46,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
         </Fragment>
       )}
 
-      <MediaViewer mediaType='IMAGE' src={giveaway.thumb} size='w-[250px] sm:w-[550px] h-[250px] sm:h-[550px] my-4' />
+      <MediaViewer mediaType='IMAGE' src={formatIpfsReference(giveaway.thumb).url} size='w-[250px] sm:w-[550px] h-[250px] sm:h-[550px] my-4' />
 
       {!!giveaway.id && giveaway.active ? (
         <div className='mb-2'>

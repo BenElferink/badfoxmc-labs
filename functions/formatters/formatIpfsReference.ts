@@ -6,8 +6,11 @@ const formatIpfsReference = (str: string) => {
     }
   }
 
-  const ipfs = str.indexOf('ipfs://') === 0 ? str : `ipfs://${str}`
-  const url = ipfs.replace('ipfs://', 'https://image-optimizer.jpgstoreapis.com/')
+  const strIsUrl = str.indexOf('https://') === 0 || str.indexOf('data:') === 0
+  const strHasIpfsPrefix = str.indexOf('ipfs://') === 0
+
+  const ipfs = strIsUrl ? '' : strHasIpfsPrefix ? str : `ipfs://${str}`
+  const url = strIsUrl ? str : ipfs.replace('ipfs://', 'https://d28yzo4ezrm37i.cloudfront.net/image/') + '?s=400'
 
   return {
     ipfs,
