@@ -253,7 +253,7 @@ const TokenSelector = (props: {
             const { isFungible } = payload
 
             setData({
-              thumb: payload['image']['url'],
+              thumb: payload['image']['ipfs'],
               tokenId: payload['tokenId'],
               tokenName: payload['tokenName'],
               tokenAmount: {
