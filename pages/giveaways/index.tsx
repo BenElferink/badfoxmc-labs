@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
 import { useData } from '@/contexts/DataContext'
-import formatIpfsReference from '@/functions/formatters/formatIpfsReference'
 import DropDown from '@/components/form/DropDown'
 import Loader from '@/components/Loader'
 import Modal from '@/components/Modal'
@@ -138,7 +137,7 @@ const Page = () => {
                   id={id}
                   active={active}
                   endAt={endAt}
-                  thumb={formatIpfsReference(thumb).url}
+                  thumb={thumb}
                   isToken={isToken}
                   tokenName={tokenName}
                   tokenAmount={tokenAmount}

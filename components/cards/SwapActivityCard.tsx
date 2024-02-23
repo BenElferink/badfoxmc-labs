@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { ArrowPathIcon, ArrowTopRightOnSquareIcon, ArrowTrendingDownIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/solid'
 import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle'
-import formatIpfsReference from '@/functions/formatters/formatIpfsReference'
 import MediaViewer from '../MediaViewer'
 import type { Swap } from '@/@types'
 
@@ -22,7 +21,7 @@ const SwapActivityCard = (props: {
             <span className='text-zinc-400'>Withdraw</span>
           </div>
 
-          <MediaViewer mediaType='IMAGE' src={formatIpfsReference(withdraw.thumb).url} size='w-[250px] h-[250px] m-2' />
+          <MediaViewer mediaType='IMAGE' src={withdraw.thumb} size='w-[250px] h-[250px] m-2' />
 
           <p className='truncate'>
             {1}&times;&nbsp;
@@ -51,7 +50,7 @@ const SwapActivityCard = (props: {
             <span className='text-zinc-400'>Deposit</span>
           </div>
 
-          <MediaViewer mediaType='IMAGE' src={formatIpfsReference(deposit.thumb).url} size='w-[250px] h-[250px] m-2' />
+          <MediaViewer mediaType='IMAGE' src={deposit.thumb} size='w-[250px] h-[250px] m-2' />
 
           <p className='truncate'>
             {1}&times;&nbsp;

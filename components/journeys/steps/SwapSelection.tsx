@@ -6,7 +6,6 @@ import { ArrowPathIcon, CheckBadgeIcon, QuestionMarkCircleIcon } from '@heroicon
 import { firestore } from '@/utils/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import formatIpfsReference from '@/functions/formatters/formatIpfsReference'
 import txConfirmation from '@/functions/txConfirmation'
 import Loader from '@/components/Loader'
 import ProgressBar from '@/components/ProgressBar'
@@ -149,7 +148,7 @@ const SwapSelection = (props: { defaultData: Partial<SwapSettings>; next?: () =>
       <div className='mt-20 mb-10 mx-auto flex items-center justify-center'>
         <div className='mr-2 flex flex-col items-center justify-center'>
           {defaultData.withdraw?.thumb ? (
-            <MediaViewer mediaType='IMAGE' src={formatIpfsReference(defaultData.withdraw.thumb).url} size='w-[280px] h-[280px]' withBorder />
+            <MediaViewer mediaType='IMAGE' src={defaultData.withdraw.thumb} size='w-[280px] h-[280px]' withBorder />
           ) : (
             <div className='w-[280px] h-[280px] flex items-center justify-center'>
               <QuestionMarkCircleIcon className='w-20 h-20' />
@@ -164,7 +163,7 @@ const SwapSelection = (props: { defaultData: Partial<SwapSettings>; next?: () =>
 
         <div className='ml-2 flex flex-col items-center justify-center'>
           {defaultData.deposit?.thumb ? (
-            <MediaViewer mediaType='IMAGE' src={formatIpfsReference(defaultData.deposit.thumb).url} size='w-[280px] h-[280px]' withBorder />
+            <MediaViewer mediaType='IMAGE' src={defaultData.deposit.thumb} size='w-[280px] h-[280px]' withBorder />
           ) : (
             <div className='w-[280px] h-[280px] flex items-center justify-center'>
               <QuestionMarkCircleIcon className='w-20 h-20' />

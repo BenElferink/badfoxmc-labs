@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import formatIpfsReference from '@/functions/formatters/formatIpfsReference'
 import MediaViewer from '@/components/MediaViewer'
 import TokenExplorer, { TokenExplorerCollections } from '@/components/TokenExplorer'
 import JourneyStepWrapper from './JourneyStepWrapper'
@@ -108,7 +107,7 @@ const TokenAmount = (props: {
     <JourneyStepWrapper disableNext={!data.tokenAmount?.onChain} next={next} back={back}>
       <h6 className='mb-6 text-xl text-center'>How many tokens?</h6>
 
-      <MediaViewer mediaType='IMAGE' src={formatIpfsReference(data.thumb || '').url} size='w-[150px] h-[150px] my-8 mx-auto' />
+      <MediaViewer mediaType='IMAGE' src={data.thumb || ''} size='w-[150px] h-[150px] my-8 mx-auto' />
 
       <div className='flex items-center justify-center'>
         <div
@@ -253,7 +252,7 @@ const TokenSelector = (props: {
             const { isFungible } = payload
 
             setData({
-              thumb: payload['image']['ipfs'],
+              thumb: payload['image']['ipfs'] || payload['image']['url'],
               tokenId: payload['tokenId'],
               tokenName: payload['tokenName'],
               tokenAmount: {
