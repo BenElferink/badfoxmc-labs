@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { useTimer } from 'react-timer-hook'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
 import MediaViewer from './MediaViewer'
 import WhoHolders from './WhoHolders'
+import Countdown from './Countdown'
 import type { Giveaway } from '@/@types'
 
 interface GiveawayViewerProps {
@@ -13,11 +13,6 @@ interface GiveawayViewerProps {
 
 const GiveawayViewer = (props: GiveawayViewerProps) => {
   const { giveaway, callbackTimeExpired } = props
-
-  const timer = useTimer({
-    expiryTimestamp: new Date(!!giveaway.id && giveaway.active ? giveaway.endAt : 0),
-    onExpire: () => (callbackTimeExpired ? callbackTimeExpired() : null),
-  })
 
   return (
     <div className='flex flex-col items-center text-center'>
@@ -49,20 +44,7 @@ const GiveawayViewer = (props: GiveawayViewerProps) => {
 
       {!!giveaway.id && giveaway.active ? (
         <div className='mb-2'>
-          <table className='mx-auto'>
-            <tbody>
-              <tr className='text-xl'>
-                <td>{`${timer.days < 10 ? '0' : ''}${timer.days}`}</td>
-                <td>:</td>
-                <td>{`${timer.hours < 10 ? '0' : ''}${timer.hours}`}</td>
-                <td>:</td>
-                <td>{`${timer.minutes < 10 ? '0' : ''}${timer.minutes}`}</td>
-                <td>:</td>
-                <td>{`${timer.seconds < 10 ? '0' : ''}${timer.seconds}`}</td>
-              </tr>
-            </tbody>
-          </table>
-
+          <Countdown timestamp={!!giveaway.id && giveaway.active ? giveaway.endAt : 0} callbackTimeExpired={callbackTimeExpired} />
           <WhoHolders
             label='Who can enter?'
             holderPolicies={giveaway.holderPolicies}

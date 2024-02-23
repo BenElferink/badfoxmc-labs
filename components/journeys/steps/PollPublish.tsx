@@ -3,13 +3,14 @@ import { toast } from 'react-hot-toast'
 import { useWallet } from '@meshsdk/react'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
-import api from '@/utils/api'
 import { firestore } from '@/utils/firebase'
+import api from '@/utils/api'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
 import PollViewer from '@/components/PollViewer'
+import Countdown from '@/components/Countdown'
 import type { ApiBaseToken, ApiPoolDelegators, ApiTokenOwners, FungibleTokenHolderWithPoints, Poll, PollSettings, StakeKey } from '@/@types'
 
 const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: () => void }) => {
@@ -284,6 +285,7 @@ const PollPublish = (props: { settings: PollSettings; next?: () => void; back?: 
       <h6 className='mb-6 text-xl text-center'>Publish Poll</h6>
 
       <PollViewer poll={settings as Poll} showClassified />
+      <Countdown timestamp={settings.endAt} />
 
       <div className={progress.policy.max ? 'my-6' : ''}>
         {!published && progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}

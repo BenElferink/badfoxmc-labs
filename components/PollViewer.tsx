@@ -1,8 +1,8 @@
 import { Fragment, useMemo } from 'react'
-import { useTimer } from 'react-timer-hook'
 import MediaViewer from './MediaViewer'
 import WhoHolders from './WhoHolders'
 import ProgressBar from './ProgressBar'
+import Countdown from './Countdown'
 import type { Poll, PollOption } from '@/@types'
 
 interface PollViewerProps {
@@ -25,11 +25,6 @@ const PollViewer = (props: PollViewerProps) => {
 
     return count
   }, [poll])
-
-  const timer = useTimer({
-    expiryTimestamp: new Date(!!poll.id && poll.active ? poll.endAt : 0),
-    onExpire: () => (callbackTimeExpired ? callbackTimeExpired() : null),
-  })
 
   return (
     <div className='flex flex-col items-center text-center'>
@@ -103,22 +98,7 @@ const PollViewer = (props: PollViewerProps) => {
 
       {!!poll.id ? (
         <div className='mb-2'>
-          {poll.active ? (
-            <table className='mx-auto'>
-              <tbody>
-                <tr className='text-xl'>
-                  <td>{`${timer.days < 10 ? '0' : ''}${timer.days}`}</td>
-                  <td>:</td>
-                  <td>{`${timer.hours < 10 ? '0' : ''}${timer.hours}`}</td>
-                  <td>:</td>
-                  <td>{`${timer.minutes < 10 ? '0' : ''}${timer.minutes}`}</td>
-                  <td>:</td>
-                  <td>{`${timer.seconds < 10 ? '0' : ''}${timer.seconds}`}</td>
-                </tr>
-              </tbody>
-            </table>
-          ) : null}
-
+          {poll.active ? <Countdown timestamp={poll.endAt} callbackTimeExpired={callbackTimeExpired} /> : null}
           <WhoHolders
             label={poll.active ? 'Who can vote?' : 'Who voted?'}
             holderPolicies={poll.holderPolicies}

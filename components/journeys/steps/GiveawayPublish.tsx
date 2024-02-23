@@ -12,6 +12,7 @@ import JourneyStepWrapper from './JourneyStepWrapper'
 import ProgressBar from '@/components/ProgressBar'
 import Loader from '@/components/Loader'
 import GiveawayViewer from '@/components/GiveawayViewer'
+import Countdown from '@/components/Countdown'
 import type { ApiBaseToken, ApiPoolDelegators, ApiTokenOwners, FungibleTokenHolderWithPoints, Giveaway, GiveawaySettings, StakeKey } from '@/@types'
 import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
 
@@ -340,6 +341,7 @@ const GiveawayPublish = (props: { settings: GiveawaySettings; next?: () => void;
       <h6 className='mb-6 text-xl text-center'>Publish Giveaway</h6>
 
       <GiveawayViewer giveaway={settings as Giveaway} />
+      <Countdown timestamp={settings.endAt} />
 
       <div className={progress.policy.max ? 'my-6' : ''}>
         {!published && progress.policy.max ? <ProgressBar label='Policy IDs' max={progress.policy.max} current={progress.policy.current} /> : null}
