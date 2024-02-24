@@ -2,13 +2,15 @@ import { useCallback, useState } from 'react'
 import { Transaction } from '@meshsdk/core'
 import { useWallet } from '@meshsdk/react'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
+import { firestore } from '@/utils/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import txConfirmation from '@/functions/txConfirmation'
-import Loader from '@/components/Loader'
-import JourneyStepWrapper from './JourneyStepWrapper'
-import type { SwapDonateSettings } from '@/@types'
-import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
+import JourneyStepWrapper from './JourneyStepWrapper'
+import Loader from '@/components/Loader'
+import MediaViewer from '@/components/MediaViewer'
+import type { SwapDonateSettings, SwapProvider } from '@/@types'
+import { DECIMALS, WALLET_ADDRESSES } from '@/constants'
 
 const DonateSign = (props: { defaultData: Partial<SwapDonateSettings>; next?: () => void; back?: () => void }) => {
   const { defaultData, next, back } = props
@@ -26,17 +28,23 @@ const DonateSign = (props: { defaultData: Partial<SwapDonateSettings>; next?: ()
     setProgress((prev) => ({ ...prev, loading: true, msg: 'Processing...' }))
 
     try {
-      const lovelaces = formatTokenAmount.toChain((defaultData.selectedTokenIds?.length || 0) * 1.5, DECIMALS['ADA'])
+      const lovelaceToPay = formatTokenAmount.toChain((defaultData.selectedTokenIds?.length || 0) * 1.5, DECIMALS['ADA'])
+      const dbData: SwapProvider = {
+        stakeKey: user.stakeKey,
+        depositTokens: (defaultData.selectedTokenIds || []).map((unit) => ({
+          unit,
+          quantity: '1',
+        })),
+        depositTxHash: '',
+        mintTxHash: '',
+      }
+
+      const collection = firestore.collection('swap-providers')
+      const { id: docId } = await collection.add(dbData)
 
       const tx = new Transaction({ initiator: wallet })
-        .sendAssets(
-          { address: WALLET_ADDRESSES['SWAP_APP'] },
-          (defaultData.selectedTokenIds || []).map((unit) => ({
-            unit,
-            quantity: '1',
-          }))
-        )
-        .sendLovelace({ address: WALLET_ADDRESSES['SWAP_APP'] }, lovelaces.toString())
+        .sendAssets({ address: WALLET_ADDRESSES['SWAP_APP'] }, dbData.depositTokens)
+        .sendLovelace({ address: WALLET_ADDRESSES['SWAP_APP'] }, lovelaceToPay.toString())
 
       console.log('Building TX...')
       setProgress((prev) => ({ ...prev, msg: 'Building TX...' }))
@@ -53,6 +61,10 @@ const DonateSign = (props: { defaultData: Partial<SwapDonateSettings>; next?: ()
       console.log('Awaiting network confirmation...', txHash)
       setProgress((prev) => ({ ...prev, msg: 'Awaiting network confirmation...' }))
       await txConfirmation(txHash)
+
+      await collection.doc(docId).update({
+        depositTxHash: txHash,
+      })
 
       console.log('TX confirmed!', txHash)
       setProgress((prev) => ({ ...prev, loading: false, msg: 'TX confirmed!' }))
@@ -100,7 +112,21 @@ const DonateSign = (props: { defaultData: Partial<SwapDonateSettings>; next?: ()
       ) : (
         <div className='flex flex-col items-center justify-center'>
           {done ? <CheckBadgeIcon className='w-24 h-24 text-green-400' /> : null}
+
           <span>{progress.msg}</span>
+
+          {!done ? (
+            <div className='mt-4 flex items-center justify-center flex-wrap'>
+              {defaultData.selectedTokenIds?.map((tId) => (
+                <MediaViewer
+                  key={tId}
+                  mediaType='IMAGE'
+                  src={user?.tokens?.find((t) => t.tokenId === tId)?.image.ipfs || ''}
+                  size='w-[150px] h-[150px] m-[5px]'
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
       )}
     </JourneyStepWrapper>

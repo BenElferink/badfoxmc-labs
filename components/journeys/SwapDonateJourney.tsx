@@ -40,25 +40,42 @@ const SwapDonateJourney = (props: { open: boolean; onClose: (options?: { withRef
   return (
     <Modal open={open} onClose={handleClose}>
       {step === 1 ? (
-        <DonateMethod defaultData={settings} callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))} next={increment} />
+        <TokenSelector
+          onlyNonFungible
+          multiSelect
+          defaultData={settings['selectedTokenIds']}
+          callback={(payload) => setSettings((prev) => ({ ...prev, selectedTokenIds: payload as TokenId[] }))}
+          back={decrement}
+          next={increment}
+        />
       ) : step === 2 ? (
-        settings['donateMethod'] === 'BUILD_TX' ? (
-          <TokenSelector
-            onlyNonFungible
-            multiSelect
-            defaultData={settings['selectedTokenIds']}
-            callback={(payload) => setSettings((prev) => ({ ...prev, selectedTokenIds: payload as TokenId[] }))}
-            back={decrement}
-            next={increment}
-          />
-        ) : (
-          <DonateManual back={decrement} />
-        )
-      ) : step === 3 ? (
         <DonateSign defaultData={settings} back={decrement} />
       ) : null}
     </Modal>
   )
+
+  // return (
+  //   <Modal open={open} onClose={handleClose}>
+  //     {step === 1 ? (
+  //       <DonateMethod defaultData={settings} callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))} next={increment} />
+  //     ) : step === 2 ? (
+  //       settings['donateMethod'] === 'BUILD_TX' ? (
+  //         <TokenSelector
+  //           onlyNonFungible
+  //           multiSelect
+  //           defaultData={settings['selectedTokenIds']}
+  //           callback={(payload) => setSettings((prev) => ({ ...prev, selectedTokenIds: payload as TokenId[] }))}
+  //           back={decrement}
+  //           next={increment}
+  //         />
+  //       ) : (
+  //         <DonateManual back={decrement} />
+  //       )
+  //     ) : step === 3 ? (
+  //       <DonateSign defaultData={settings} back={decrement} />
+  //     ) : null}
+  //   </Modal>
+  // )
 }
 
 export default SwapDonateJourney

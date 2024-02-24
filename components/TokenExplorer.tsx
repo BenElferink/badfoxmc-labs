@@ -6,7 +6,7 @@ import TextFrown from './TextFrown'
 import Loader from './Loader'
 import Input from './form/Input'
 import type { ApiPopulatedToken, TokenId } from '@/@types'
-import { DECIMALS, POPULATED_LOVELACE } from '@/constants'
+import { DECIMALS, POLICY_IDS, POPULATED_LOVELACE } from '@/constants'
 
 export type TokenExplorerCollections = {
   policyId: string
@@ -111,7 +111,7 @@ const TokenExplorer = (props: {
                 return null
               }
 
-              if (onlyNonFungible && t.isFungible) {
+              if (onlyNonFungible && (t.isFungible || t.policyId === POLICY_IDS['SWAP_REFUND_TOKEN'])) {
                 return null
               }
 

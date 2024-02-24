@@ -345,3 +345,18 @@ export interface SwapDonateSettings {
   donateMethod: 'BUILD_TX' | 'MANUAL_TX'
   selectedTokenIds: TokenId[]
 }
+
+export interface SwapProvider {
+  stakeKey: StakeKey
+  depositTokens: {
+    unit: TokenId
+    quantity: string
+  }[]
+  depositTxHash: TransactionId
+  mintTxHash: TransactionId
+}
+
+export interface PolicyDoc {
+  dbSerialNumber: number
+  policyId: PolicyId
+}

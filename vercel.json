@@ -6,11 +6,19 @@
     },
     {
       "path": "/api/cron/giveaways",
-      "schedule": "*/10 * * * *"
+      "schedule": "*/15 * * * *"
     },
     {
       "path": "/api/cron/swaps",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/mint-refund-tokens",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/burn-refund-tokens",
+      "schedule": "0 * * * *"
     }
   ]
 }

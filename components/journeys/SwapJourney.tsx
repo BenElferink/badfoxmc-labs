@@ -6,6 +6,7 @@ import TokenSelector from './steps/TokenSelector'
 import SwapSelection from './steps/SwapSelection'
 import type { SwapSettings, TokenSelectionSettings } from '@/@types'
 import type { TokenExplorerCollections } from '../TokenExplorer'
+import { POLICY_IDS } from '@/constants'
 
 const defaultSettings: SwapSettings = {
   withdraw: {
@@ -52,6 +53,9 @@ const SwapJourney = (props: { collections: TokenExplorerCollections; open: boole
   const increment = () => setStep((prev) => prev + 1)
   const decrement = () => setStep((prev) => prev - 1)
 
+  const refundTokensForTheseCollections =
+    user.tokens?.filter((t) => t.policyId === POLICY_IDS['SWAP_REFUND_TOKEN'] && collections.find((c) => c.policyId === t.attributes.forPolicy)) || []
+
   return (
     <Modal open={open} onClose={handleClose}>
       {step === 1 ? (
@@ -80,10 +84,16 @@ const SwapJourney = (props: { collections: TokenExplorerCollections; open: boole
       ) : step === 4 ? (
         <TokenSelector
           forceTitle='Select a Token to Deposit'
-          forceCollections={collections.map((c) => ({
-            policyId: c.policyId,
-            tokens: user.tokens?.filter((t) => t.tokenId.indexOf(c.policyId) === 0) || [],
-          }))}
+          forceCollections={[
+            {
+              policyId: POLICY_IDS['SWAP_REFUND_TOKEN'],
+              tokens: refundTokensForTheseCollections,
+            },
+            ...collections.map((c) => ({
+              policyId: c.policyId,
+              tokens: user.tokens?.filter((t) => t.tokenId.indexOf(c.policyId) === 0) || [],
+            })),
+          ]}
           defaultData={{
             tokenId: settings['deposit']['tokenId'],
             thumb: settings['deposit']['thumb'],
