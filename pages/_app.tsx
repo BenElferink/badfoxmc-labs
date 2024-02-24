@@ -7,7 +7,7 @@ import { Roboto } from 'next/font/google'
 import { useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { MeshProvider } from '@meshsdk/react'
-import { Bars3Icon, BeakerIcon } from '@heroicons/react/24/solid'
+import { Bars3Icon } from '@heroicons/react/24/solid'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { DataProvider } from '@/contexts/DataContext'
 import { RenderProvider } from '@/contexts/RenderContext'
@@ -56,7 +56,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <div className='w-screen min-h-screen'>
                   <header id='header' className='sticky top-0 h-20 px-4 z-20 flex items-center justify-between'>
                     <div className='flex items-center'>
-                      <BeakerIcon className='w-10 h-10' />
+                      <Image src='https://badfoxmc.com/media/logo/white_cropped.png' alt='logo' width={50} height={50} />
                       <h1 className='ml-1.5 text-xl whitespace-nowrap'>Bad Labs</h1>
                     </div>
 
@@ -80,14 +80,56 @@ function MyApp({ Component, pageProps }: AppProps) {
                       <Component {...pageProps} />
                     </main>
 
-                    <footer id='footer' className='p-1 flex items-center justify-center drop-shadow-[0_0_2px_rgba(0,0,0,1)]'>
-                      <Link href='https://badfoxmc.com' target='_blank' rel='noopener noreferrer' className='p-2 flex items-center justify-center'>
-                        <Image src='https://badfoxmc.com/media/logo/white_cropped.png' alt='logo' width={50} height={50} priority unoptimized />
-                        <div className='ml-2 text-start whitespace-nowrap'>
-                          <span className='text-xs'>Powered by:</span>
-                          <h6 className='text-sm'>Bad Fox MC</h6>
-                        </div>
-                      </Link>
+                    <footer id='footer' className='flex flex-wrap items-center justify-center'>
+                      {[
+                        {
+                          name: 'Google Firebase',
+                          url: 'https://firebase.google.com',
+                          logoUrl: '/media/logo/firebase.svg',
+                        },
+                        {
+                          name: 'Blockfrost',
+                          url: 'https://blockfrost.io',
+                          logoUrl: '/media/logo/blockfrost.svg',
+                        },
+                        {
+                          name: 'jpg.store',
+                          url: 'https://jpg.store',
+                          logoUrl: '/media/logo/jpgstore.png',
+                        },
+                        {
+                          name: '$handle',
+                          url: 'https://adahandle.com',
+                          logoUrl: '/media/logo/adahandle.svg',
+                        },
+                        {
+                          name: 'CNFT Tools',
+                          url: 'https://cnft.tools',
+                          logoUrl: '/media/logo/cnfttools.svg',
+                        },
+                        {
+                          name: 'Mesh.js',
+                          url: 'https://meshjs.dev',
+                          logoUrl: 'https://badfoxmc.com/media/logo/other/mesh.png',
+                        },
+                      ].map((obj) => (
+                        <Link
+                          key={`powered-by-${obj.name}`}
+                          href={obj.url}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='relative w-32 h-20 m-8 cursor-pointer'
+                        >
+                          <Image
+                            src={obj.logoUrl}
+                            alt={obj.name}
+                            fill
+                            sizes='3rem'
+                            unoptimized
+                            className='object-contain drop-shadow-[-1px_-1px_1px_rgba(255,255,255,1)]'
+                          />
+                        </Link>
+                      ))}
                     </footer>
                   </div>
                 </div>
