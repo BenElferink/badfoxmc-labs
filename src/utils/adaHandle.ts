@@ -8,7 +8,7 @@ class AdaHandle {
     this.baseUrl = 'https://api.handle.me'
   }
 
-  resolveHandle = (
+  resolveHolderFromHandle = (
     handle: string
   ): Promise<{
     holder: StakeKey | Address['address']
@@ -73,7 +73,7 @@ class AdaHandle {
     })
   }
 
-  resolveWalletHandle = (stakeKey: StakeKey): Promise<string> => {
+  resolveHandleFromHolder = (stakeKey: StakeKey): Promise<string> => {
     const uri = `${this.baseUrl}/holders/${stakeKey}`
 
     return new Promise(async (resolve, reject) => {
@@ -96,11 +96,11 @@ class AdaHandle {
         let handle = data.default_handle || ''
 
         if (handle) {
-          const { holder } = await this.resolveHandle(handle)
+          const { holder } = await this.resolveHolderFromHandle(handle)
 
           if (holder !== stakeKey) {
             console.log('Resolved with incorrect wallet handle:', handle)
-            return resolve('')
+            return resolve('') 
           }
 
           handle = `$${handle}`
