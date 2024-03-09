@@ -6,7 +6,7 @@ const formatIpfsReference = (str: string) => {
     }
   }
 
-  const strIsUrl = str.indexOf('https://') === 0 || str.indexOf('data:') === 0
+  const strIsUrl = str.indexOf('data:') === 0 || str.indexOf('https://') === 0 || str.indexOf('/') === 0
   const strHasIpfsPrefix = str.indexOf('ipfs://') === 0
 
   const ipfs = strIsUrl ? '' : strHasIpfsPrefix ? str : `ipfs://${str}`

@@ -120,15 +120,7 @@ const HolderPolicies = (props: {
         <br />
         <br />* Ranks are obtained from
         <Link href='https://cnft.tools' target='_blank' rel='noopener noreferrer' className='group'>
-          <Image
-            src='https://badfoxmc.com/media/logo/other/cnfttools.png'
-            alt=''
-            width={20}
-            height={20}
-            className='inline ml-1 mr-0.5'
-            priority
-            unoptimized
-          />
+          <Image src='/media/logo/cnfttools.png' alt='' width={20} height={20} className='inline ml-1 mr-0.5' priority unoptimized />
           <span className='text-blue-200 group-hover:underline'>cnft.tools</span>
         </Link>
       </p>
