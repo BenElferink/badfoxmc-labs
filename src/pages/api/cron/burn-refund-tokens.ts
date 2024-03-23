@@ -33,13 +33,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         refundTokens.forEach((t) =>
           tx.burnAsset(forgingScript, {
             unit: t.tokenId,
-            quantity: t.tokenAmount.onChain,
+            quantity: t.tokenAmount.onChain.toString(),
           })
         )
 
         const unsignedTx = await tx.build()
         const signedTx = await wallet.signTx(unsignedTx)
         const txHash = await wallet.submitTx(signedTx)
+
+        console.log('refund tokens burned:', txHash)
 
         return res.status(204).end()
       }
