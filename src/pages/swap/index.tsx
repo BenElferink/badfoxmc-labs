@@ -20,11 +20,11 @@ const Page = () => {
   const { user, getAndSetUser } = useAuth()
   const { swapWallet, fetchSwapWallet, swaps, fetchSwaps } = useData()
 
-  useEffect(() => {
-    if (!Object.keys(swapWallet).length) fetchSwapWallet()
-    if (!swaps.length) fetchSwaps()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // useEffect(() => {
+  //   if (!Object.keys(swapWallet).length) fetchSwapWallet()
+  //   if (!swaps.length) fetchSwaps()
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
   const [openDonateJourney, setOpenDonateJourney] = useState(false)
   const [selectedId, setSelectedId] = useState<PolicyId>(query.id?.toString() || '')
@@ -39,6 +39,14 @@ const Page = () => {
   }>({
     who: 'everyone',
   })
+
+  return (
+    <div className='w-full flex flex-col items-center text-center'>
+      down for maintenance...
+      <br />
+      we&apos;ll be back soon 😃
+    </div>
+  )
 
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
