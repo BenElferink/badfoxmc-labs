@@ -103,14 +103,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             walletPayload[policyId] = {
               name: details.name || policyId,
               thumb: details.pfpUrl || token.image.url,
-              floor: formatTokenAmount.fromChain(details.floorPrice, DECIMALS['ADA']),
+              floor: details.floorPrice,
               tokens: [tokenPayload],
             }
           } catch (error) {
             walletPayload[policyId] = {
               name: policyId,
               thumb: '',
-              floor: formatTokenAmount.fromChain(0, DECIMALS['ADA']),
+              floor: 0,
               tokens: [tokenPayload],
             }
           }

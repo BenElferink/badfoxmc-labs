@@ -348,7 +348,7 @@ class JpgStore {
           description: collection.description,
           pfpUrl: collection.hero_image,
           bannerUrl: collection.banner_image,
-          floorPrice: Number(collection.floor || formatTokenAmount.fromChain(stats.jpg_floor_lovelace, DECIMALS['ADA'])),
+          floorPrice: Number(formatTokenAmount.fromChain(collection.floor || stats.jpg_floor_lovelace, DECIMALS['ADA'])),
         }
 
         return resolve(payload)
