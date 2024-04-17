@@ -96,7 +96,9 @@ const DonateSign = (props: { defaultData: Partial<SwapDonateSettings>; next?: ()
   return (
     <JourneyStepWrapper
       back={back}
+      disableBack={progress.loading || done}
       next={next}
+      disableNext={progress.loading || done}
       buttons={[
         {
           label: 'Sign TX',

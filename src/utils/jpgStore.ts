@@ -1,6 +1,7 @@
 import axios from 'axios'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import type { ActivityType, Address, ApiMarketToken, ApiPolicyMarketDetails, PolicyId, StakeKey, TokenId, TransactionId } from '@/@types'
+import { DECIMALS } from '@/constants'
 
 interface FetchedListingOrSale {
   asset_id: TokenId
@@ -334,7 +335,7 @@ class JpgStore {
         console.log('Fetching collection', policyId)
 
         const {
-          data: { collection },
+          data: { collection, stats },
         } = await axios.get<FetchedCollectionDetails>(uri, {
           headers: this.headers,
         })
@@ -347,7 +348,7 @@ class JpgStore {
           description: collection.description,
           pfpUrl: collection.hero_image,
           bannerUrl: collection.banner_image,
-          floorPrice: Number(collection.floor),
+          floorPrice: Number(collection.floor || formatTokenAmount.fromChain(stats.jpg_floor_lovelace, DECIMALS['ADA'])),
         }
 
         return resolve(payload)
