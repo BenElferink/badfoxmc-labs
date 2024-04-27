@@ -186,13 +186,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           batch.update(collection.doc(id), updateBody)
         }
 
-        await batch.commit()
-
         if (payTo.length) {
           const payedOut = await sendToWallets(payTo)
 
           console.log('payout done', payedOut)
         }
+
+        await batch.commit()
 
         return res.status(204).end()
       }
