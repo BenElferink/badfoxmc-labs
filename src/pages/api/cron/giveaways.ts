@@ -126,73 +126,91 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const batch = firestore.batch()
 
         // Note on slice(0, 1) : only process one at a time until scaling solution has been provided
-        for await (const doc of docsThatNeedToRaffleWinners.slice(0, 1)) {
-          const { id, stakeKey, isToken, tokenId, tokenAmount, otherAmount, numOfWinners, entries } = doc
+        // for await (const doc of docsThatNeedToRaffleWinners.slice(0, 1)) {
 
-          const winners: GiveawayWinner[] = []
-          const enteredStakeKeys: string[] = entries?.map((entry) => new Array(entry.points).fill(entry.stakeKey)).flat()
+        const doc = docsThatNeedToRaffleWinners[0]
+        const { id, stakeKey, isToken, tokenId, tokenAmount, otherAmount, numOfWinners, entries } = doc
 
-          let finalNumOfWinners = Math.min(numOfWinners, enteredStakeKeys.length)
+        let lowestPointCount = 0
 
-          if (!finalNumOfWinners) {
-            // basically returns prize to the owner
-            enteredStakeKeys.push(stakeKey)
-            finalNumOfWinners = 1
-          }
-
-          const amountPerWinner = Math.floor((isToken ? tokenAmount.onChain : otherAmount) / finalNumOfWinners)
-
-          for (let i = 1; i <= finalNumOfWinners; i++) {
-            const randomIdx = Math.floor(Math.random() * enteredStakeKeys.length)
-            const thisStakeKey = enteredStakeKeys[randomIdx]
-
-            if (thisStakeKey) {
-              const alreadyWon = winners.find((obj) => obj.stakeKey === thisStakeKey)
-
-              if (alreadyWon) {
-                i--
-              } else {
-                const wallet = await api.wallet.getData(thisStakeKey)
-                const { address } = wallet.addresses[0]
-
-                winners.push({
-                  stakeKey: thisStakeKey,
-                  address,
-                  amount: amountPerWinner,
-                })
-              }
+        const winners: GiveawayWinner[] = []
+        const enteredStakeKeys: string[] = (entries || [])
+          .sort((a, b) => a.points - b.points)
+          .map((entry, i) => {
+            if (i === 0) {
+              lowestPointCount = entry.points
             }
 
-            enteredStakeKeys.splice(randomIdx, 1)
-          }
+            return new Array(Math.round(entry.points / lowestPointCount)).fill(entry.stakeKey)
+          })
+          .flat()
 
-          const updateBody: Partial<Giveaway> = {
-            active: false,
-            fungibleHolders: [],
-            nonFungibleUsedUnits: [],
-            entries: [],
-            winners: FieldValue.arrayUnion(...winners) as unknown as Giveaway['winners'],
-          }
+        let finalNumOfWinners = Math.min(numOfWinners, enteredStakeKeys.length)
 
-          if (isToken) {
-            payTo.push(
-              ...winners.map((item) => ({
-                ...item,
-                tokenId,
-              }))
-            )
-          }
-
-          batch.update(collection.doc(id), updateBody)
+        if (!finalNumOfWinners) {
+          // basically returns prize to the owner
+          enteredStakeKeys.push(stakeKey)
+          finalNumOfWinners = 1
         }
+
+        const amountPerWinner = Math.floor((isToken ? tokenAmount.onChain : otherAmount) / finalNumOfWinners)
+
+        for (let i = 1; i <= finalNumOfWinners; i++) {
+          const randomIdx = Math.floor(Math.random() * enteredStakeKeys.length)
+          const thisStakeKey = enteredStakeKeys[randomIdx]
+
+          if (thisStakeKey) {
+            const alreadyWon = winners.find((obj) => obj.stakeKey === thisStakeKey)
+
+            if (alreadyWon) {
+              i--
+            } else {
+              const wallet = await api.wallet.getData(thisStakeKey)
+
+              const { address } = wallet.addresses[0]
+
+              winners.push({
+                stakeKey: thisStakeKey,
+                address,
+                amount: amountPerWinner,
+              })
+            }
+          }
+
+          enteredStakeKeys.splice(randomIdx, 1)
+        }
+
+        const updateBody: Partial<Giveaway> = {
+          active: false,
+          fungibleHolders: [],
+          nonFungibleUsedUnits: [],
+          entries: [],
+          winners: FieldValue.arrayUnion(...winners) as unknown as Giveaway['winners'],
+        }
+
+        if (isToken) {
+          payTo.push(
+            ...winners.map((item) => ({
+              ...item,
+              tokenId,
+            }))
+          )
+        }
+
+        batch.update(collection.doc(id), updateBody)
+
+        // end of loop - for after scaling solution
+        // }
 
         if (payTo.length) {
           const payedOut = await sendToWallets(payTo)
 
           console.log('payout done', payedOut)
-        }
 
-        await batch.commit()
+          await batch.commit()
+
+          return res.status(200).json({ payedOut })
+        }
 
         return res.status(204).end()
       }
