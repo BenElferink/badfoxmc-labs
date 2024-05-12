@@ -129,87 +129,90 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         // for await (const doc of docsThatNeedToRaffleWinners.slice(0, 1)) {
 
         const doc = docsThatNeedToRaffleWinners[0]
-        const { id, stakeKey, isToken, tokenId, tokenAmount, otherAmount, numOfWinners, entries } = doc
 
-        let lowestPointCount = 0
+        if (doc) {
+          const { id, stakeKey, isToken, tokenId, tokenAmount, otherAmount, numOfWinners, entries } = doc
 
-        const winners: GiveawayWinner[] = []
-        const enteredStakeKeys: string[] = (entries || [])
-          .sort((a, b) => a.points - b.points)
-          .map((entry, i) => {
-            if (i === 0) {
-              lowestPointCount = entry.points
-            }
+          let lowestPointCount = 0
 
-            return new Array(Math.round(entry.points / lowestPointCount)).fill(entry.stakeKey)
-          })
-          .flat()
+          const winners: GiveawayWinner[] = []
+          const enteredStakeKeys: string[] = (entries || [])
+            .sort((a, b) => a.points - b.points)
+            .map((entry, i) => {
+              if (i === 0) {
+                lowestPointCount = entry.points
+              }
 
-        let finalNumOfWinners = Math.min(numOfWinners, enteredStakeKeys.length)
+              return new Array(Math.round(entry.points / lowestPointCount)).fill(entry.stakeKey)
+            })
+            .flat()
 
-        if (!finalNumOfWinners) {
-          // basically returns prize to the owner
-          enteredStakeKeys.push(stakeKey)
-          finalNumOfWinners = 1
-        }
+          let finalNumOfWinners = Math.min(numOfWinners, enteredStakeKeys.length)
 
-        const amountPerWinner = Math.floor((isToken ? tokenAmount.onChain : otherAmount) / finalNumOfWinners)
-
-        for (let i = 1; i <= finalNumOfWinners; i++) {
-          const randomIdx = Math.floor(Math.random() * enteredStakeKeys.length)
-          const thisStakeKey = enteredStakeKeys[randomIdx]
-
-          if (thisStakeKey) {
-            const alreadyWon = winners.find((obj) => obj.stakeKey === thisStakeKey)
-
-            if (alreadyWon) {
-              i--
-            } else {
-              const wallet = await api.wallet.getData(thisStakeKey)
-
-              const { address } = wallet.addresses[0]
-
-              winners.push({
-                stakeKey: thisStakeKey,
-                address,
-                amount: amountPerWinner,
-              })
-            }
+          if (!finalNumOfWinners) {
+            // basically returns prize to the owner
+            enteredStakeKeys.push(stakeKey)
+            finalNumOfWinners = 1
           }
 
-          enteredStakeKeys.splice(randomIdx, 1)
-        }
+          const amountPerWinner = Math.floor((isToken ? tokenAmount.onChain : otherAmount) / finalNumOfWinners)
 
-        const updateBody: Partial<Giveaway> = {
-          active: false,
-          fungibleHolders: [],
-          nonFungibleUsedUnits: [],
-          entries: [],
-          winners: FieldValue.arrayUnion(...winners) as unknown as Giveaway['winners'],
-        }
+          for (let i = 1; i <= finalNumOfWinners; i++) {
+            const randomIdx = Math.floor(Math.random() * enteredStakeKeys.length)
+            const thisStakeKey = enteredStakeKeys[randomIdx]
 
-        if (isToken) {
-          payTo.push(
-            ...winners.map((item) => ({
-              ...item,
-              tokenId,
-            }))
-          )
-        }
+            if (thisStakeKey) {
+              const alreadyWon = winners.find((obj) => obj.stakeKey === thisStakeKey)
 
-        batch.update(collection.doc(id), updateBody)
+              if (alreadyWon) {
+                i--
+              } else {
+                const wallet = await api.wallet.getData(thisStakeKey)
 
-        // end of loop - for after scaling solution
-        // }
+                const { address } = wallet.addresses[0]
 
-        if (payTo.length) {
-          const payedOut = await sendToWallets(payTo)
+                winners.push({
+                  stakeKey: thisStakeKey,
+                  address,
+                  amount: amountPerWinner,
+                })
+              }
+            }
 
-          console.log('payout done', payedOut)
+            enteredStakeKeys.splice(randomIdx, 1)
+          }
 
-          await batch.commit()
+          const updateBody: Partial<Giveaway> = {
+            active: false,
+            fungibleHolders: [],
+            nonFungibleUsedUnits: [],
+            entries: [],
+            winners: FieldValue.arrayUnion(...winners) as unknown as Giveaway['winners'],
+          }
 
-          return res.status(200).json({ payedOut })
+          if (isToken) {
+            payTo.push(
+              ...winners.map((item) => ({
+                ...item,
+                tokenId,
+              }))
+            )
+          }
+
+          batch.update(collection.doc(id), updateBody)
+
+          // end of loop - for after scaling solution
+          // }
+
+          if (payTo.length) {
+            const payedOut = await sendToWallets(payTo)
+
+            console.log('payout done', payedOut)
+
+            await batch.commit()
+
+            return res.status(200).json({ payedOut })
+          }
         }
 
         return res.status(204).end()
