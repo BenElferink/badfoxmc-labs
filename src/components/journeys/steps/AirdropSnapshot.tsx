@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
+import { utils, writeFileXLSX } from 'xlsx'
 import api from '@/utils/api'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
@@ -310,6 +311,36 @@ const AirdropSnapshot = (props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings])
 
+  const downloadSnapshot = useCallback(async () => {
+    setProgress((prev) => ({ ...prev, loading: true, msg: 'Downloading...' }))
+
+    try {
+      const ws = utils.json_to_sheet(
+        payoutHolders.map((item) => ({
+          amount: formatTokenAmount.fromChain(item.payout, settings.tokenAmount.decimals),
+          tokenName: settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain,
+          address: item.address,
+          stakeKey: item.stakeKey,
+        })),
+        { header: ['amount', 'tokenName', 'address', 'stakeKey'] }
+      )
+
+      ws['!cols'] = [{ width: 20 }, { width: 15 }, { width: 100 }, { width: 70 }]
+
+      const wb = utils.book_new()
+      utils.book_append_sheet(wb, ws, 'snapshot')
+
+      writeFileXLSX(wb, `Bad Labs Snapshot (${new Date().toLocaleDateString()}).xlsx`)
+
+      setProgress((prev) => ({ ...prev, loading: false, msg: 'Snapshot Done' }))
+    } catch (error: any) {
+      console.error(error)
+      const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
+
+      setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }))
+    }
+  }, [payoutHolders, settings])
+
   return (
     <JourneyStepWrapper
       disableNext={progress.loading || !snapshotEnded}
@@ -321,6 +352,11 @@ const AirdropSnapshot = (props: {
           label: 'Run Snapshot',
           disabled: progress.loading || snapshotEnded,
           onClick: () => runSnapshot(),
+        },
+        {
+          label: 'Download Snapshot',
+          disabled: progress.loading || !snapshotEnded,
+          onClick: () => downloadSnapshot(),
         },
       ]}
     >

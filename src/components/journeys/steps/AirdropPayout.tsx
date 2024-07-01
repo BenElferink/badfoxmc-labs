@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { utils, writeFileXLSX } from 'xlsx'
 import { useWallet } from '@meshsdk/react'
 import { Transaction } from '@meshsdk/core'
@@ -186,11 +186,13 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
     try {
       const ws = utils.json_to_sheet(
         processedPayoutHolders.map((item) => ({
-          ...item,
-          payout: formatTokenAmount.fromChain(item.payout, settings.tokenAmount.decimals),
+          amount: formatTokenAmount.fromChain(item.payout, settings.tokenAmount.decimals),
           tokenName: settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain,
+          address: item.address,
+          stakeKey: item.stakeKey,
+          txHash: item.txHash,
         })),
-        { header: ['payout', 'tokenName', 'address', 'stakeKey', 'txHash'] }
+        { header: ['amount', 'tokenName', 'address', 'stakeKey', 'txHash'] }
       )
 
       ws['!cols'] = [{ width: 20 }, { width: 15 }, { width: 100 }, { width: 70 }, { width: 70 }]
@@ -208,6 +210,8 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }))
     }
   }, [processedPayoutHolders, settings])
+
+  const totalAmount = useMemo(() => processedPayoutHolders.reduce((prev, curr) => prev + curr.payout, 0), [processedPayoutHolders])
 
   return (
     <JourneyStepWrapper disableBack={progress.loading || payoutEnded} next={next} back={back}>
@@ -232,7 +236,13 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       <div className='w-2/3 h-0.5 my-8 mx-auto rounded-full bg-zinc-400' />
 
       <p className='w-full my-2 text-center'>
-        {processedPayoutHolders.length} Receiving Wallet{processedPayoutHolders.length > 1 ? 's' : ''}
+        {formatTokenAmount.fromChain(totalAmount, settings.tokenAmount.decimals).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}{' '}
+        {settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain}
+        <br />
+        {processedPayoutHolders.length} Wallet{processedPayoutHolders.length > 1 ? 's' : ''}
       </p>
 
       {processedPayoutHolders.map((item) => (
