@@ -72,19 +72,18 @@ const Auth = () => {
             {/* @ts-ignore */}
             {error ? <p className='text-red-400'>{error?.message || error?.toString()}</p> : null}
 
-            {installedWallets.map((w) =>
-              !['nufiSnap'].includes(w.id) ? (
-                <button
-                  key={`wallet-${w.id}`}
-                  onClick={() => connect(w.id)}
-                  disabled={connected || connecting}
-                  className='w-full max-w-[420px] my-2 mx-auto p-4 flex items-center justify-between rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:opacity-40'
-                >
-                  <Image src={w.icon} alt='' width={35} height={35} className='drop-shadow-[0_0_1px_rgba(0,0,0,1)]' priority unoptimized />
-                  {w.name.toUpperCase().replace('WALLET', '').trim()}
-                </button>
-              ) : null
-            )}
+            {installedWallets.map((w) => (
+              <button
+                key={`wallet-${w.id}`}
+                onClick={() => connect(w.id)}
+                disabled={connected || connecting}
+                className='w-full max-w-[420px] my-2 mx-auto p-4 flex items-center justify-between rounded-lg bg-zinc-700 bg-opacity-70 hover:bg-zinc-600 hover:bg-opacity-70 disabled:opacity-40'
+              >
+                <Image src={w.icon} alt='' width={35} height={35} className='drop-shadow-[0_0_1px_rgba(0,0,0,1)]' priority unoptimized />
+                {w.name.toUpperCase().replace('WALLET', '').trim()}
+                {w.id === 'nufiSnap' ? ' (experimental)' : null}
+              </button>
+            ))}
 
             {connected ? (
               <div className='max-w-[calc(420px+0.5rem)] mx-auto'>
