@@ -215,7 +215,7 @@ export interface TokenSelectionSettings {
 }
 
 export interface AirdropSettings extends HolderSettings, TokenSelectionSettings {
-  useCustomList: boolean
+  airdropMethod: 'none' | 'holder-snapshot' | 'delegator-snapshot' | 'custom-list'
 }
 
 export interface Airdrop extends TokenSelectionSettings {

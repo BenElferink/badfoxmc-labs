@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useWallet } from '@meshsdk/react'
 import Modal from '../Modal'
 import ErrorNotConnected from './steps/ErrorNotConnected'
-import AirdropSnapshotOrFile from './steps/AirdropSnapshotOrFile'
+import AirdropMethod from './steps/AirdropMethod'
 import AirdropSnapshot from './steps/AirdropSnapshot'
 import AirdropCustomList from './steps/AirdropCustomList'
 import AirdropPayout from './steps/AirdropPayout'
@@ -26,7 +26,7 @@ const defaultSettings: AirdropSettings = {
   },
   thumb: '',
 
-  useCustomList: false,
+  airdropMethod: 'none',
   holderPolicies: [],
 
   withBlacklist: false,
@@ -74,14 +74,14 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
   return (
     <Modal open={open} onClose={handleClose}>
       {step === 1 ? (
-        <AirdropSnapshotOrFile
+        <AirdropMethod
           defaultData={{
-            useCustomList: settings['useCustomList'],
+            airdropMethod: settings['airdropMethod'],
           }}
           callback={(payload) => setSettings((prev) => ({ ...prev, ...payload }))}
           next={increment}
         />
-      ) : settings.useCustomList ? (
+      ) : settings.airdropMethod === 'custom-list' ? (
         step === 2 ? (
           <TokenSelector
             onlyFungible
