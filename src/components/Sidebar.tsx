@@ -1,4 +1,4 @@
-import { HomeIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid'
+import { ArrowPathIcon, CreditCardIcon, HomeIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid'
 import LinkList from './LinkList'
 
 const Sidebar = (props: { open: boolean }) => {
@@ -25,18 +25,18 @@ const Sidebar = (props: { open: boolean }) => {
               Icon: (props) => <PaperAirplaneIcon {...props} />,
               path: '/airdrops',
             },
-            // {
-            //   label: 'Escrow / Swap',
-            //   Icon: (props) => <ArrowPathIcon {...props} />,
-            //   path: '/escrow',
-            //   tags: ['PRO'],
-            // },
-            // {
-            //   label: 'Vested Payments',
-            //   Icon: (props) => <CreditCardIcon {...props} />,
-            //   path: '/vesting',
-            //   tags: ['PRO'],
-            // },
+            {
+              label: 'Escrow',
+              Icon: (props) => <ArrowPathIcon {...props} />,
+              path: '',
+              tags: ['SOON'],
+            },
+            {
+              label: 'Vesting',
+              Icon: (props) => <CreditCardIcon {...props} />,
+              path: '',
+              tags: ['SOON'],
+            },
             // {
             //   label: 'Developers',
             //   Icon: (props) => <CodeBracketIcon {...props} />,
