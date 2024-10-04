@@ -8,16 +8,16 @@ import Countdown from '@/components/Countdown'
 import { AIRDROP_DESCRIPTION } from './airdrops'
 
 const ChainLoadBar = ({ label, percent }: { label: string; percent: number }) => {
-  const borderColor =
-    percent === 0
-      ? 'border-zinc-800'
-      : percent <= 25
-      ? 'border-green-600'
-      : percent <= 50
-      ? 'border-yellow-600'
-      : percent <= 75
-      ? 'border-orange-600'
-      : 'border-red-600'
+  const borderColor = 'border-zinc-800'
+  // percent === 0
+  //   ? 'border-zinc-800'
+  //   : percent <= 25
+  //   ? 'border-green-600'
+  //   : percent <= 50
+  //   ? 'border-yellow-600'
+  //   : percent <= 75
+  //   ? 'border-orange-600'
+  //   : 'border-red-600'
   const bgColor =
     percent === 0
       ? 'bg-zinc-600/50'
@@ -65,29 +65,30 @@ const Page = () => {
   }, [])
 
   const [epochInfo, setEpochInfo] = useState({ epoch: 0, percent: 0, startTime: 0, endTime: 0, nowTime: 0 })
+  const [chainLoad, setChainLoad] = useState({ load5m: 0, load1h: 0, load24h: 0 })
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const epochHandler = () =>
       api.epoch
         .getData()
         .then((data) => setEpochInfo(data))
         .catch((error) => console.error(error))
-    }, 60 * 60 * 1000) // 1 hour
-
-    return () => clearInterval(interval)
-  }, [])
-
-  const [chainLoad, setChainLoad] = useState({ load5m: 0, load1h: 0, load24h: 0 })
-
-  useEffect(() => {
-    const interval = setInterval(() => {
+    const chainHandler = () =>
       poolPm
         .getChainLoad()
         .then((data) => setChainLoad(data))
         .catch((error) => console.error(error))
-    }, 10 * 1000) // 10 seconds
 
-    return () => clearInterval(interval)
+    epochHandler()
+    chainHandler()
+
+    const epochInterval = setInterval(epochHandler, 60 * 60 * 1000) // 1 hour
+    const chainInterval = setInterval(chainHandler, 10 * 1000) // 10 seconds
+
+    return () => {
+      clearInterval(epochInterval)
+      clearInterval(chainInterval)
+    }
   }, [])
 
   return (
@@ -103,7 +104,7 @@ const Page = () => {
             </div>
           </div>
 
-          <div className='h-fit mb-4 bg-transparent rounded-full border border-blue-600'>
+          <div className='h-fit mb-4 bg-transparent rounded-full border border-zinc-800'>
             <div className='py-1 px-4 rounded-full bg-blue-600/50' style={{ width: `${epochInfo.percent}%` }}>
               <span className='whitespace-nowrap text-xs text-blue-200'>{epochInfo.percent.toFixed(2)}%</span>
             </div>
