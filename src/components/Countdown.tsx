@@ -9,7 +9,7 @@ const Countdown = ({ timestamp, callbackTimeExpired }: { timestamp: number; call
   return (
     <table className='mx-auto'>
       <tbody>
-        <tr className='text-xl'>
+        <tr>
           <td>{`${timer.days < 10 ? '0' : ''}${timer.days}`}</td>
           <td>:</td>
           <td>{`${timer.hours < 10 ? '0' : ''}${timer.hours}`}</td>

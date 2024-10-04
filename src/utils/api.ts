@@ -10,6 +10,7 @@ import type {
   ApiTransaction,
   ApiWallet,
 } from '@/@types'
+import type { EpochResponse } from '@/pages/api/cardano/epoch'
 
 class Api {
   baseUrl: string
@@ -35,6 +36,26 @@ class Api {
     } else {
       return await retry()
     }
+  }
+
+  epoch = {
+    getData: (): Promise<EpochResponse> => {
+      const uri = `${this.baseUrl}/epoch`
+
+      return new Promise(async (resolve, reject) => {
+        try {
+          console.log('Fetching epoch')
+
+          const { data } = await axios.get<EpochResponse>(uri)
+
+          console.log('Fetched epoch:', data.epoch)
+
+          return resolve(data)
+        } catch (error: any) {
+          return await this.handleError(error, reject, async () => await this.epoch.getData())
+        }
+      })
+    },
   }
 
   wallet = {
