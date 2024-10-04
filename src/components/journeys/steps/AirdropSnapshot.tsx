@@ -364,11 +364,11 @@ const AirdropSnapshot = (props: {
       <p className='my-6 text-xs text-center'>
         Snapshot does not include &apos;script&apos; wallets
         <br />
-        (For example:{' '}
+        (For example:&nbsp;
         <Link href='https://jpg.store' target='_blank' rel='noopener noreferrer' className='text-blue-200 hover:underline'>
           jpg.store
         </Link>
-        ,{' '}
+        ,&nbsp;
         <Link href='https://labs.mutant-nft.com' target='_blank' rel='noopener noreferrer' className='text-blue-200 hover:underline'>
           Mutant Labs
         </Link>

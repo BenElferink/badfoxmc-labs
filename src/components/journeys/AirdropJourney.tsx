@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
+import { useWallet } from '@meshsdk/react'
 import Modal from '../Modal'
 import ErrorNotConnected from './steps/ErrorNotConnected'
-import ErrorNotTokenGateHolder from './steps/ErrorNotTokenGateHolder'
 import AirdropSnapshotOrFile from './steps/AirdropSnapshotOrFile'
 import AirdropSnapshot from './steps/AirdropSnapshot'
 import AirdropCustomList from './steps/AirdropCustomList'
@@ -40,7 +39,7 @@ const defaultSettings: AirdropSettings = {
 
 const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
   const { open, onClose } = props
-  const { user } = useAuth()
+  const { connected } = useWallet()
 
   const [step, setStep] = useState(1)
   const [settings, setSettings] = useState<Partial<AirdropSettings>>(defaultSettings)
@@ -49,10 +48,11 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
   const handleClose = () => {
     setStep(1)
     setSettings(defaultSettings)
+    setPayoutHolders([])
     onClose()
   }
 
-  if (!user) {
+  if (!connected) {
     return (
       <Modal open={open} onClose={handleClose}>
         <ErrorNotConnected onClose={handleClose} />
@@ -60,13 +60,13 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
     )
   }
 
-  if (user && !user.isTokenGateHolder) {
-    return (
-      <Modal open={open} onClose={handleClose}>
-        <ErrorNotTokenGateHolder />
-      </Modal>
-    )
-  }
+  // if (user && !user.isTokenGateHolder) {
+  //   return (
+  //     <Modal open={open} onClose={handleClose}>
+  //       <ErrorNotTokenGateHolder />
+  //     </Modal>
+  //   )
+  // }
 
   const increment = () => setStep((prev) => prev + 1)
   const decrement = () => setStep((prev) => prev - 1)

@@ -1,6 +1,7 @@
 import api from '@/utils/api'
-import sleep from './sleep'
 import type { ApiTransaction } from '@/@types'
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(() => resolve(true), ms))
 
 const txConfirmation = async (_txHash: string): Promise<ApiTransaction> => {
   try {

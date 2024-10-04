@@ -16,6 +16,7 @@ const getAirdrops = async () => {
         ...data,
       }
     })
+    .filter((x) => x.tokenAmount.onChain)
     .sort((a, b) => b.timestamp - a.timestamp)
 
   console.log(`succesfully fetched ${docs.length} airdrop(s) from db`)

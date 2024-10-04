@@ -1,11 +1,4 @@
-import {
-  ArrowPathIcon,
-  BanknotesIcon,
-  ChartBarIcon,
-  // CodeBracketIcon,
-  GiftIcon,
-  HomeIcon,
-} from '@heroicons/react/24/solid'
+import { HomeIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid'
 import LinkList from './LinkList'
 
 const Sidebar = (props: { open: boolean }) => {
@@ -29,37 +22,32 @@ const Sidebar = (props: { open: boolean }) => {
             },
             {
               label: 'Airdrops',
-              Icon: (props) => <BanknotesIcon {...props} />,
+              Icon: (props) => <PaperAirplaneIcon {...props} />,
               path: '/airdrops',
-              tags: ['PRO'],
             },
-            {
-              label: 'Governance',
-              Icon: (props) => <ChartBarIcon {...props} />,
-              path: '/polls',
-              tags: ['PRO'],
-            },
-            {
-              label: 'Giveaways',
-              Icon: (props) => <GiftIcon {...props} />,
-              path: '/giveaways',
-            },
-            {
-              label: 'NFT Swap',
-              Icon: (props) => <ArrowPathIcon {...props} />,
-              path: '/swap',
-            },
+            // {
+            //   label: 'Escrow / Swap',
+            //   Icon: (props) => <ArrowPathIcon {...props} />,
+            //   path: '/escrow',
+            //   tags: ['PRO'],
+            // },
+            // {
+            //   label: 'Vested Payments',
+            //   Icon: (props) => <CreditCardIcon {...props} />,
+            //   path: '/vesting',
+            //   tags: ['PRO'],
+            // },
             // {
             //   label: 'Developers',
             //   Icon: (props) => <CodeBracketIcon {...props} />,
             //   nested: [
             //     {
-            //       label: 'SDK',
-            //       path: '/dev/sdk',
-            //     },
-            //     {
             //       label: 'API',
             //       path: '/dev/api',
+            //     },
+            //     {
+            //       label: 'SDK',
+            //       path: '/dev/sdk',
             //     },
             //   ],
             // },

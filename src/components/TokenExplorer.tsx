@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useLovelace } from '@meshsdk/react'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from './MediaViewer'
@@ -33,6 +34,7 @@ const TokenExplorer = (props: {
   } = props
 
   const { user } = useAuth()
+  const lovelaces = useLovelace()
   const [loading, setLoading] = useState(false)
   const [collections, setCollections] = useState<TokenExplorerCollections>(!!forceCollections ? [...forceCollections] : [])
 
@@ -43,13 +45,11 @@ const TokenExplorer = (props: {
     try {
       const payload: TokenExplorerCollections = []
 
-      if (withAda) {
-        const lovelaces = user.lovelaces || 0
-
+      if (withAda && lovelaces) {
         const adaBalance = {
           ...POPULATED_LOVELACE,
           tokenAmount: {
-            onChain: lovelaces,
+            onChain: Number(lovelaces),
             display: formatTokenAmount.fromChain(lovelaces, DECIMALS['ADA']),
             decimals: DECIMALS['ADA'],
           },
@@ -82,11 +82,11 @@ const TokenExplorer = (props: {
       setLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, withAda])
+  }, [user, withAda, lovelaces])
 
   useEffect(() => {
-    if (!collections.length && !forceCollections) getCollections()
-  }, [collections, forceCollections, getCollections])
+    if (!forceCollections) getCollections()
+  }, [forceCollections, getCollections])
 
   const [search, setSearch] = useState('')
 
@@ -111,7 +111,7 @@ const TokenExplorer = (props: {
                 return null
               }
 
-              if (onlyNonFungible && (t.isFungible || t.policyId === POLICY_IDS['SWAP_REFUND_TOKEN'])) {
+              if (onlyNonFungible && t.isFungible) {
                 return null
               }
 

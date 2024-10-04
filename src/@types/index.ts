@@ -139,12 +139,10 @@ export interface ApiWallet {
   tokens?: ApiBaseToken[] | ApiPopulatedToken[]
 }
 
-export interface User extends ApiWallet {
-  lovelaces?: number
-  username?: string
-  profilePicture?: string
-  isTokenGateHolder?: boolean
-  tokens?: ApiPopulatedToken[]
+export interface User {
+  stakeKey: StakeKey
+  tokens: ApiPopulatedToken[]
+  isTokenGateHolder: boolean
 }
 
 export interface SnapshotHolder {
@@ -163,6 +161,7 @@ export interface PayoutHolder {
   stakeKey: StakeKey
   address: Address['address']
   payout: number
+  forceLovelace?: boolean
   txHash?: string
 }
 
@@ -219,144 +218,8 @@ export interface AirdropSettings extends HolderSettings, TokenSelectionSettings 
   useCustomList: boolean
 }
 
-export interface GiveawaySettings extends HolderSettings, TokenSelectionSettings {
-  isToken: boolean
-
-  otherTitle: string
-  otherDescription: string
-  otherAmount: number
-
-  numOfWinners: number
-  endAt: number
-}
-
-export interface PollOption {
-  serial: number
-  answer: string
-  isMedia: boolean
-  mediaType: MediaType | ''
-  mediaUrl: string
-}
-
-export interface PollSettings extends HolderSettings {
-  endAt: number
-  isClassified: boolean
-
-  question: string
-  description?: string
-  options: PollOption[]
-}
-
 export interface Airdrop extends TokenSelectionSettings {
   id?: string
   stakeKey: StakeKey
   timestamp: number
-}
-
-export interface GiveawayWinner {
-  stakeKey: StakeKey
-  address: Address['address']
-  amount: number
-}
-
-export interface Giveaway extends GiveawaySettings {
-  id?: string
-  stakeKey: StakeKey
-  active: boolean
-
-  // for entry
-  fungibleHolders: FungibleTokenHolderWithPoints[]
-  nonFungibleUsedUnits: TokenId[]
-  entries: {
-    stakeKey: StakeKey
-    points: number
-  }[]
-
-  // for raffle
-  winners: GiveawayWinner[]
-
-  // for payout
-  // txDeposit?: string
-  // txsWithdrawn?: string[]
-}
-
-export interface Poll extends PollSettings {
-  id?: string
-  stakeKey: StakeKey
-  active: boolean
-
-  // for entry
-  fungibleHolders: FungibleTokenHolderWithPoints[]
-  nonFungibleUsedUnits: TokenId[]
-  entries: {
-    stakeKey: StakeKey
-    points: number
-  }[]
-
-  // for poll results
-  [vote_serial: string]: any // number >= 0
-  topSerial?: number
-  totalEntries?: number
-}
-
-export interface SwapWallet {
-  [policyId: PolicyId]: {
-    name: string
-    thumb: string
-    floor: number
-    tokens: ApiPopulatedToken[]
-  }
-}
-
-export interface SwapSettings {
-  withdraw: {
-    tokenId: TokenSelectionSettings['tokenId']
-    thumb: TokenSelectionSettings['thumb']
-    tokenName: TokenSelectionSettings['tokenName']
-  }
-  deposit: {
-    tokenId: TokenSelectionSettings['tokenId']
-    thumb: TokenSelectionSettings['thumb']
-    tokenName: TokenSelectionSettings['tokenName']
-  }
-}
-
-export interface Swap {
-  id?: string
-  stakeKey: StakeKey
-  timestamp: number
-
-  isRefunded?: boolean
-  withdraw: {
-    txHash: TransactionId
-    tokenId: SwapSettings['withdraw']['tokenId']
-    thumb: SwapSettings['withdraw']['thumb']
-    displayName: TokenName['display']
-  }
-  deposit: {
-    txHash: TransactionId
-    tokenId: SwapSettings['deposit']['tokenId']
-    thumb: SwapSettings['deposit']['thumb']
-    displayName: TokenName['display']
-  }
-}
-
-export interface SwapDonateSettings {
-  donateMethod: 'BUILD_TX' | 'MANUAL_TX'
-  selectedTokenIds: TokenId[]
-}
-
-export interface SwapProvider {
-  stakeKey: StakeKey
-  depositTokens: {
-    unit: TokenId
-    quantity: string
-  }[]
-  depositTxHash: TransactionId
-  mintTxHash: TransactionId
-}
-
-export interface PolicyDoc {
-  dbSerialNumber: number
-  policyId: PolicyId
 }

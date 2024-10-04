@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
 import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle'
+import getExplorerUrl from '@/functions/formatters/getExplorerUrl'
 import MediaViewer from '../MediaViewer'
 import type { Airdrop } from '@/@types'
 
@@ -14,21 +15,21 @@ const AirdropCard = (props: {
 
   return (
     <div className='m-1 p-0.5 rounded-lg bg-gradient-to-b from-purple-700 via-blue-700 to-green-700'>
-      <div className='w-[190px] h-[160px] rounded-lg bg-zinc-800 flex flex-col items-center justify-evenly'>
+      <div className='w-[180px] h-[150px] rounded-lg bg-zinc-800 flex flex-col items-center justify-evenly'>
         <MediaViewer mediaType='IMAGE' src={thumb} size='w-[55px] h-[55px]' />
 
         <div>
           <p className='text-center text-xs'>{tokenName.ticker || tokenName.display || tokenName.onChain}</p>
           <p className='text-center truncate'>
             {tokenAmount.display.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
             })}
           </p>
         </div>
 
         <Link
-          href={`https://cexplorer.io/stake/${stakeKey}`}
+          href={getExplorerUrl('stakeKey', stakeKey)}
           target='_blank'
           rel='noopener noreferrer'
           className='text-xs text-blue-200 flex items-center'

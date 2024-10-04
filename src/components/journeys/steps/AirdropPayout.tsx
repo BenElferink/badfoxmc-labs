@@ -1,30 +1,35 @@
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { utils, writeFileXLSX } from 'xlsx'
 import { useWallet } from '@meshsdk/react'
 import { Transaction } from '@meshsdk/core'
-import { ArrowTopRightOnSquareIcon, CheckBadgeIcon } from '@heroicons/react/24/solid'
+import { ArrowTopRightOnSquareIcon, CheckBadgeIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 import { firestore } from '@/utils/firebase'
-import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import txConfirmation from '@/functions/txConfirmation'
+import getExplorerUrl from '@/functions/formatters/getExplorerUrl'
 import Loader from '@/components/Loader'
 import Button from '@/components/form/Button'
 import ProgressBar from '@/components/ProgressBar'
 import JourneyStepWrapper from './JourneyStepWrapper'
 import type { Airdrop, PayoutHolder, AirdropSettings } from '@/@types'
-import { DECIMALS, ONE_MILLION } from '@/constants'
+import { DECIMALS, SYMBOLS, WALLETS } from '@/constants'
 
 const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: AirdropSettings; next?: () => void; back?: () => void }) => {
   const { payoutHolders, settings, next, back } = props
   const { wallet } = useWallet()
-  const { user } = useAuth()
+
+  const ticker = settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain
+  const totalAmount = useMemo(() => payoutHolders.reduce((prev, curr) => prev + curr.payout, 0), [])
+  const devFee = useMemo(() => formatTokenAmount.toChain(Math.max(1, payoutHolders.length * 0.5), DECIMALS['ADA']), [])
+  const devPayed = useRef(false)
 
   const [processedPayoutHolders, setProcessedPayoutHolders] = useState([...payoutHolders])
-  const [payoutEnded, setPayoutEnded] = useState(false)
   const [progress, setProgress] = useState({
     msg: '',
     loading: false,
+    error: false,
+    ended: false,
     batch: {
       current: 0,
       max: 0,
@@ -33,7 +38,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
 
   const runPayout = useCallback(
     async (difference?: number): Promise<any> => {
-      setProgress((prev) => ({ ...prev, loading: true }))
+      setProgress((prev) => ({ ...prev, loading: true, error: false }))
 
       if (!difference) {
         setProgress((prev) => ({ ...prev, loading: true, msg: 'Batching TXs...' }))
@@ -42,7 +47,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       if (settings.tokenId !== 'lovelace') {
         const minAdaPerHolder = 1.2
         const adaNeeded = Math.ceil(processedPayoutHolders.length / minAdaPerHolder)
-        const adaInWallet = formatTokenAmount.fromChain(await wallet.getLovelace(), DECIMALS['ADA'])
+        const adaInWallet = formatTokenAmount.fromChain((await wallet.getLovelace()) || 0, DECIMALS['ADA'])
 
         if (adaInWallet < adaNeeded) {
           setProgress((prev) => ({
@@ -55,6 +60,14 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       }
 
       const unpayedWallets = processedPayoutHolders.filter(({ txHash }) => !txHash)
+      if (!devPayed.current)
+        unpayedWallets.unshift({
+          stakeKey: WALLETS['STAKE_KEYS']['TREASURY'],
+          address: WALLETS['ADDRESSES']['TREASURY'],
+          payout: devFee,
+          forceLovelace: true,
+        })
+
       const batchSize = difference ? Math.floor(difference * unpayedWallets.length) : unpayedWallets.length
       const batches: PayoutHolder[][] = []
 
@@ -76,17 +89,20 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
 
           const tx = new Transaction({ initiator: wallet })
 
-          for (const { address, payout } of batch) {
-            if (settings.tokenId === 'lovelace') {
-              if (payout < ONE_MILLION) {
-                const str1 = 'Cardano requires at least 1 ADA per TX.'
-                const str2 = `This wallet has only ${formatTokenAmount.fromChain(payout, DECIMALS['ADA']).toFixed(2)} ADA assigned to it:\n${address}`
-                const str3 = 'Click OK if you want to increase the payout for this wallet to 1 ADA.'
-                const str4 = 'Click cancel to exclude this wallet from the airdrop.'
-                const str5 = 'Note: accepting will increase the total pool size.'
+          for (const { address, payout, forceLovelace } of batch) {
+            if (settings.tokenId === 'lovelace' || forceLovelace) {
+              const minLovelaces = formatTokenAmount.toChain(1, DECIMALS['ADA'])
 
-                if (window.confirm(`${str1}\n\n${str2}\n\n${str3}\n${str4}\n\n${str5}`)) {
-                  tx.sendLovelace({ address }, String(ONE_MILLION))
+              if (payout < minLovelaces) {
+                const str1 = 'Cardano requires at least 1 ADA per TX.'
+                const str2 = `This wallet has only ${formatTokenAmount.fromChain(payout, DECIMALS['ADA']).toFixed(2)} ADA assigned to it:`
+                const str3 = address
+                const str4 = 'Click OK if you want to increase the payout for this wallet to 1 ADA.'
+                const str5 = 'Click cancel to exclude this wallet from the airdrop.'
+                const str6 = 'Note: accepting will increase the total pool size!'
+
+                if (window.confirm(`${str1}\n${str2}\n${str3}\n\n${str4}\n${str5}\n${str6}`)) {
+                  tx.sendLovelace({ address }, String(minLovelaces))
                 }
               } else {
                 tx.sendLovelace({ address }, String(payout))
@@ -105,6 +121,8 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
           const unsignedTx = await tx.build()
           const signedTx = await wallet.signTx(unsignedTx)
           const txHash = await wallet.submitTx(signedTx)
+
+          if (!devPayed.current) devPayed.current = true
 
           setProgress((prev) => ({
             ...prev,
@@ -139,7 +157,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
         const tAmountDisplay = _disp === 1 ? formatTokenAmount.fromChain(countPayouts(), _dec) : _disp
 
         const airdrop: Airdrop = {
-          stakeKey: user?.stakeKey || (await wallet.getRewardAddresses())[0],
+          stakeKey: (await wallet.getRewardAddresses())[0],
           timestamp: Date.now(),
 
           tokenId: settings.tokenId,
@@ -155,29 +173,29 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
         const collection = firestore.collection('airdrops')
         await collection.add(airdrop)
 
-        setProgress((prev) => ({ ...prev, loading: false, msg: 'Airdrop Done' }))
-        setPayoutEnded(true)
+        setProgress((prev) => ({ ...prev, loading: false, ended: true, msg: 'Airdrop Done' }))
       } catch (error: any) {
         console.error(error)
         const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
 
         if (!!errMsg && errMsg.indexOf('Maximum transaction size') !== -1) {
-          // [Transaction] An error occurred during build: Maximum transaction size of 16384 exceeded. Found: 21861.
+          // OLD: [Transaction] An error occurred during build: Maximum transaction size of 16384 exceeded. Found: 21861.
+          // NEW: txBuildResult error: JsValue("Maximum transaction size of 16384 exceeded. Found: 19226")
           const splitMessage: string[] = errMsg.split(' ')
-          const [max, curr] = splitMessage.filter((str) => !isNaN(Number(str))).map((str) => Number(str))
-          // [16384, 21861]
+          const [max, curr] = splitMessage.map((str) => Number(str.replace(/[^\d]/g, ''))).filter((num) => num && !isNaN(num))
+          // [16384, any_number_higher_than_16384]
 
           const newDifference = (difference || 1) * (max / curr)
 
           setProgress((prev) => ({ ...prev, loading: true, msg: `Trying Batch Size ${String(newDifference)}` }))
           return await runPayout(newDifference)
         } else {
-          setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }))
+          setProgress((prev) => ({ ...prev, loading: false, error: true, msg: errMsg }))
         }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [processedPayoutHolders, settings, wallet, user]
+    [processedPayoutHolders, settings, wallet]
   )
 
   const downloadReceipt = useCallback(async () => {
@@ -187,7 +205,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       const ws = utils.json_to_sheet(
         processedPayoutHolders.map((item) => ({
           amount: formatTokenAmount.fromChain(item.payout, settings.tokenAmount.decimals),
-          tokenName: settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain,
+          tokenName: ticker,
           address: item.address,
           stakeKey: item.stakeKey,
           txHash: item.txHash,
@@ -211,38 +229,49 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
     }
   }, [processedPayoutHolders, settings])
 
-  const totalAmount = useMemo(() => processedPayoutHolders.reduce((prev, curr) => prev + curr.payout, 0), [processedPayoutHolders])
-
   return (
-    <JourneyStepWrapper disableBack={progress.loading || payoutEnded} next={next} back={back}>
+    <JourneyStepWrapper disableBack={progress.loading || progress.ended} next={next} back={back}>
       <h6 className='mb-6 text-xl text-center'>Payout</h6>
 
       <div className='w-full my-2 flex items-center justify-between'>
-        <Button label='Batch & Sign TXs' disabled={progress.loading || payoutEnded} onClick={() => runPayout()} />
-        <Button label='Download Receipt' disabled={progress.loading || !payoutEnded} onClick={() => downloadReceipt()} />
+        <Button label='Batch & Sign TXs' disabled={progress.loading || progress.ended} onClick={() => runPayout()} />
+        <Button label='Download Receipt' disabled={progress.loading || !progress.ended} onClick={() => downloadReceipt()} />
       </div>
 
-      {!payoutEnded && progress.batch.max ? <ProgressBar label='TX Batches' max={progress.batch.max} current={progress.batch.current} /> : null}
+      {!progress.ended && progress.batch.max ? <ProgressBar label='TX Batches' max={progress.batch.max} current={progress.batch.current} /> : null}
 
       {progress.loading ? (
         <Loader withLabel label={progress.msg} />
       ) : (
         <div className='flex flex-col items-center justify-center'>
-          {payoutEnded ? <CheckBadgeIcon className='w-24 h-24 text-green-400' /> : null}
-          <span>{progress.msg}</span>
+          {progress.ended ? <CheckBadgeIcon className='w-24 h-24 text-green-400' /> : null}
+          {progress.error ? (
+            <div className='flex items-center justify-center'>
+              <ExclamationTriangleIcon className='w-6 h-6 mr-1 text-red-400' />
+              <span className='text-red-200'>{progress.msg}</span>
+            </div>
+          ) : (
+            <span>{progress.msg}</span>
+          )}
         </div>
       )}
 
       <div className='w-2/3 h-0.5 my-8 mx-auto rounded-full bg-zinc-400' />
 
       <p className='w-full my-2 text-center'>
+        {processedPayoutHolders.length} Wallet{processedPayoutHolders.length > 1 ? 's' : ''}
+        <br />
+        {ticker === 'ADA' ? SYMBOLS['ADA'] : null}
         {formatTokenAmount.fromChain(totalAmount, settings.tokenAmount.decimals).toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        })}{' '}
-        {settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain}
+        })}
+        {ticker === 'ADA' ? null : <>&nbsp;{ticker}</>}
         <br />
-        {processedPayoutHolders.length} Wallet{processedPayoutHolders.length > 1 ? 's' : ''}
+        <span className='text-xs'>
+          (&#43;&nbsp;{SYMBOLS['ADA']}
+          {formatTokenAmount.fromChain(devFee, DECIMALS['ADA'])} Service Fee)
+        </span>
       </p>
 
       {processedPayoutHolders.map((item) => (
@@ -257,11 +286,11 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
                 maximumFractionDigits: 2,
               })}
             </span>
-            <span className='text-center text-xs'>&nbsp;{settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain}</span>
+            <span className='text-center text-xs'>&nbsp;{ticker}</span>
           </div>
 
           <Link
-            href={`https://cexplorer.io/${item.stakeKey ? `stake/${item.stakeKey}` : `address/${item.address}`}`}
+            href={item.stakeKey ? getExplorerUrl('stakeKey', item.stakeKey) : getExplorerUrl('address', item.address)}
             target='_blank'
             rel='noopener noreferrer'
             className='text-xs text-blue-200 flex items-center hover:underline'
@@ -272,7 +301,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
 
           {item.txHash ? (
             <Link
-              href={`https://cexplorer.io/tx/${item.txHash}`}
+              href={getExplorerUrl('tx', item.txHash)}
               target='_blank'
               rel='noopener noreferrer'
               className='text-xs text-blue-200 flex items-center hover:underline'

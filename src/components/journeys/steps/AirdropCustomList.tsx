@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { read, utils } from 'xlsx'
 import api from '@/utils/api'
-import { useWallet } from '@meshsdk/react'
+import { useLovelace } from '@meshsdk/react'
 import { useAuth } from '@/contexts/AuthContext'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
@@ -19,7 +19,7 @@ const AirdropCustomList = (props: {
 }) => {
   const { payoutHolders, settings, callback, next, back } = props
   const { user } = useAuth()
-  const { wallet } = useWallet()
+  const lovelaces = useLovelace()
 
   const [ended, setEnded] = useState(!!payoutHolders.length)
   const [progress, setProgress] = useState({
@@ -45,7 +45,7 @@ const AirdropCustomList = (props: {
       let keyCount = 0
 
       for await (const [objKey, keyVal] of Object.entries(rowObj)) {
-        const key = objKey.toLowerCase()
+        const key = objKey.trim().toLowerCase()
 
         if (['wallet', 'amount'].includes(key)) {
           if (key === 'amount') {
@@ -59,7 +59,7 @@ const AirdropCustomList = (props: {
               return
             }
 
-            const amountOnChain = Math.floor(formatTokenAmount.toChain(v, settings.tokenAmount.decimals))
+            const amountOnChain = formatTokenAmount.toChain(v, settings.tokenAmount.decimals)
             payoutWallet['payout'] = amountOnChain
             keyCount++
             totalAmountOnChain += amountOnChain
@@ -111,7 +111,7 @@ const AirdropCustomList = (props: {
         }
       }
 
-      if (keyCount !== goodKeyCount) {
+      if (keyCount < goodKeyCount) {
         setProgress((prev) => ({
           ...prev,
           loading: false,
@@ -129,9 +129,7 @@ const AirdropCustomList = (props: {
     }
 
     const userOwnedOnChain =
-      settings.tokenId === 'lovelace'
-        ? Number(await wallet.getLovelace())
-        : user?.tokens?.find((token) => token.tokenId === settings.tokenId)?.tokenAmount.onChain || 0
+      settings.tokenId === 'lovelace' ? Number(lovelaces || '0') : user?.tokens.find((t) => t.tokenId === settings.tokenId)?.tokenAmount.onChain || 0
 
     if (totalAmountOnChain > userOwnedOnChain) {
       setProgress((prev) => ({

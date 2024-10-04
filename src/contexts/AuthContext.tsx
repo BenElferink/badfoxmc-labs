@@ -1,12 +1,41 @@
 import { PropsWithChildren, createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useWallet } from '@meshsdk/react'
+import { AssetExtended } from '@meshsdk/core'
 import api from '@/utils/api'
-import getUser from '@/functions/storage/users/getUser'
-import eachLimit from '@/functions/eachLimit'
 import chunk from '@/functions/chunk'
-import type { ApiBaseToken, ApiPopulatedToken, User } from '@/@types'
-import { BFMC_BANKER_CARD_TOKEN_IDS, POLICY_IDS } from '@/constants'
+import eachLimit from '@/functions/eachLimit'
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
+import type { ApiPopulatedToken, User } from '@/@types'
+import { POLICY_IDS } from '@/constants'
+
+const BFMC_BANKER_CARD_TOKEN_IDS = [
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303733',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303534',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303633',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303638',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303533',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303532',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303636',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303535',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303531',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303631',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303630',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303539',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303632',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303730',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303637',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303732',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303536',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303537',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303639',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303731',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303635',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303634',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303530',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303538',
+  '1d52a061c0b6daea2cb248d32790fbf32d21b78723fcfde75177f17642616e6b4361726432303734',
+]
 
 interface AuthContext {
   user: User | null
@@ -28,83 +57,57 @@ export const useAuth = () => useContext(AuthContext)
 
 export const AuthProvider = (props: PropsWithChildren) => {
   const { children } = props
-  const { connecting, connected, name, wallet, disconnect } = useWallet()
+  const { connecting, connected, wallet, disconnect } = useWallet()
 
   const [openConnectModal, setOpenConnectModal] = useState(false)
   const toggleConnectModal = (bool?: boolean) => setOpenConnectModal((prev) => bool ?? !prev)
 
   const [user, setUser] = useState<AuthContext['user']>(null)
 
-  const getAndSetUser = useCallback(
-    async (forceStakeKey?: string): Promise<void> => {
-      try {
-        let sKey = ''
-        let lovelaces = 0
+  const getAndSetUser = useCallback(async (): Promise<void> => {
+    try {
+      const sKey = (await wallet.getRewardAddresses())[0]
+      const assets = await wallet.getAssets()
+      const isTokenGateHolder = !!assets?.find((a) => a.policyId === POLICY_IDS['BAD_KEY'] || BFMC_BANKER_CARD_TOKEN_IDS.includes(a.unit))
 
-        if (forceStakeKey) {
-          sKey = forceStakeKey
-        } else {
-          const stakeKeys = await wallet.getRewardAddresses()
-          sKey = stakeKeys[0]
-          lovelaces = Number(await wallet.getLovelace())
-        }
+      // const populatedTokens = await Promise.all(tokens?.map((t) => api.token.getData(t.tokenId)) || [])
+      const populatedTokens: ApiPopulatedToken[] = []
 
-        const user = await getUser(sKey)
+      await eachLimit<AssetExtended[]>(chunk<AssetExtended>(assets || [], 10), 10, async (items) => {
+        for await (const { unit, quantity } of items) {
+          try {
+            const fetchedToken = await api.token.getData(unit)
 
-        const { addresses, poolId, tokens } = await api.wallet.getData(sKey, {
-          withStakePool: true,
-          withTokens: true,
-        })
+            fetchedToken.tokenAmount.onChain = Number(quantity)
+            fetchedToken.tokenAmount.display = formatTokenAmount.fromChain(quantity, fetchedToken.tokenAmount.decimals)
 
-        const populatedTokens: ApiPopulatedToken[] = []
-
-        await eachLimit<ApiBaseToken[]>(chunk<ApiBaseToken>(tokens || [], 10), 10, async (items) => {
-          for await (const { tokenId, tokenAmount } of items) {
-            try {
-              const fetchedToken = await api.token.getData(tokenId)
-
-              populatedTokens.push({
-                ...fetchedToken,
-                tokenAmount,
-              })
-            } catch (error: any) {
-              if (error.code === 'ECONNRESET') {
-                console.error('Connection reset error.')
-              } else {
-                console.error(error.message)
-              }
+            populatedTokens.push(fetchedToken)
+          } catch (error: any) {
+            if (error.code === 'ECONNRESET') {
+              console.error('Connection reset error.')
+            } else {
+              console.error(error.message)
             }
           }
-        })
+        }
+      })
 
-        const isTokenGateHolder = !!tokens?.find(
-          ({ tokenId }) => tokenId.indexOf(POLICY_IDS['BAD_KEY']) == 0 || BFMC_BANKER_CARD_TOKEN_IDS.includes(tokenId)
-        )
+      setUser({
+        stakeKey: sKey,
+        tokens: populatedTokens,
+        isTokenGateHolder,
+      })
+    } catch (error: any) {
+      setUser(null)
+      disconnect()
 
-        setUser({
-          stakeKey: sKey,
-          addresses,
-          lovelaces,
-          username: user?.username || '',
-          profilePicture: user?.profilePicture || '',
-          poolId,
-          isTokenGateHolder,
-          tokens: populatedTokens.filter((x) => !!x),
-        })
-      } catch (error: any) {
-        setUser(null)
-        disconnect()
-
-        toast.dismiss()
-        toast.error(error.message || error.toString())
-      }
-    },
-    [name, wallet, user, disconnect]
-  )
+      toast.dismiss()
+      toast.error(error.message || error.toString())
+    }
+  }, [wallet, disconnect])
 
   useEffect(() => {
     if (connected && !user) {
-      toast.success(`Connected ${name}`)
       toast.loading('Loading Wallet')
 
       getAndSetUser().then(() => {
