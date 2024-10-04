@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { useWallet } from '@meshsdk/react'
 import Modal from '../Modal'
-import ErrorNotConnected from './steps/ErrorNotConnected'
 import AirdropMethod from './steps/AirdropMethod'
 import AirdropSnapshot from './steps/AirdropSnapshot'
 import AirdropCustomList from './steps/AirdropCustomList'
@@ -39,7 +37,6 @@ const defaultSettings: AirdropSettings = {
 
 const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
   const { open, onClose } = props
-  const { connected } = useWallet()
 
   const [step, setStep] = useState(1)
   const [settings, setSettings] = useState<Partial<AirdropSettings>>(defaultSettings)
@@ -52,27 +49,11 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
     onClose()
   }
 
-  if (!connected) {
-    return (
-      <Modal open={open} onClose={handleClose}>
-        <ErrorNotConnected onClose={handleClose} />
-      </Modal>
-    )
-  }
-
-  // if (user && !user.isTokenGateHolder) {
-  //   return (
-  //     <Modal open={open} onClose={handleClose}>
-  //       <ErrorNotTokenGateHolder />
-  //     </Modal>
-  //   )
-  // }
-
   const increment = () => setStep((prev) => prev + 1)
   const decrement = () => setStep((prev) => prev - 1)
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal withConnected open={open} onClose={handleClose}>
       {step === 1 ? (
         <AirdropMethod
           defaultData={{

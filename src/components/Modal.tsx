@@ -1,8 +1,15 @@
-import { XMarkIcon } from '@heroicons/react/24/solid'
 import type { PropsWithChildren } from 'react'
+import { XMarkIcon } from '@heroicons/react/24/solid'
+import { useWallet } from '@meshsdk/react'
+import { useAuth } from '@/contexts/AuthContext'
+import Loader from './Loader'
+import ErrorNotConnected from './journeys/steps/ErrorNotConnected'
+import ErrorNotTokenGateHolder from './journeys/steps/ErrorNotTokenGateHolder'
 
-const Modal = (props: PropsWithChildren<{ open: boolean; onClose: () => void }>) => {
-  const { children, open, onClose } = props
+const Modal = (props: PropsWithChildren<{ open: boolean; onClose: () => void; withConnected?: boolean; withTokenGate?: boolean }>) => {
+  const { children, open, onClose, withConnected, withTokenGate } = props
+  const { connected } = useWallet()
+  const { user } = useAuth()
 
   return (
     <div
@@ -18,7 +25,15 @@ const Modal = (props: PropsWithChildren<{ open: boolean; onClose: () => void }>)
               <XMarkIcon className='w-8 h-8 animate-pulse hover:animate-spin' />
             </button>
 
-            {children}
+            {(withConnected || withTokenGate) && !connected ? (
+              <ErrorNotConnected onClose={onClose} />
+            ) : (withConnected || withTokenGate) && !user ? (
+              <Loader />
+            ) : withTokenGate && !user?.isTokenGateHolder ? (
+              <ErrorNotTokenGateHolder />
+            ) : (
+              children
+            )}
           </div>
         </section>
       ) : null}
