@@ -65,7 +65,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                   <footer id='footer' className='p-2 flex flex-col items-center justify-center'>
                     <div className='flex items-end justify-center'>
                       <div className='mx-2'>
-                        <Link href='https://cardano.org' className='flex flex-col items-center'>
+                        <Link href='https://cardano.org' target='_blank' rel='noopener noreferrer' className='flex flex-col items-center'>
                           <MediaViewer mediaType='IMAGE' src='https://cardano.org/img/cardano-white.svg' size='h-[30px] w-[30px]' />
                           <span>Cardano</span>
                         </Link>
