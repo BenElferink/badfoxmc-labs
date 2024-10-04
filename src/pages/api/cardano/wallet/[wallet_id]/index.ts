@@ -31,11 +31,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
   try {
     switch (method) {
       case 'GET': {
-        console.log('Fetching wallet with identifier:', walletId)
-
         const { stakeKey, addresses } = await resolveWalletIdentifiers(walletId)
-
-        console.log('Fetched wallet:', stakeKey)
 
         const populatedAddresses = []
         const ownedUnitsByAddress = []
@@ -43,11 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
         for (let idx = 0; idx < addresses.length; idx++) {
           const addr = addresses[idx]
 
-          console.log('Fetching address:', addr)
-
           const { type, script, amount } = await blockfrost.addresses(addr)
-
-          console.log('Fetched address:', type)
 
           populatedAddresses.push({
             address: addr,
@@ -65,12 +57,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
         }
 
         if (withStakePool && stakeKey) {
-          console.log('Fetching stake pool of wallet:', stakeKey)
-
           const account = await blockfrost.accounts(stakeKey)
           const poolId = account.pool_id || ''
-
-          console.log('Fetched stake pool:', poolId)
 
           wallet.poolId = poolId
         }
@@ -79,11 +67,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
           const units = []
 
           if (stakeKey) {
-            console.log('Fetching tokens of wallet:', stakeKey)
-
             const ownedUnitsByStake = await blockfrost.accountsAddressesAssetsAll(stakeKey)
-
-            console.log('Fetched tokens:', ownedUnitsByStake.length)
 
             units.push(...ownedUnitsByStake)
           } else {

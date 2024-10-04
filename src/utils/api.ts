@@ -44,11 +44,7 @@ class Api {
 
       return new Promise(async (resolve, reject) => {
         try {
-          console.log('Fetching epoch')
-
           const { data } = await axios.get<EpochResponse>(uri)
-
-          console.log('Fetched epoch:', data.epoch)
 
           return resolve(data)
         } catch (error: any) {
@@ -71,11 +67,7 @@ class Api {
 
       return new Promise(async (resolve, reject) => {
         try {
-          console.log('Fetching wallet:', walletId)
-
           const { data } = await axios.get<ApiWallet>(uri)
-
-          console.log('Fetched wallet:', data.stakeKey)
 
           return resolve(data)
         } catch (error: any) {
@@ -98,11 +90,7 @@ class Api {
 
       return new Promise(async (resolve, reject) => {
         try {
-          console.log('Fetching policy tokens:', policyId)
-
           const { data } = await axios.get<ApiPolicy>(uri)
-
-          console.log('Fetched policy tokens:', data.tokens.length)
 
           return resolve(data)
         } catch (error: any) {
@@ -117,11 +105,7 @@ class Api {
 
         return new Promise(async (resolve, reject) => {
           try {
-            console.log('Fetching policy market data:', policyId)
-
             const { data } = await axios.get<ApiMarket>(uri)
-
-            console.log('Fetched policy market data:', data.items.length)
 
             return resolve(data)
           } catch (error: any) {
@@ -134,11 +118,7 @@ class Api {
 
         return new Promise(async (resolve, reject) => {
           try {
-            console.log('Fetching policy market activity:', policyId)
-
             const { data } = await axios.get<ApiMarket>(uri)
-
-            console.log('Fetched policy market activity:', data.items.length)
 
             return resolve(data)
           } catch (error: any) {
@@ -151,11 +131,7 @@ class Api {
 
         return new Promise(async (resolve, reject) => {
           try {
-            console.log('Fetching policy market details:', policyId)
-
             const { data } = await axios.get<ApiPolicyMarketDetails>(uri)
-
-            console.log('Fetched policy market details:', data.name)
 
             return resolve(data)
           } catch (error: any) {
@@ -177,11 +153,7 @@ class Api {
 
       return new Promise(async (resolve, reject) => {
         try {
-          console.log('Fetching token:', tokenId)
-
           const { data } = await axios.get<ApiPopulatedToken>(uri)
-
-          console.log('Fetched token:', data.fingerprint)
 
           return resolve(data)
         } catch (error: any) {
@@ -199,11 +171,7 @@ class Api {
 
       return new Promise(async (resolve, reject) => {
         try {
-          console.log('Fetching token owners:', tokenId)
-
           const { data } = await axios.get<ApiTokenOwners>(uri)
-
-          console.log('Fetched token owners:', data.owners.length)
 
           return resolve(data)
         } catch (error: any) {
@@ -218,11 +186,7 @@ class Api {
 
         return new Promise(async (resolve, reject) => {
           try {
-            console.log('Fetching token market data:', tokenId)
-
             const { data } = await axios.get<ApiMarket>(uri)
-
-            console.log('Fetched token market data:', data.items.length)
 
             return resolve(data)
           } catch (error: any) {
@@ -235,11 +199,7 @@ class Api {
 
         return new Promise(async (resolve, reject) => {
           try {
-            console.log('Fetching token market activity:', tokenId)
-
             const { data } = await axios.get<ApiMarket>(uri)
-
-            console.log('Fetched token market activity:', data.items.length)
 
             return resolve(data)
           } catch (error: any) {
@@ -256,11 +216,7 @@ class Api {
 
       return new Promise(async (resolve, reject) => {
         try {
-          console.log('Fetching stake pool:', poolId)
-
           const { data } = await axios.get<ApiPool>(uri)
-
-          console.log('Fetched stake pool:', data.ticker)
 
           return resolve(data)
         } catch (error: any) {
@@ -278,11 +234,7 @@ class Api {
 
       return new Promise(async (resolve, reject) => {
         try {
-          console.log('Fetching stake pool delegators:', poolId)
-
           const { data } = await axios.get<ApiPoolDelegators>(uri)
-
-          console.log('Fetched stake pool delegators:', data.delegators.length)
 
           return resolve(data)
         } catch (error: any) {
@@ -303,11 +255,7 @@ class Api {
 
       return new Promise(async (resolve, reject) => {
         try {
-          console.log('Fetching transaction:', transactionId)
-
           const { data } = await axios.get<ApiTransaction>(uri)
-
-          console.log('Fetched transaction:', data.block)
 
           return resolve(data)
         } catch (error: any) {

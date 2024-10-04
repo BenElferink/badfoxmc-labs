@@ -28,15 +28,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PoolDelegatorsR
   try {
     switch (method) {
       case 'GET': {
-        console.log('Fetching delegators:', poolId)
-
         const delegators = await blockfrost.poolsByIdDelegators(poolId, {
           count: 100,
           page,
           order: 'asc',
         })
-
-        console.log('Fetched delegators:', delegators.length)
 
         const payload: ApiPoolDelegators = {
           poolId,

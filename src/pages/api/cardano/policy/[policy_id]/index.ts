@@ -44,11 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PolicyResponse>
           rankedAssets = fetched
         }
 
-        console.log('Fetching tokens of Policy ID:', policyId)
-
         const fetchedTokens = allTokens ? await blockfrost.assetsPolicyByIdAll(policyId) : await blockfrost.assetsPolicyById(policyId)
-
-        console.log('Fetched tokens:', fetchedTokens.length)
 
         const tokens = []
 

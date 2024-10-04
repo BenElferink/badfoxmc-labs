@@ -16,11 +16,7 @@ const resolveTokenRegisteredMetadata = async (tokenId: string, metadata?: compon
       decimals = ctrToken.decimals
       ticker = ctrToken.ticker
     } catch (error) {
-      console.log('Fetching token:', tokenId)
-
       const bfToken = await blockfrost.assetsById(tokenId)
-
-      console.log('Fetched token:', bfToken.fingerprint)
 
       decimals = bfToken?.metadata?.decimals || 0
       ticker = bfToken?.metadata?.ticker || ''

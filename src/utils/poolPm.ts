@@ -42,6 +42,8 @@ class PoolPm {
 
     return new Promise(async (resolve, reject) => {
       try {
+        console.log('Fetching chain load')
+
         const { data } = await axios.get<FetchedChainInformation>(uri, {
           headers: {
             'Accept-Encoding': 'application/json',
@@ -53,6 +55,8 @@ class PoolPm {
           load1h: data.load_1h * 100,
           load24h: data.load_24h * 100,
         }
+
+        console.log('Fetched chain load:', payload)
 
         return resolve(payload)
       } catch (error: any) {

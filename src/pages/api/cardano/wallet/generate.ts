@@ -21,8 +21,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletGenerateR
   try {
     switch (method) {
       case 'GET': {
-        console.log('Generating new app wallet')
-
         const mnemonic = AppWallet.brew()
 
         const provider = new BlockfrostProvider(API_KEYS['BLOCKFROST_API_KEY'])
@@ -37,8 +35,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletGenerateR
         })
 
         const address = wallet.getPaymentAddress()
-
-        console.log('Successfully generated app wallet:', '')
 
         return res.status(200).json({
           address,

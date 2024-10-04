@@ -24,11 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TransactionResp
   try {
     switch (method) {
       case 'GET': {
-        console.log('Fetching TX:', transactionId)
-
         const tx = await blockfrost.txs(transactionId)
-
-        console.log('Fetched TX')
 
         const payload: ApiTransaction = {
           transactionId,
@@ -37,8 +33,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TransactionResp
         }
 
         if (withUtxos) {
-          console.log('Fetching UTXOs:', transactionId)
-
           const txUtxos = await blockfrost.txsUtxos(transactionId)
           const utxos: ApiUtxo[] = []
 
@@ -74,8 +68,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TransactionResp
               }
             }
           }
-
-          console.log('Fetched UTXOs:', utxos.length)
 
           payload.utxos = utxos
         }

@@ -26,8 +26,6 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
 
   const populateMintTx = options?.populateMintTx || false
 
-  console.log('Fetching token with Token ID:', tokenId)
-
   const {
     policy_id: policyId,
     fingerprint,
@@ -38,8 +36,6 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
     metadata,
     initial_mint_tx_hash,
   } = await blockfrost.assetsById(tokenId)
-
-  console.log('Fetched token:', fingerprint)
 
   const tokenAmountOnChain = Number(quantity)
   let tokenAmountDecimals = 0
@@ -149,11 +145,7 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
   }
 
   if (populateMintTx) {
-    console.log('Fetching TX:', payload.mintTransactionId)
-
     const tx = await blockfrost.txs(payload.mintTransactionId)
-
-    console.log('Fetched TX')
 
     payload.mintBlockHeight = tx.block_height
   } else {

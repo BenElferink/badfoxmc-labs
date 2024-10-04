@@ -27,12 +27,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<PoolResponse>) 
   try {
     switch (method) {
       case 'GET': {
-        console.log('Fetching stake pool:', poolId)
-
         const data = await blockfrost.poolMetadata(poolId)
         const ticker = data.ticker || ''
-
-        console.log('Fetched stake pool:', ticker)
 
         const payload: ApiPool = {
           poolId,
