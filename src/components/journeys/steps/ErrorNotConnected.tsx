@@ -6,10 +6,10 @@ const ErrorNotConnected = (props: { onClose?: () => void }) => {
   const { toggleConnectModal } = useAuth()
 
   return (
-    <div className='max-w-[350px] mx-auto flex flex-col items-center justify-center'>
+    <div className='mx-auto flex flex-col items-center justify-center'>
       <TextFrown text="You're not connected" className='mt-[10vh] mb-2' />
 
-      <div className='w-full rounded-lg bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
+      <div className='max-w-[350px] w-full rounded-lg bg-gradient-to-b from-purple-500 via-blue-500 to-green-500'>
         <button
           onClick={() => {
             toggleConnectModal(true)

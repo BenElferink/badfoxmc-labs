@@ -10,6 +10,8 @@ import Modal from './Modal'
 import Button from './form/Button'
 import TextFrown from './TextFrown'
 import { DECIMALS, LS_KEYS, SYMBOLS } from '@/constants'
+import Link from 'next/link'
+import ErrorNoWallets from './journeys/steps/ErrorNoWallets'
 
 const Auth = () => {
   const { openConnectModal, toggleConnectModal } = useAuth()
@@ -64,7 +66,7 @@ const Auth = () => {
 
       <Modal open={openConnectModal} onClose={() => toggleConnectModal(false)}>
         {!installedWallets.length ? (
-          <TextFrown text='No wallets installed...' className='mt-[10vh]' />
+          <ErrorNoWallets />
         ) : (
           <div className='max-w-[1024px] mx-auto text-center'>
             <h2 className='text-lg'>Connect Wallet</h2>
