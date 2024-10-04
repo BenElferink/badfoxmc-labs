@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { Fragment, useEffect, useMemo, useRef } from 'react'
-import { useAddress, useLovelace, useWallet, useWalletList } from '@meshsdk/react'
+import { useWallet, useWalletList } from '@meshsdk/react'
 import { toast } from 'react-hot-toast'
 import { WalletIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/contexts/AuthContext'
@@ -8,17 +8,13 @@ import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle'
 import Modal from './Modal'
 import Button from './form/Button'
-import TextFrown from './TextFrown'
-import { DECIMALS, LS_KEYS, SYMBOLS } from '@/constants'
-import Link from 'next/link'
 import ErrorNoWallets from './journeys/steps/ErrorNoWallets'
+import { DECIMALS, LS_KEYS, SYMBOLS } from '@/constants'
 
 const Auth = () => {
-  const { openConnectModal, toggleConnectModal } = useAuth()
+  const { openConnectModal, toggleConnectModal, user } = useAuth()
   const { connect, disconnect, connecting, connected, name, error } = useWallet()
   const installedWallets = useWalletList()
-  const address = useAddress()
-  const lovelaces = useLovelace()
 
   const mountRef = useRef(false)
   const walletAppInfo = useMemo(() => installedWallets.find((x) => x.id === name), [installedWallets, name])
@@ -52,8 +48,8 @@ const Auth = () => {
 
           {connected ? (
             <Fragment>
-              <span className='mx-2 text-xs'>{truncateStringInMiddle(address, 7) || '...'}</span>
-              <span>{`${SYMBOLS['ADA']} ${formatTokenAmount.fromChain(lovelaces || 0, DECIMALS['ADA']).toLocaleString('en-US', {
+              <span className='mx-2 text-xs'>{truncateStringInMiddle(user?.stakeKey, 7) || '...'}</span>
+              <span>{`${SYMBOLS['ADA']} ${formatTokenAmount.fromChain(user?.lovelaces || 0, DECIMALS['ADA']).toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}`}</span>

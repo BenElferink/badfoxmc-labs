@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLovelace } from '@meshsdk/react'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from '@/components/MediaViewer'
@@ -18,7 +17,6 @@ const TokenAmount = (props: {
 }) => {
   const { defaultData, callback, next, back } = props
   const { user } = useAuth()
-  const lovelaces = useLovelace()
   const [data, setData] = useState(defaultData)
 
   useEffect(() => {
@@ -35,16 +33,15 @@ const TokenAmount = (props: {
   const mountRef = useRef(false)
 
   useEffect(() => {
-    if (!mountRef.current && lovelaces) {
+    if (!mountRef.current && user) {
       const tokenId = defaultData.tokenId || ''
+      const selectedAmountOnChain = defaultData.tokenAmount?.onChain || 0
 
       if (tokenId === 'lovelace') {
-        setBalanceOnChain(Number(lovelaces || '0'))
+        setBalanceOnChain(Number(user.lovelaces || '0'))
       } else {
-        setBalanceOnChain(user?.tokens.find((t) => t.tokenId === tokenId)?.tokenAmount.onChain || 0)
+        setBalanceOnChain(user.tokens.find((t) => t.tokenId === tokenId)?.tokenAmount.onChain || 0)
       }
-
-      const selectedAmountOnChain = defaultData.tokenAmount?.onChain || 0
 
       if (selectedAmountOnChain) {
         setAmountValue(selectedAmountOnChain)
@@ -53,7 +50,7 @@ const TokenAmount = (props: {
 
       mountRef.current = true
     }
-  }, [defaultData, lovelaces, user?.tokens])
+  }, [user, defaultData])
 
   const handleAmountChange = (val: string) => {
     let v = Number(val)

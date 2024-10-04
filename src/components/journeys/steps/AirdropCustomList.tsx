@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { read, utils } from 'xlsx'
 import api from '@/utils/api'
-import { useLovelace } from '@meshsdk/react'
 import { useAuth } from '@/contexts/AuthContext'
 import { CheckBadgeIcon } from '@heroicons/react/24/solid'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
@@ -19,7 +18,6 @@ const AirdropCustomList = (props: {
 }) => {
   const { payoutHolders, settings, callback, next, back } = props
   const { user } = useAuth()
-  const lovelaces = useLovelace()
 
   const [ended, setEnded] = useState(!!payoutHolders.length)
   const [progress, setProgress] = useState({
@@ -129,7 +127,9 @@ const AirdropCustomList = (props: {
     }
 
     const userOwnedOnChain =
-      settings.tokenId === 'lovelace' ? Number(lovelaces || '0') : user?.tokens.find((t) => t.tokenId === settings.tokenId)?.tokenAmount.onChain || 0
+      settings.tokenId === 'lovelace'
+        ? Number(user?.lovelaces || '0')
+        : user?.tokens.find((t) => t.tokenId === settings.tokenId)?.tokenAmount.onChain || 0
 
     if (totalAmountOnChain > userOwnedOnChain) {
       setProgress((prev) => ({

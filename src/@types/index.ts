@@ -141,6 +141,7 @@ export interface ApiWallet {
 
 export interface User {
   stakeKey: StakeKey
+  lovelaces: number
   tokens: ApiPopulatedToken[]
   isTokenGateHolder: boolean
 }

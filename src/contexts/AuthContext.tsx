@@ -67,6 +67,7 @@ export const AuthProvider = (props: PropsWithChildren) => {
   const getAndSetUser = useCallback(async (): Promise<void> => {
     try {
       const sKey = (await wallet.getRewardAddresses())[0]
+      const lovelaces = Number((await wallet.getLovelace()) || '0')
       const assets = await wallet.getAssets()
       const isTokenGateHolder = !!assets?.find((a) => a.policyId === POLICY_IDS['BAD_KEY'] || BFMC_BANKER_CARD_TOKEN_IDS.includes(a.unit))
 
@@ -94,6 +95,7 @@ export const AuthProvider = (props: PropsWithChildren) => {
 
       setUser({
         stakeKey: sKey,
+        lovelaces,
         tokens: populatedTokens,
         isTokenGateHolder,
       })

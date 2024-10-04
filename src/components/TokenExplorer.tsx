@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useLovelace } from '@meshsdk/react'
 import { useAuth } from '@/contexts/AuthContext'
 import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
 import MediaViewer from './MediaViewer'
@@ -7,7 +6,7 @@ import TextFrown from './TextFrown'
 import Loader from './Loader'
 import Input from './form/Input'
 import type { ApiPopulatedToken, TokenId } from '@/@types'
-import { DECIMALS, POLICY_IDS, POPULATED_LOVELACE } from '@/constants'
+import { DECIMALS, POPULATED_LOVELACE } from '@/constants'
 
 export type TokenExplorerCollections = {
   policyId: string
@@ -34,7 +33,6 @@ const TokenExplorer = (props: {
   } = props
 
   const { user } = useAuth()
-  const lovelaces = useLovelace()
   const [loading, setLoading] = useState(false)
   const [collections, setCollections] = useState<TokenExplorerCollections>(!!forceCollections ? [...forceCollections] : [])
 
@@ -45,12 +43,12 @@ const TokenExplorer = (props: {
     try {
       const payload: TokenExplorerCollections = []
 
-      if (withAda && lovelaces) {
+      if (withAda && user?.lovelaces) {
         const adaBalance = {
           ...POPULATED_LOVELACE,
           tokenAmount: {
-            onChain: Number(lovelaces),
-            display: formatTokenAmount.fromChain(lovelaces, DECIMALS['ADA']),
+            onChain: Number(user.lovelaces),
+            display: formatTokenAmount.fromChain(user.lovelaces, DECIMALS['ADA']),
             decimals: DECIMALS['ADA'],
           },
         }
@@ -82,7 +80,7 @@ const TokenExplorer = (props: {
       setLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, withAda, lovelaces])
+  }, [user, withAda])
 
   useEffect(() => {
     if (!forceCollections) getCollections()
