@@ -64,7 +64,7 @@ const Auth = () => {
 
       <Modal open={openConnectModal} onClose={() => toggleConnectModal(false)}>
         {!installedWallets.length ? (
-          <TextFrown text='No wallets installed...' className='mt-[50%]' />
+          <TextFrown text='No wallets installed...' className='mt-[10vh]' />
         ) : (
           <div className='max-w-[1024px] mx-auto text-center'>
             <h2 className='text-lg'>Connect Wallet</h2>
