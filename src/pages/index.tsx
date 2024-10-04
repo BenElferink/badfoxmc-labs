@@ -56,28 +56,38 @@ const ChainLoadBar = ({ label, percent }: { label: string; percent: number }) =>
 
 const Page = () => {
   const { airdrops, fetchAirdrops } = useData()
-  const [epochInfo, setEpochInfo] = useState({ epoch: 0, percent: 0, startTime: 0, endTime: 0, nowTime: 0 })
 
   useEffect(() => {
     ;(async () => {
-      setEpochInfo(await api.epoch.getData())
       if (!airdrops.length) await fetchAirdrops()
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const [epochInfo, setEpochInfo] = useState({ epoch: 0, percent: 0, startTime: 0, endTime: 0, nowTime: 0 })
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      api.epoch
+        .getData()
+        .then((data) => setEpochInfo(data))
+        .catch((error) => console.error(error))
+    }, 60 * 60 * 1000) // 1 hour
+
+    return () => clearInterval(interval)
+  }, [])
+
   const [chainLoad, setChainLoad] = useState({ load5m: 0, load1h: 0, load24h: 0 })
 
   useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        setChainLoad(await poolPm.getChainLoad())
-      } catch (error) {}
-    }, 10 * 1000)
+    const interval = setInterval(() => {
+      poolPm
+        .getChainLoad()
+        .then((data) => setChainLoad(data))
+        .catch((error) => console.error(error))
+    }, 10 * 1000) // 10 seconds
 
-    return () => {
-      clearInterval(interval)
-    }
+    return () => clearInterval(interval)
   }, [])
 
   return (
