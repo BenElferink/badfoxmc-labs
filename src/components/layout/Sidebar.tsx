@@ -1,5 +1,5 @@
 import { ArrowPathIcon, CreditCardIcon, HomeIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid'
-import LinkList from './LinkList'
+import LinkList from '@/components/LinkList'
 
 const Sidebar = (props: { open: boolean }) => {
   const { open } = props
