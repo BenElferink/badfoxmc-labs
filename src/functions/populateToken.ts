@@ -93,29 +93,37 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
     'files',
     'decimals',
     'ticker',
+
     'link',
     'links',
     'url',
     'website',
     'twitter',
     'discord',
+    'youtube',
+    'instagram',
+    'telegram',
   ]
 
   const attributes: ApiPopulatedToken['attributes'] = {}
 
   Object.entries(onchain_metadata?.attributes || onchain_metadata || metadata || {}).forEach(([key, val]) => {
-    if (!forbiddenAttributeKeys.includes(key.toLowerCase())) {
+    const keyLower = key.toLowerCase()
+
+    if (!forbiddenAttributeKeys.includes(keyLower)) {
       if (onchain_metadata_standard === 'CIP68v1') {
-        attributes[key] = formatHex.fromHex(val?.toString() || 'X').slice(1)
+        attributes[keyLower] = formatHex.fromHex(val?.toString() || 'X').slice(1)
       } else {
         if (typeof val === 'object' && !Array.isArray(val)) {
           Object.entries(val).forEach(([subKey, subVal]) => {
-            if (!forbiddenAttributeKeys.includes(subKey.toLowerCase())) {
-              attributes[subKey] = subVal?.toString()
+            const subKeyLower = subKey.toLowerCase()
+
+            if (!forbiddenAttributeKeys.includes(subKeyLower)) {
+              attributes[subKeyLower] = subVal?.toString()
             }
           })
         } else {
-          attributes[key] = val?.toString()
+          attributes[keyLower] = val?.toString()
         }
       }
     }

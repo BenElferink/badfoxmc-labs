@@ -244,10 +244,7 @@ const AirdropSnapshot = (props: {
                 const attributes: ApiPopulatedToken['attributes'] = asset.attributes
 
                 policySetting.traitOptions.forEach(({ category, trait, amount }) => {
-                  if (
-                    attributes[category]?.toLowerCase() === trait.toLowerCase() ||
-                    attributes[category.toLowerCase()]?.toLowerCase() === trait.toLowerCase()
-                  ) {
+                  if (attributes[category.toLowerCase()]?.toLowerCase() === trait.toLowerCase()) {
                     // calc here because it's not calculated at the time of input
                     // only token selection amount is calculated at the time of input
                     const onChainAmountConvertedWithDecimals = formatTokenAmount.toChain(amount, settings.tokenAmount.decimals)
