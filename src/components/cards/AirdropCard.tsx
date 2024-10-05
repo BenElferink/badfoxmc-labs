@@ -15,7 +15,7 @@ const AirdropCard = (props: {
 
   return (
     <div className='m-1 p-0.5 rounded-lg bg-gradient-to-b from-purple-700 via-blue-700 to-green-700'>
-      <div className='w-[180px] h-[150px] rounded-lg bg-zinc-800 flex flex-col items-center justify-evenly'>
+      <div className='w-[150px] sm:w-[180px] h-[150px] rounded-lg bg-zinc-800 flex flex-col items-center justify-evenly'>
         <MediaViewer mediaType='IMAGE' src={thumb} size='w-[55px] h-[55px]' />
 
         <div>
