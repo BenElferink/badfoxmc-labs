@@ -64,26 +64,38 @@ const Page = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const [epochInfo, setEpochInfo] = useState({ epoch: 0, percent: 0, startTime: 0, endTime: 0, nowTime: 0 })
+  const [epochInfo, setEpochInfo] = useState({ epoch: 0, startTime: 0, endTime: 0, nowTime: 0, percent: 0 })
   const [chainLoad, setChainLoad] = useState({ load5m: 0, load1h: 0, load24h: 0 })
 
   useEffect(() => {
-    const epochHandler = () =>
+    const fetchEpoch = () => {
       api.epoch
         .getData()
         .then((data) => setEpochInfo(data))
         .catch((error) => console.error(error))
-    const chainHandler = () =>
+    }
+    const incrementEpoch = () => {
+      setEpochInfo((prev) => {
+        if (!prev.epoch) return prev
+
+        const nowTime = prev.nowTime + 1000
+        const percent = (100 / (prev.endTime - prev.startTime)) * (nowTime - prev.startTime)
+
+        return { ...prev, nowTime, percent }
+      })
+    }
+    const fetchChainLoad = () => {
       poolPm
         .getChainLoad()
         .then((data) => setChainLoad(data))
         .catch((error) => console.error(error))
+    }
 
-    epochHandler()
-    chainHandler()
+    fetchEpoch()
+    fetchChainLoad()
 
-    const epochInterval = setInterval(epochHandler, 60 * 60 * 1000) // 1 hour
-    const chainInterval = setInterval(chainHandler, 10 * 1000) // 10 seconds
+    const epochInterval = setInterval(incrementEpoch, 1000) // 1 second
+    const chainInterval = setInterval(fetchChainLoad, 10 * 1000) // 10 seconds
 
     return () => {
       clearInterval(epochInterval)

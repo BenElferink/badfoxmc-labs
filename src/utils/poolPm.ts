@@ -44,11 +44,7 @@ class PoolPm {
       try {
         console.log('Fetching chain load')
 
-        const { data } = await axios.get<FetchedChainInformation>(uri, {
-          headers: {
-            'Accept-Encoding': 'application/json',
-          },
-        })
+        const { data } = await axios.get<FetchedChainInformation>(uri)
 
         const payload = {
           load5m: data.load_5m * 100,

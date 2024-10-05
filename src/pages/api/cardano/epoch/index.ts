@@ -11,10 +11,10 @@ export const config = {
 
 export interface EpochResponse {
   epoch: number
-  percent: number
   startTime: number
   endTime: number
   nowTime: number
+  percent: number
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<EpochResponse>) => {
@@ -59,10 +59,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<EpochResponse>)
 
         const payload = {
           epoch,
-          percent: (100 / (endTime - startTime)) * (nowTime - startTime),
           startTime,
           endTime,
           nowTime,
+          percent: (100 / (endTime - startTime)) * (nowTime - startTime),
         }
 
         return res.status(200).json(payload)
