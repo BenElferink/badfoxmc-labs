@@ -327,7 +327,7 @@ const AirdropSnapshot = (props: {
       const wb = utils.book_new()
       utils.book_append_sheet(wb, ws, 'snapshot')
 
-      writeFileXLSX(wb, `Bad Labs Snapshot (${new Date().toLocaleDateString()}).xlsx`)
+      writeFileXLSX(wb, `Snapshot_${new Date().toLocaleDateString()}.xlsx`)
 
       setProgress((prev) => ({ ...prev, loading: false, msg: 'Snapshot Done' }))
     } catch (error: any) {

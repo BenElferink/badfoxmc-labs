@@ -20,10 +20,10 @@ export const API_KEYS = {
 
 export const WALLETS = {
   STAKE_KEYS: {
-    TREASURY: 'stake1ux65w9j86elkh0nfmhrnvyx6qek77sppw2qpzxfur4l5xcqvvc06y',
+    DEV: 'stake1u80fcwkvn0cdy2zn8hlw7vf4v4sq4q23khj4z39wtvflr5cmyn8n7',
   },
   ADDRESSES: {
-    TREASURY: 'addr1q9p9yq4lz834729chxsdwa7utfp5wr754zkn6hltxz42m594guty04nldwlxnhw8xcgd5pndaaqzzu5qzyvnc8tlgdsqtazkyh',
+    DEV: 'addr1q9knw3lmvlpsvemjpgmkqkwtkzv8wueggf9aavvzyt2akpw7nsavexls6g59x007aucn2etqp2q4rd0929z2ukcn78fslm56p9',
   },
   KEYS: {
     // MNEMONIC: Array.isArray(process.env.MNEMONIC) ? process.env.MNEMONIC : process.env.MNEMONIC?.split(',') || [],

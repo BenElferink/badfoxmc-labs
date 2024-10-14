@@ -1,5 +1,6 @@
 const getExplorerUrl = (type: 'stakeKey' | 'address' | 'tx' | 'policy' | 'token', value: string) => {
   const baseUrl = 'https://cexplorer.io'
+  // https://cexplorer.io/search?query=XXX
 
   switch (type) {
     case 'stakeKey':

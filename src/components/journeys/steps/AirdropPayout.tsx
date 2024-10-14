@@ -29,6 +29,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
     msg: '',
     loading: false,
     error: false,
+    started: false,
     ended: false,
     batch: {
       current: 0,
@@ -62,8 +63,8 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       const unpayedWallets = processedPayoutHolders.filter(({ txHash }) => !txHash)
       if (!devPayed.current)
         unpayedWallets.unshift({
-          stakeKey: WALLETS['STAKE_KEYS']['TREASURY'],
-          address: WALLETS['ADDRESSES']['TREASURY'],
+          stakeKey: WALLETS['STAKE_KEYS']['DEV'],
+          address: WALLETS['ADDRESSES']['DEV'],
           payout: devFee,
           forceLovelace: true,
         })
@@ -128,6 +129,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
             ...prev,
             batch: { ...prev.batch, current: prev.batch.current + 1, max: batches.length },
             msg: 'Awaiting Network Confirmation...',
+            started: true, // "started" here, because we need 1st batch to succeed
           }))
 
           await txConfirmation(txHash)
@@ -218,7 +220,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       const wb = utils.book_new()
       utils.book_append_sheet(wb, ws, 'airdrop')
 
-      writeFileXLSX(wb, `Bad Labs Airdrop (${new Date().toLocaleDateString()}).xlsx`)
+      writeFileXLSX(wb, `Airdrop_${new Date().toLocaleDateString()}.xlsx`)
 
       setProgress((prev) => ({ ...prev, loading: false, msg: '' }))
     } catch (error: any) {
@@ -235,7 +237,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
 
       <div className='w-full my-2 flex items-center justify-between'>
         <Button label='Batch & Sign TXs' disabled={progress.loading || progress.ended} onClick={() => runPayout()} />
-        <Button label='Download Receipt' disabled={progress.loading || !progress.ended} onClick={() => downloadReceipt()} />
+        <Button label='Download Receipt' disabled={progress.loading || !progress.started} onClick={() => downloadReceipt()} />
       </div>
 
       {!progress.ended && progress.batch.max ? <ProgressBar label='TX Batches' max={progress.batch.max} current={progress.batch.current} /> : null}
