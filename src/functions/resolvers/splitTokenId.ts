@@ -1,38 +1,38 @@
-import formatHex from '../formatters/formatHex'
-import type { PolicyId, TokenId } from '@/@types'
+import formatHex from '../formatters/formatHex';
+import type { PolicyId, TokenId } from '@/@types';
 
 const splitTokenId = (tokenId: TokenId, policyId: PolicyId) => {
-  const tokenLabel = tokenId.replace(policyId, '')
+  const tokenLabel = tokenId.replace(policyId, '');
 
-  let tokenType = ''
+  let tokenType = '';
 
   switch (tokenLabel.substring(0, 8)) {
     case '000de140': // CIP-68 nft token
-      tokenType = '222'
-      break
+      tokenType = '222';
+      break;
 
     case '000643b0': // CIP-68 ref token
-      tokenType = '100'
-      break
+      tokenType = '100';
+      break;
 
     default:
-      break
+      break;
   }
 
-  let tokenName = formatHex.fromHex(tokenLabel)
+  let tokenName = formatHex.fromHex(tokenLabel);
 
   if (tokenName === tokenLabel) {
-    tokenName = formatHex.fromHex(tokenLabel.substring(8))
+    tokenName = formatHex.fromHex(tokenLabel.substring(8));
 
     if (tokenName === tokenLabel) {
-      tokenName = tokenLabel
+      tokenName = tokenLabel;
     }
   }
 
   return {
     tokenType,
     tokenName,
-  }
-}
+  };
+};
 
-export default splitTokenId
+export default splitTokenId;

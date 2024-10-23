@@ -1,14 +1,14 @@
-import { Fragment, useCallback, useState } from 'react'
-import { toast } from 'react-hot-toast'
-import api from '@/utils/api'
-import { PlusCircleIcon } from '@heroicons/react/24/solid'
-import JourneyStepWrapper from './JourneyStepWrapper'
-import ProgressBar from '@/components/ProgressBar'
-import Loader from '@/components/Loader'
-import Input from '@/components/form/Input'
-import Button from '@/components/form/Button'
-import TrashButton from '@/components/form/TrashButton'
-import type { HolderSettings, PolicyId, StakeKey, TokenId } from '@/@types'
+import { Fragment, useCallback, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import api from '@/utils/api';
+import { PlusCircleIcon } from '@heroicons/react/24/solid';
+import JourneyStepWrapper from './JourneyStepWrapper';
+import ProgressBar from '@/components/ProgressBar';
+import Loader from '@/components/Loader';
+import Input from '@/components/form/Input';
+import Button from '@/components/form/Button';
+import TrashButton from '@/components/form/TrashButton';
+import type { HolderSettings, PolicyId, StakeKey, TokenId } from '@/@types';
 
 interface BlacklistByBlockHeight {
   policyId: PolicyId
@@ -27,7 +27,7 @@ const initProgress = {
     current: 0,
     max: 0,
   },
-}
+};
 
 const HolderBlacklist = (props: {
   defaultData: Partial<HolderSettings>
@@ -35,20 +35,20 @@ const HolderBlacklist = (props: {
   next?: () => void
   back?: () => void
 }) => {
-  const { defaultData, callback, next, back } = props
-  const [formData, setFormData] = useState(defaultData)
-  const [loading, setLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({})
+  const { defaultData, callback, next, back } = props;
+  const [formData, setFormData] = useState(defaultData);
+  const [loading, setLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({});
 
-  const [withWallets, setWithWallets] = useState(false)
-  const [withTokens, setWithTokens] = useState(false)
-  const [tokensAlreadyScanned, setTokensAlreadyScanned] = useState(false)
-  const [blacklistByBlockHeight, setBlacklistByBlockHeight] = useState<BlacklistByBlockHeight[]>([])
-  const [progress, setProgress] = useState({ ...initProgress })
+  const [withWallets, setWithWallets] = useState(false);
+  const [withTokens, setWithTokens] = useState(false);
+  const [tokensAlreadyScanned, setTokensAlreadyScanned] = useState(false);
+  const [blacklistByBlockHeight, setBlacklistByBlockHeight] = useState<BlacklistByBlockHeight[]>([]);
+  const [progress, setProgress] = useState({ ...initProgress });
 
   const populateTokenIds = useCallback(async () => {
-    const filtered = blacklistByBlockHeight.filter(({ blockHeight }) => !!blockHeight)
-    const blacklistTokenIds: TokenId[] = []
+    const filtered = blacklistByBlockHeight.filter(({ blockHeight }) => !!blockHeight);
+    const blacklistTokenIds: TokenId[] = [];
 
     try {
       setProgress((prev) => ({
@@ -56,29 +56,29 @@ const HolderBlacklist = (props: {
         loading: true,
         msg: 'Processing...',
         policy: { ...prev.policy, current: 0, max: filtered.length },
-      }))
+      }));
 
       for (const { policyId, blockHeight: policyBlockHeight, isAfter: policyBlockHeightIsAfter } of filtered) {
-        const { tokens: policyTokens } = await api.policy.getData(policyId, { allTokens: true })
+        const { tokens: policyTokens } = await api.policy.getData(policyId, { allTokens: true });
 
         setProgress((prev) => ({
           ...prev,
           token: { ...prev.token, current: 0, max: policyTokens.length },
-        }))
+        }));
 
         for (let aIdx = 0; aIdx < policyTokens.length; aIdx++) {
-          const { tokenId, tokenAmount } = policyTokens[aIdx]
+          const { tokenId, tokenAmount } = policyTokens[aIdx];
 
           if (tokenAmount.onChain !== 0) {
-            const { mintBlockHeight } = await api.token.getData(tokenId, { populateMintTx: true })
+            const { mintBlockHeight } = await api.token.getData(tokenId, { populateMintTx: true });
 
             if (policyBlockHeightIsAfter) {
               if ((mintBlockHeight as number) > policyBlockHeight) {
-                blacklistTokenIds.push(tokenId)
+                blacklistTokenIds.push(tokenId);
               }
             } else {
               if ((mintBlockHeight as number) < policyBlockHeight) {
-                blacklistTokenIds.push(tokenId)
+                blacklistTokenIds.push(tokenId);
               }
             }
           }
@@ -86,25 +86,25 @@ const HolderBlacklist = (props: {
           setProgress((prev) => ({
             ...prev,
             token: { ...prev.token, current: prev.token.current + 1, max: policyTokens.length },
-          }))
+          }));
         }
 
         setProgress((prev) => ({
           ...prev,
           policy: { ...prev.policy, current: prev.policy.current + 1, max: filtered.length },
-        }))
+        }));
       }
 
-      setTokensAlreadyScanned(true)
-      setFormData((prev) => ({ ...prev, blacklistTokens: blacklistTokenIds }))
-      setProgress((prev) => ({ ...prev, loading: false, msg: '' }))
+      setTokensAlreadyScanned(true);
+      setFormData((prev) => ({ ...prev, blacklistTokens: blacklistTokenIds }));
+      setProgress((prev) => ({ ...prev, loading: false, msg: '' }));
     } catch (error: any) {
-      console.error(error)
-      const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
+      console.error(error);
+      const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR';
 
-      setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }))
+      setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }));
     }
-  }, [blacklistByBlockHeight])
+  }, [blacklistByBlockHeight]);
 
   return (
     <JourneyStepWrapper
@@ -122,75 +122,75 @@ const HolderBlacklist = (props: {
             withBlacklist: false,
             blacklistWallets: [],
             blacklistTokens: [],
-          })
+          });
 
-          if (next) return setTimeout(() => next(), 0)
-          else return
+          if (next) return setTimeout(() => next(), 0);
+          else return;
         }
 
-        setLoading(true)
+        setLoading(true);
 
-        let allowNext = true
-        const blacklistStakeKeys: StakeKey[] = []
-        const blacklistTokenIds: TokenId[] = []
+        let allowNext = true;
+        const blacklistStakeKeys: StakeKey[] = [];
+        const blacklistTokenIds: TokenId[] = [];
 
-        toast.loading('Validating')
+        toast.loading('Validating');
 
         if (withWallets && formData['blacklistWallets']?.length) {
           for await (const walletId of formData['blacklistWallets']) {
             try {
               if (!!walletId) {
-                const { stakeKey: id } = await api.wallet.getData(walletId)
+                const { stakeKey: id } = await api.wallet.getData(walletId);
 
-                if (!id) throw new Error(`No stake key for wallet ID: ${walletId}`)
+                if (!id) throw new Error(`No stake key for wallet ID: ${walletId}`);
 
-                blacklistStakeKeys.push(id)
+                blacklistStakeKeys.push(id);
               }
 
-              setFormErrors((prev) => ({ ...prev, [walletId]: false }))
+              setFormErrors((prev) => ({ ...prev, [walletId]: false }));
             } catch (error) {
-              allowNext = false
+              allowNext = false;
 
-              setFormErrors((prev) => ({ ...prev, [walletId]: true }))
+              setFormErrors((prev) => ({ ...prev, [walletId]: true }));
             }
           }
         }
 
         if (withTokens && formData['blacklistTokens']?.length) {
           if (tokensAlreadyScanned) {
-            blacklistTokenIds.push(...formData['blacklistTokens'])
+            blacklistTokenIds.push(...formData['blacklistTokens']);
           } else {
             for await (const tokenId of formData['blacklistTokens']) {
               try {
                 if (!!tokenId) {
-                  const { tokenId: id } = await api.token.getData(tokenId)
-                  blacklistTokenIds.push(id)
+                  const { tokenId: id } = await api.token.getData(tokenId);
+                  blacklistTokenIds.push(id);
                 }
 
-                setFormErrors((prev) => ({ ...prev, [tokenId]: false }))
+                setFormErrors((prev) => ({ ...prev, [tokenId]: false }));
               } catch (error) {
-                allowNext = false
+                allowNext = false;
 
-                setFormErrors((prev) => ({ ...prev, [tokenId]: true }))
+                setFormErrors((prev) => ({ ...prev, [tokenId]: true }));
               }
             }
           }
         }
 
-        toast.dismiss()
-        if (!allowNext) toast.error('Bad Value(s)')
+        toast.dismiss();
+        if (!allowNext) toast.error('Bad Value(s)');
 
-        const filteredWallets = blacklistStakeKeys.filter((str) => !!str)
-        const filteredTokenIds = blacklistTokenIds.filter((str) => !!str)
+        const filteredWallets = blacklistStakeKeys.filter((str) => !!str);
+        const filteredTokenIds = blacklistTokenIds.filter((str) => !!str);
 
         callback({
           withBlacklist: !!filteredWallets.length || !!filteredTokenIds.length,
           blacklistWallets: filteredWallets,
           blacklistTokens: filteredTokenIds,
-        })
+        });
 
-        setLoading(false)
-        if (allowNext && next) setTimeout(() => next(), 0)
+        setLoading(false);
+        if (allowNext && next) setTimeout(() => next(), 0);
       }}
       back={back}
       buttons={
@@ -211,11 +211,11 @@ const HolderBlacklist = (props: {
       <div
         onClick={() => {
           if (!loading && !progress.loading) {
-            setWithWallets(false)
-            setWithTokens(false)
-            setBlacklistByBlockHeight([])
-            setProgress({ ...initProgress })
-            setFormData(() => ({ withBlacklist: false, blacklistWallets: [], blacklistTokens: [] }))
+            setWithWallets(false);
+            setWithTokens(false);
+            setBlacklistByBlockHeight([]);
+            setProgress({ ...initProgress });
+            setFormData(() => ({ withBlacklist: false, blacklistWallets: [], blacklistTokens: [] }));
           }
         }}
         className={
@@ -233,7 +233,7 @@ const HolderBlacklist = (props: {
       <div
         onClick={() => {
           if (!loading && !progress.loading) {
-            setFormData((prev) => ({ ...prev, withBlacklist: true }))
+            setFormData((prev) => ({ ...prev, withBlacklist: true }));
           }
         }}
         className={
@@ -258,10 +258,10 @@ const HolderBlacklist = (props: {
               disabled={loading || progress.loading}
               checked={withWallets}
               onChange={(e) => {
-                const checked = e.target.checked
+                const checked = e.target.checked;
 
-                setWithWallets(checked)
-                setFormData((prev) => ({ ...prev, blacklistWallets: checked ? [''] : [] }))
+                setWithWallets(checked);
+                setFormData((prev) => ({ ...prev, blacklistWallets: checked ? [''] : [] }));
               }}
             />
             <span className='pl-2 py-1 text-lg text-zinc-400'>Blacklist using wallets:</span>
@@ -278,15 +278,15 @@ const HolderBlacklist = (props: {
                     value={str}
                     setValue={(v) =>
                       setFormData((prev) => {
-                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                         if (!payload['blacklistWallets']) {
-                          payload['blacklistWallets'] = [v]
+                          payload['blacklistWallets'] = [v];
                         } else {
-                          payload['blacklistWallets'][idx] = v
+                          payload['blacklistWallets'][idx] = v;
                         }
 
-                        return payload
+                        return payload;
                       })
                     }
                   />
@@ -296,20 +296,20 @@ const HolderBlacklist = (props: {
                       disabled={loading || progress.loading}
                       onClick={() => {
                         setFormData((prev) => {
-                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                           if (!payload['blacklistWallets']) {
-                            payload['blacklistWallets'] = []
+                            payload['blacklistWallets'] = [];
                           }
 
-                          const foundIdx = payload['blacklistWallets'].findIndex((val) => val === str)
+                          const foundIdx = payload['blacklistWallets'].findIndex((val) => val === str);
 
                           if (foundIdx !== -1) {
-                            payload['blacklistWallets'].splice(foundIdx, 1)
+                            payload['blacklistWallets'].splice(foundIdx, 1);
                           }
 
-                          return payload
-                        })
+                          return payload;
+                        });
                       }}
                     />
                   ) : null}
@@ -322,15 +322,15 @@ const HolderBlacklist = (props: {
                 disabled={!!(formData['blacklistWallets'] || []).filter((str) => !str).length || loading || progress.loading}
                 onClick={() =>
                   setFormData((prev) => {
-                    const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                    const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                     if (!payload['blacklistWallets']) {
-                      payload['blacklistWallets'] = []
+                      payload['blacklistWallets'] = [];
                     }
 
-                    payload['blacklistWallets'].push('')
+                    payload['blacklistWallets'].push('');
 
-                    return payload
+                    return payload;
                   })
                 }
               />
@@ -345,11 +345,11 @@ const HolderBlacklist = (props: {
               disabled={loading || progress.loading}
               checked={withTokens}
               onChange={(e) => {
-                const checked = e.target.checked
+                const checked = e.target.checked;
 
-                setWithTokens(checked)
-                setFormData((prev) => ({ ...prev, blacklistTokens: checked ? [''] : [] }))
-                if (!checked) setBlacklistByBlockHeight([])
+                setWithTokens(checked);
+                setFormData((prev) => ({ ...prev, blacklistTokens: checked ? [''] : [] }));
+                if (!checked) setBlacklistByBlockHeight([]);
               }}
             />
             <span className='pl-2 py-1 text-lg text-zinc-400'>Blacklist using tokens:</span>
@@ -366,15 +366,15 @@ const HolderBlacklist = (props: {
                     value={str}
                     setValue={(v) =>
                       setFormData((prev) => {
-                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                         if (!payload['blacklistTokens']) {
-                          payload['blacklistTokens'] = [v]
+                          payload['blacklistTokens'] = [v];
                         } else {
-                          payload['blacklistTokens'][idx] = v
+                          payload['blacklistTokens'][idx] = v;
                         }
 
-                        return payload
+                        return payload;
                       })
                     }
                   />
@@ -384,20 +384,20 @@ const HolderBlacklist = (props: {
                       disabled={loading || progress.loading}
                       onClick={() => {
                         setFormData((prev) => {
-                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                           if (!payload['blacklistTokens']) {
-                            payload['blacklistTokens'] = []
+                            payload['blacklistTokens'] = [];
                           }
 
-                          const foundIdx = payload['blacklistTokens'].findIndex((val) => val === str)
+                          const foundIdx = payload['blacklistTokens'].findIndex((val) => val === str);
 
                           if (foundIdx !== -1) {
-                            payload['blacklistTokens'].splice(foundIdx, 1)
+                            payload['blacklistTokens'].splice(foundIdx, 1);
                           }
 
-                          return payload
-                        })
+                          return payload;
+                        });
                       }}
                     />
                   ) : null}
@@ -410,18 +410,18 @@ const HolderBlacklist = (props: {
                 disabled={!!(formData['blacklistTokens'] || []).filter((str) => !str).length || loading || progress.loading}
                 onClick={() => {
                   setFormData((prev) => {
-                    const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                    const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                     if (!payload['blacklistTokens']) {
-                      payload['blacklistTokens'] = []
+                      payload['blacklistTokens'] = [];
                     }
 
-                    payload['blacklistTokens'].push('')
+                    payload['blacklistTokens'].push('');
 
-                    return payload
-                  })
+                    return payload;
+                  });
 
-                  setTokensAlreadyScanned(false)
+                  setTokensAlreadyScanned(false);
                 }}
               />
 
@@ -437,8 +437,8 @@ const HolderBlacklist = (props: {
                     <p className='pl-4 py-1 text-lg text-zinc-400'>Alternatively, populate Token IDs using block-height:</p>
 
                     {defaultData['holderPolicies']?.map(({ policyId }, policyIdx) => {
-                      const blockIdx = blacklistByBlockHeight.findIndex((item) => item.policyId === policyId)
-                      const blockItem = blockIdx !== -1 ? blacklistByBlockHeight[blockIdx] : null
+                      const blockIdx = blacklistByBlockHeight.findIndex((item) => item.policyId === policyId);
+                      const blockItem = blockIdx !== -1 ? blacklistByBlockHeight[blockIdx] : null;
 
                       return (
                         <div key={`pid-${policyIdx}-${defaultData['holderPolicies']?.length}`}>
@@ -460,14 +460,14 @@ const HolderBlacklist = (props: {
                                     checked={blockItem?.isAfter === false}
                                     onChange={(e) =>
                                       setBlacklistByBlockHeight((prev) => {
-                                        const payload: typeof blacklistByBlockHeight = JSON.parse(JSON.stringify(prev))
+                                        const payload: typeof blacklistByBlockHeight = JSON.parse(JSON.stringify(prev));
 
                                         payload[blockIdx] = {
                                           ...payload[blockIdx],
                                           isAfter: false,
-                                        }
+                                        };
 
-                                        return payload
+                                        return payload;
                                       })
                                     }
                                     className='disabled:opacity-50'
@@ -488,14 +488,14 @@ const HolderBlacklist = (props: {
                                     checked={blockItem?.isAfter === true}
                                     onChange={(e) =>
                                       setBlacklistByBlockHeight((prev) => {
-                                        const payload: typeof blacklistByBlockHeight = JSON.parse(JSON.stringify(prev))
+                                        const payload: typeof blacklistByBlockHeight = JSON.parse(JSON.stringify(prev));
 
                                         payload[blockIdx] = {
                                           ...payload[blockIdx],
                                           isAfter: true,
-                                        }
+                                        };
 
-                                        return payload
+                                        return payload;
                                       })
                                     }
                                     className='disabled:opacity-50'
@@ -511,25 +511,25 @@ const HolderBlacklist = (props: {
                                   value={blockItem?.blockHeight}
                                   setValue={(v) =>
                                     setBlacklistByBlockHeight((prev) => {
-                                      const payload: typeof blacklistByBlockHeight = JSON.parse(JSON.stringify(prev))
-                                      const n = Number(v)
+                                      const payload: typeof blacklistByBlockHeight = JSON.parse(JSON.stringify(prev));
+                                      const n = Number(v);
 
-                                      if (isNaN(n) || n < 0) return payload
+                                      if (isNaN(n) || n < 0) return payload;
 
                                       if (blockIdx === -1) {
                                         payload.push({
                                           policyId,
                                           blockHeight: n,
                                           isAfter: false,
-                                        })
+                                        });
                                       } else {
                                         payload[blockIdx] = {
                                           ...payload[blockIdx],
                                           blockHeight: n,
-                                        }
+                                        };
                                       }
 
-                                      return payload
+                                      return payload;
                                     })
                                   }
                                 />
@@ -537,7 +537,7 @@ const HolderBlacklist = (props: {
                             </div>
                           </div>
                         </div>
-                      )
+                      );
                     })}
                   </Fragment>
                 )
@@ -549,7 +549,7 @@ const HolderBlacklist = (props: {
         </Fragment>
       ) : null}
     </JourneyStepWrapper>
-  )
-}
+  );
+};
 
-export default HolderBlacklist
+export default HolderBlacklist;

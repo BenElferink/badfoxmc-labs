@@ -1,7 +1,7 @@
-import { TrashIcon } from '@heroicons/react/24/solid'
+import { TrashIcon } from '@heroicons/react/24/solid';
 
 const TrashButton: (props: { onClick?: () => void; disabled?: boolean }) => JSX.Element = (props) => {
-  const { onClick, disabled } = props
+  const { onClick, disabled } = props;
 
   return (
     <button
@@ -11,7 +11,7 @@ const TrashButton: (props: { onClick?: () => void; disabled?: boolean }) => JSX.
     >
       <TrashIcon className='w-4 h-4' />
     </button>
-  )
-}
+  );
+};
 
-export default TrashButton
+export default TrashButton;

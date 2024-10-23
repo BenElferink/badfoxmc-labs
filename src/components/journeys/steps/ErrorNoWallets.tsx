@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import TextFrown from '@/components/TextFrown'
+import Link from 'next/link';
+import TextFrown from '@/components/TextFrown';
 
 const ErrorNoWallets = () => {
   return (
@@ -17,7 +17,7 @@ const ErrorNoWallets = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ErrorNoWallets
+export default ErrorNoWallets;

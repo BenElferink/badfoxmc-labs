@@ -1,96 +1,96 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import blockfrost from '@/utils/blockfrost'
-import formatHex from '@/functions/formatters/formatHex'
-import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import resolveTokenRegisteredMetadata from '@/functions/resolvers/resolveTokenRegisteredMetadata'
-import resolveWalletIdentifiers from '@/functions/resolvers/resolveWalletIdentifiers'
-import splitTokenId from '@/functions/resolvers/splitTokenId'
-import { ERROR_TYPES, POLICY_IDS } from '@/constants'
-import type { ApiBaseToken, ApiWallet } from '@/@types'
-import populateToken from '@/functions/populateToken'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import blockfrost from '@/utils/blockfrost';
+import formatHex from '@/functions/formatters/formatHex';
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount';
+import resolveTokenRegisteredMetadata from '@/functions/resolvers/resolveTokenRegisteredMetadata';
+import resolveWalletIdentifiers from '@/functions/resolvers/resolveWalletIdentifiers';
+import splitTokenId from '@/functions/resolvers/splitTokenId';
+import { ERROR_TYPES, POLICY_IDS } from '@/constants';
+import type { ApiBaseToken, ApiWallet } from '@/@types';
+import populateToken from '@/functions/populateToken';
 
 export const config = {
   maxDuration: 300,
   api: {
     responseLimit: false,
   },
-}
+};
 
 export interface WalletResponse extends ApiWallet {}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>) => {
-  const { method, query } = req
+  const { method, query } = req;
 
-  const walletId = query.wallet_id?.toString() as string
+  const walletId = query.wallet_id?.toString() as string;
 
-  const allAddresses = !!query.all_addresses && query.all_addresses == 'true'
-  const withStakePool = !!query.with_stake_pool && query.with_stake_pool == 'true'
-  const withTokens = !!query.with_tokens && query.with_tokens == 'true'
-  const populateTokens = !!query.populate_tokens && query.populate_tokens == 'true'
+  const allAddresses = !!query.all_addresses && query.all_addresses == 'true';
+  const withStakePool = !!query.with_stake_pool && query.with_stake_pool == 'true';
+  const withTokens = !!query.with_tokens && query.with_tokens == 'true';
+  const populateTokens = !!query.populate_tokens && query.populate_tokens == 'true';
 
   try {
     switch (method) {
       case 'GET': {
-        const { stakeKey, addresses } = await resolveWalletIdentifiers(walletId)
+        const { stakeKey, addresses } = await resolveWalletIdentifiers(walletId);
 
-        const populatedAddresses = []
-        const ownedUnitsByAddress = []
+        const populatedAddresses = [];
+        const ownedUnitsByAddress = [];
 
         for (let idx = 0; idx < addresses.length; idx++) {
-          const addr = addresses[idx]
+          const addr = addresses[idx];
 
-          const { type, script, amount } = await blockfrost.addresses(addr)
+          const { type, script, amount } = await blockfrost.addresses(addr);
 
           populatedAddresses.push({
             address: addr,
             isScript: script,
-          })
+          });
 
-          ownedUnitsByAddress.push(...amount)
+          ownedUnitsByAddress.push(...amount);
 
-          if (!allAddresses) break
+          if (!allAddresses) break;
         }
 
         let wallet: ApiWallet = {
           stakeKey,
           addresses: populatedAddresses,
-        }
+        };
 
         if (withStakePool && stakeKey) {
-          const account = await blockfrost.accounts(stakeKey)
-          const poolId = account.pool_id || ''
+          const account = await blockfrost.accounts(stakeKey);
+          const poolId = account.pool_id || '';
 
-          wallet.poolId = poolId
+          wallet.poolId = poolId;
         }
 
         if (withTokens) {
-          const units = []
+          const units = [];
 
           if (stakeKey) {
-            const ownedUnitsByStake = await blockfrost.accountsAddressesAssetsAll(stakeKey)
+            const ownedUnitsByStake = await blockfrost.accountsAddressesAssetsAll(stakeKey);
 
-            units.push(...ownedUnitsByStake)
+            units.push(...ownedUnitsByStake);
           } else {
-            units.push(...ownedUnitsByAddress)
+            units.push(...ownedUnitsByAddress);
           }
 
-          wallet.handles = []
+          wallet.handles = [];
           wallet.tokens = await Promise.all(
             units.map(async ({ unit, quantity }) => {
-              if (populateTokens) return await populateToken(unit, { quantity })
+              if (populateTokens) return await populateToken(unit, { quantity });
 
-              const tokenId = unit
-              const tokenAmountOnChain = Number(quantity)
-              let tokenAmountDecimals = 0
+              const tokenId = unit;
+              const tokenAmountOnChain = Number(quantity);
+              let tokenAmountDecimals = 0;
 
-              const isFungible = tokenAmountOnChain > 1
-              let tokenNameTicker = ''
+              const isFungible = tokenAmountOnChain > 1;
+              let tokenNameTicker = '';
 
               if (isFungible) {
-                const { decimals, ticker } = await resolveTokenRegisteredMetadata(tokenId)
+                const { decimals, ticker } = await resolveTokenRegisteredMetadata(tokenId);
 
-                tokenAmountDecimals = decimals
-                tokenNameTicker = ticker
+                tokenAmountDecimals = decimals;
+                tokenNameTicker = ticker;
               }
 
               const token: ApiBaseToken = {
@@ -101,40 +101,40 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
                   decimals: tokenAmountDecimals,
                   display: formatTokenAmount.fromChain(tokenAmountOnChain, tokenAmountDecimals),
                 },
-              }
+              };
 
               if (isFungible) {
                 token.tokenName = {
                   onChain: '',
                   ticker: tokenNameTicker,
                   display: '',
-                }
+                };
               }
 
-              return token
+              return token;
             })
-          )
+          );
 
           wallet.handles.push(
             ...wallet.tokens
               .filter(({ tokenId }) => tokenId.indexOf(POLICY_IDS['ADA_HANDLE']) === 0)
               .map(({ tokenId }) => `$${formatHex.fromHex(splitTokenId(tokenId, POLICY_IDS['ADA_HANDLE']).tokenName)}`)
-          )
+          );
         }
 
-        return res.status(200).json(wallet)
+        return res.status(200).json(wallet);
       }
 
       default: {
-        res.setHeader('Allow', 'GET')
-        return res.status(405).end()
+        res.setHeader('Allow', 'GET');
+        return res.status(405).end();
       }
     }
   } catch (error: any) {
-    console.error(error)
+    console.error(error);
 
     if (error?.message === ERROR_TYPES['INVALID_WALLET_IDENTIFIER']) {
-      return res.status(400).end('Please provide a valid wallet identifer: $handle / addr1... / stake1...')
+      return res.status(400).end('Please provide a valid wallet identifer: $handle / addr1... / stake1...');
     }
 
     if (
@@ -144,11 +144,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletResponse>
         'Invalid or malformed stake address format.',
       ].includes(error?.message)
     ) {
-      return res.status(404).end(`Wallet not found: ${walletId}`)
+      return res.status(404).end(`Wallet not found: ${walletId}`);
     }
 
-    return res.status(500).end()
+    return res.status(500).end();
   }
-}
+};
 
-export default handler
+export default handler;

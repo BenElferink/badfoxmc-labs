@@ -1,47 +1,47 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { PauseIcon, PlayIcon } from '@heroicons/react/24/solid'
-import WaveSurfer from 'wavesurfer.js'
-import { useRender } from '@/contexts/RenderContext'
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { PauseIcon, PlayIcon } from '@heroicons/react/24/solid';
+import WaveSurfer from 'wavesurfer.js';
+import { useRender } from '@/contexts/RenderContext';
 
 const MusicPlayer = (props: { src: string }) => {
-  const { src } = props
+  const { src } = props;
 
-  const { userClicked } = useRender()
-  const [mounted, setMounted] = useState(false)
-  const [playing, setPlaying] = useState(false)
+  const { userClicked } = useRender();
+  const [mounted, setMounted] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
-  const waveRef = useRef<WaveSurfer | null>(null)
-  const visualRef = useRef<HTMLDivElement | null>(null)
+  const waveRef = useRef<WaveSurfer | null>(null);
+  const visualRef = useRef<HTMLDivElement | null>(null);
 
   const stop = useCallback(() => {
-    const _wave = waveRef.current
+    const _wave = waveRef.current;
 
     if (_wave) {
-      _wave.stop()
+      _wave.stop();
 
-      setPlaying(false)
+      setPlaying(false);
     }
-  }, [waveRef])
+  }, [waveRef]);
 
   const pause = useCallback(() => {
-    const _wave = waveRef.current
+    const _wave = waveRef.current;
 
     if (_wave) {
-      _wave.pause()
+      _wave.pause();
 
-      setPlaying(false)
+      setPlaying(false);
     }
-  }, [waveRef])
+  }, [waveRef]);
 
   const play = useCallback(() => {
-    const _wave = waveRef.current
+    const _wave = waveRef.current;
 
     if (_wave) {
-      _wave.play()
+      _wave.play();
 
-      setPlaying(true)
+      setPlaying(true);
     }
-  }, [waveRef])
+  }, [waveRef]);
 
   useEffect(() => {
     if (!waveRef.current && visualRef.current && userClicked && !mounted) {
@@ -50,24 +50,24 @@ const MusicPlayer = (props: { src: string }) => {
         waveColor: 'whitesmoke',
         progressColor: 'skyblue',
         barWidth: 1,
-      })
+      });
 
       _wave.on('finish', () => {
-        stop()
-      })
+        stop();
+      });
 
-      _wave.load(src.replace('https://firebasestorage.googleapis.com', '/storage'))
-      waveRef.current = _wave
-      setMounted(true)
+      _wave.load(src.replace('https://firebasestorage.googleapis.com', '/storage'));
+      waveRef.current = _wave;
+      setMounted(true);
 
       return () => {
-        _wave.destroy()
-        waveRef.current = null
-        setMounted(false)
-      }
+        _wave.destroy();
+        waveRef.current = null;
+        setMounted(false);
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [waveRef, visualRef, userClicked, src])
+  }, [waveRef, visualRef, userClicked, src]);
 
   return (
     <div className='w-full h-[130px] flex items-center'>
@@ -78,7 +78,7 @@ const MusicPlayer = (props: { src: string }) => {
 
       <div ref={visualRef} className='w-full' />
     </div>
-  )
-}
+  );
+};
 
-export default MusicPlayer
+export default MusicPlayer;

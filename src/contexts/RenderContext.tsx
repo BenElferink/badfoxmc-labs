@@ -7,7 +7,7 @@ import {
   Dispatch,
   SetStateAction,
   useEffect,
-} from 'react'
+} from 'react';
 
 const ctxInit: {
   reRender: number
@@ -17,28 +17,28 @@ const ctxInit: {
   reRender: 0,
   setReRender: () => {},
   userClicked: false,
-}
+};
 
-const RenderContext = createContext(ctxInit)
+const RenderContext = createContext(ctxInit);
 
 export const useRender = () => {
-  return useContext(RenderContext)
-}
+  return useContext(RenderContext);
+};
 
 export const RenderProvider = ({ children }: { children: ReactNode }) => {
-  const [reRender, setReRender] = useState(ctxInit.reRender)
-  const [userClicked, setUserClicked] = useState(ctxInit.userClicked)
+  const [reRender, setReRender] = useState(ctxInit.reRender);
+  const [userClicked, setUserClicked] = useState(ctxInit.userClicked);
 
   useEffect(() => {
     const handler = () => {
-      if (!userClicked) setUserClicked(true)
-    }
+      if (!userClicked) setUserClicked(true);
+    };
 
-    window.addEventListener('click', handler)
+    window.addEventListener('click', handler);
     return () => {
-      window.removeEventListener('click', handler)
-    }
-  }, [userClicked])
+      window.removeEventListener('click', handler);
+    };
+  }, [userClicked]);
 
   const memoedValue = useMemo(
     () => ({
@@ -47,7 +47,7 @@ export const RenderProvider = ({ children }: { children: ReactNode }) => {
       userClicked,
     }),
     [reRender, setReRender, userClicked]
-  )
+  );
 
-  return <RenderContext.Provider value={memoedValue}>{children}</RenderContext.Provider>
-}
+  return <RenderContext.Provider value={memoedValue}>{children}</RenderContext.Provider>;
+};

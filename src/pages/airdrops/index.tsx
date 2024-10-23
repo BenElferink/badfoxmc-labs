@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
-import { PlusIcon } from '@heroicons/react/24/solid'
-import { useData } from '@/contexts/DataContext'
-import resolveMonthName from '@/functions/resolvers/resolveMonthName'
-import Loader from '@/components/Loader'
-import AirdropCard from '@/components/cards/AirdropCard'
-import AirdropJourney from '@/components/journeys/AirdropJourney'
-import type { Airdrop } from '@/@types'
+import { useEffect, useState } from 'react';
+import { PlusIcon } from '@heroicons/react/24/solid';
+import { useData } from '@/contexts/DataContext';
+import resolveMonthName from '@/functions/resolvers/resolveMonthName';
+import Loader from '@/components/Loader';
+import AirdropCard from '@/components/cards/AirdropCard';
+import AirdropJourney from '@/components/journeys/AirdropJourney';
+import type { Airdrop } from '@/@types';
 
 interface AirdropTimeline {
   [year: string]: {
@@ -14,39 +14,39 @@ interface AirdropTimeline {
 }
 
 export const AIRDROP_DESCRIPTION =
-  "The airdrop tool utilizes Cardano's Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy ID(s)."
+  "The airdrop tool utilizes Cardano's Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy ID(s).";
 
 const Page = () => {
-  const { airdrops, fetchAirdrops } = useData()
-  const [openJourney, setOpenJourney] = useState(false)
-  const [airdropTimeline, setAirdropTimeline] = useState<AirdropTimeline | null>(null)
+  const { airdrops, fetchAirdrops } = useData();
+  const [openJourney, setOpenJourney] = useState(false);
+  const [airdropTimeline, setAirdropTimeline] = useState<AirdropTimeline | null>(null);
 
   useEffect(() => {
     if (!airdrops.length) {
-      fetchAirdrops()
+      fetchAirdrops();
     } else {
-      const payload: AirdropTimeline = {}
+      const payload: AirdropTimeline = {};
 
       airdrops.forEach((item) => {
-        const date = new Date(item.timestamp)
-        const y = date.getFullYear().toString()
-        const m = date.getMonth().toString()
+        const date = new Date(item.timestamp);
+        const y = date.getFullYear().toString();
+        const m = date.getMonth().toString();
 
         if (payload[y]) {
           if (payload[y][m]) {
-            payload[y][m].push(item)
+            payload[y][m].push(item);
           } else {
-            payload[y][m] = [item]
+            payload[y][m] = [item];
           }
         } else {
-          payload[y] = { [m]: [item] }
+          payload[y] = { [m]: [item] };
         }
-      })
+      });
 
-      setAirdropTimeline(payload)
+      setAirdropTimeline(payload);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [airdrops])
+  }, [airdrops]);
 
   return (
     <div className='w-full flex flex-col items-center sm:items-start'>
@@ -92,12 +92,12 @@ const Page = () => {
       <AirdropJourney
         open={openJourney}
         onClose={() => {
-          setOpenJourney(false)
-          fetchAirdrops()
+          setOpenJourney(false);
+          fetchAirdrops();
         }}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;

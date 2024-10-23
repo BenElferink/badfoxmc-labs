@@ -1,40 +1,40 @@
-import Image from 'next/image'
-import { Fragment, useEffect, useMemo, useRef } from 'react'
-import { useWallet, useWalletList } from '@meshsdk/react'
-import { toast } from 'react-hot-toast'
-import { WalletIcon } from '@heroicons/react/24/solid'
-import { useAuth } from '@/contexts/AuthContext'
-import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle'
-import Modal from './Modal'
-import Button from './form/Button'
-import ErrorNoWallets from './journeys/steps/ErrorNoWallets'
-import { DECIMALS, LS_KEYS, SYMBOLS } from '@/constants'
+import Image from 'next/image';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
+import { useWallet, useWalletList } from '@meshsdk/react';
+import { toast } from 'react-hot-toast';
+import { WalletIcon } from '@heroicons/react/24/solid';
+import { useAuth } from '@/contexts/AuthContext';
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount';
+import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle';
+import Modal from './Modal';
+import Button from './form/Button';
+import ErrorNoWallets from './journeys/steps/ErrorNoWallets';
+import { DECIMALS, LS_KEYS, SYMBOLS } from '@/constants';
 
 const Auth = () => {
-  const { openConnectModal, toggleConnectModal, user } = useAuth()
-  const { connect, disconnect, connecting, connected, name, error } = useWallet()
-  const installedWallets = useWalletList()
+  const { openConnectModal, toggleConnectModal, user } = useAuth();
+  const { connect, disconnect, connecting, connected, name, error } = useWallet();
+  const installedWallets = useWalletList();
 
-  const mountRef = useRef(false)
-  const walletAppInfo = useMemo(() => installedWallets.find((x) => x.id === name), [installedWallets, name])
+  const mountRef = useRef(false);
+  const walletAppInfo = useMemo(() => installedWallets.find((x) => x.id === name), [installedWallets, name]);
 
   useEffect(() => {
     if (!mountRef.current) {
-      mountRef.current = true
+      mountRef.current = true;
 
-      const lsValue = localStorage.getItem(LS_KEYS['WALLET_PROVIDER'])
-      if (lsValue) connect(lsValue)
+      const lsValue = localStorage.getItem(LS_KEYS['WALLET_PROVIDER']);
+      if (lsValue) connect(lsValue);
     } else {
       if (connected) {
-        localStorage.setItem(LS_KEYS['WALLET_PROVIDER'], name)
-        toggleConnectModal(false)
+        localStorage.setItem(LS_KEYS['WALLET_PROVIDER'], name);
+        toggleConnectModal(false);
       } else {
-        localStorage.removeItem(LS_KEYS['WALLET_PROVIDER'])
+        localStorage.removeItem(LS_KEYS['WALLET_PROVIDER']);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, name])
+  }, [connected, name]);
 
   return (
     <Fragment>
@@ -89,8 +89,8 @@ const Auth = () => {
                   label='Disconnect'
                   disabled={!connected || connecting}
                   onClick={() => {
-                    disconnect()
-                    toast.success('Disconnected')
+                    disconnect();
+                    toast.success('Disconnected');
                   }}
                 />
               </div>
@@ -99,7 +99,7 @@ const Auth = () => {
         )}
       </Modal>
     </Fragment>
-  )
-}
+  );
+};
 
-export default Auth
+export default Auth;

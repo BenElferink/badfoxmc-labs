@@ -1,11 +1,11 @@
-import type { ApiPopulatedToken, MediaType } from '@/@types'
+import type { ApiPopulatedToken, MediaType } from '@/@types';
 
 export const SYMBOLS = {
   ADA: '₳',
-}
+};
 export const DECIMALS = {
   ADA: 6,
-}
+};
 
 export const API_KEYS = {
   FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,7 +16,7 @@ export const API_KEYS = {
   FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
 
   BLOCKFROST_API_KEY: process.env.BLOCKFROST_API_KEY || '',
-}
+};
 
 export const WALLETS = {
   STAKE_KEYS: {
@@ -28,19 +28,19 @@ export const WALLETS = {
   KEYS: {
     // MNEMONIC: Array.isArray(process.env.MNEMONIC) ? process.env.MNEMONIC : process.env.MNEMONIC?.split(',') || [],
   },
-}
+};
 
 export const POLICY_IDS = {
   ADA_HANDLE: 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a',
   BAD_KEY: '80e3ccc66f4dfeff6bc7d906eb166a984a1fc6d314e33721ad6add14',
-}
+};
 
 export const LS_KEYS = {
   WALLET_PROVIDER: 'WALLET_PROVIDER',
-}
+};
 export const ERROR_TYPES = {
   INVALID_WALLET_IDENTIFIER: 'INVALID_WALLET_IDENTIFIER',
-}
+};
 
 export const TIME_LABELS = {
   MINUTES: 'Minutes',
@@ -48,13 +48,13 @@ export const TIME_LABELS = {
   DAYS: 'Days',
   WEEKS: 'Weeks',
   MONTHS: 'Months',
-}
+};
 
 export const MEDIA_TYPES: Record<MediaType, MediaType> = {
   IMAGE: 'IMAGE',
   VIDEO: 'VIDEO',
   AUDIO: 'AUDIO',
-}
+};
 
 export const POPULATED_LOVELACE: ApiPopulatedToken = {
   tokenId: 'lovelace',
@@ -78,4 +78,4 @@ export const POPULATED_LOVELACE: ApiPopulatedToken = {
   },
   files: [],
   attributes: {},
-}
+};

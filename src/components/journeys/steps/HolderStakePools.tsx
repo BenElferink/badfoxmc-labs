@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { toast } from 'react-hot-toast'
-import api from '@/utils/api'
-import { PlusCircleIcon } from '@heroicons/react/24/solid'
-import JourneyStepWrapper from './JourneyStepWrapper'
-import Input from '@/components/form/Input'
-import Button from '@/components/form/Button'
-import TrashButton from '@/components/form/TrashButton'
-import type { HolderSettings, PoolId } from '@/@types'
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import api from '@/utils/api';
+import { PlusCircleIcon } from '@heroicons/react/24/solid';
+import JourneyStepWrapper from './JourneyStepWrapper';
+import Input from '@/components/form/Input';
+import Button from '@/components/form/Button';
+import TrashButton from '@/components/form/TrashButton';
+import type { HolderSettings, PoolId } from '@/@types';
 
 const HolderStakePools = (props: {
   defaultData: Partial<HolderSettings>
@@ -14,51 +14,51 @@ const HolderStakePools = (props: {
   next?: () => void
   back?: () => void
 }) => {
-  const { defaultData, callback, next, back } = props
-  const [formData, setFormData] = useState(defaultData)
-  const [loading, setLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({})
+  const { defaultData, callback, next, back } = props;
+  const [formData, setFormData] = useState(defaultData);
+  const [loading, setLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({});
 
   return (
     <JourneyStepWrapper
       disableNext={loading || (formData['withDelegators'] && !formData['stakePools']?.filter((str) => !!str).length)}
       disableBack={loading}
       next={async () => {
-        setLoading(true)
-        let allowNext = true
-        const poolIds: PoolId[] = []
+        setLoading(true);
+        let allowNext = true;
+        const poolIds: PoolId[] = [];
 
         if (formData['withDelegators']) {
-          toast.loading('Validating')
+          toast.loading('Validating');
 
           for await (const poolId of formData['stakePools'] || []) {
             try {
               if (!!poolId) {
-                const stakePool = await api.stakePool.getData(poolId)
-                poolIds.push(stakePool.poolId)
+                const stakePool = await api.stakePool.getData(poolId);
+                poolIds.push(stakePool.poolId);
               }
 
-              setFormErrors((prev) => ({ ...prev, [poolId]: false }))
+              setFormErrors((prev) => ({ ...prev, [poolId]: false }));
             } catch (error) {
-              allowNext = false
+              allowNext = false;
 
-              setFormErrors((prev) => ({ ...prev, [poolId]: true }))
+              setFormErrors((prev) => ({ ...prev, [poolId]: true }));
             }
           }
 
-          toast.dismiss()
-          if (!allowNext) toast.error('Bad Value(s)')
+          toast.dismiss();
+          if (!allowNext) toast.error('Bad Value(s)');
         }
 
-        const filtered = poolIds.filter((str) => !!str)
+        const filtered = poolIds.filter((str) => !!str);
 
         callback({
           withDelegators: !!filtered.length,
           stakePools: filtered,
-        })
+        });
 
-        setLoading(false)
-        if (allowNext && next) setTimeout(() => next(), 0)
+        setLoading(false);
+        if (allowNext && next) setTimeout(() => next(), 0);
       }}
       back={back}
     >
@@ -105,15 +105,15 @@ const HolderStakePools = (props: {
                   value={str}
                   setValue={(v) =>
                     setFormData((prev) => {
-                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                       if (!payload['stakePools']) {
-                        payload['stakePools'] = [v]
+                        payload['stakePools'] = [v];
                       } else {
-                        payload['stakePools'][idx] = v
+                        payload['stakePools'][idx] = v;
                       }
 
-                      return payload
+                      return payload;
                     })
                   }
                 />
@@ -122,20 +122,20 @@ const HolderStakePools = (props: {
                   <TrashButton
                     onClick={() => {
                       setFormData((prev) => {
-                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                         if (!payload['stakePools']) {
-                          payload['stakePools'] = []
+                          payload['stakePools'] = [];
                         }
 
-                        const foundIdx = payload['stakePools'].findIndex((val) => val === str)
+                        const foundIdx = payload['stakePools'].findIndex((val) => val === str);
 
                         if (foundIdx !== -1) {
-                          payload['stakePools'].splice(foundIdx, 1)
+                          payload['stakePools'].splice(foundIdx, 1);
                         }
 
-                        return payload
-                      })
+                        return payload;
+                      });
                     }}
                   />
                 ) : null}
@@ -151,21 +151,21 @@ const HolderStakePools = (props: {
           disabled={!!(formData['stakePools'] || []).filter((str) => !str).length}
           onClick={() =>
             setFormData((prev) => {
-              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+              const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
               if (!payload['stakePools']) {
-                payload['stakePools'] = []
+                payload['stakePools'] = [];
               }
 
-              payload['stakePools'].push('')
+              payload['stakePools'].push('');
 
-              return payload
+              return payload;
             })
           }
         />
       ) : null}
     </JourneyStepWrapper>
-  )
-}
+  );
+};
 
-export default HolderStakePools
+export default HolderStakePools;

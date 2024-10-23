@@ -1,6 +1,6 @@
-import { PropsWithChildren } from 'react'
-import { ArrowUpTrayIcon } from '@heroicons/react/24/solid'
-import Button from '@/components/form/Button'
+import { PropsWithChildren } from 'react';
+import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
+import Button from '@/components/form/Button';
 
 const JourneyStepWrapper = (
   props: PropsWithChildren<{
@@ -19,7 +19,7 @@ const JourneyStepWrapper = (
     hoverButtons?: boolean
   }>
 ) => {
-  const { children, disableNext, disableBack, next, back, buttons, hoverButtons } = props
+  const { children, disableNext, disableBack, next, back, buttons, hoverButtons } = props;
 
   return (
     <div className='min-h-[95vh] sm:min-h-[70vh] mx-auto flex flex-col items-center justify-between'>
@@ -44,8 +44,8 @@ const JourneyStepWrapper = (
                     disabled={disabled}
                     onChange={(e) => {
                       // @ts-ignore
-                      const file = (e.target.files as FileList)[0]
-                      if (callbackFile) callbackFile(file)
+                      const file = (e.target.files as FileList)[0];
+                      if (callbackFile) callbackFile(file);
                     }}
                     className='absolute w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed'
                   />
@@ -65,7 +65,7 @@ const JourneyStepWrapper = (
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default JourneyStepWrapper
+export default JourneyStepWrapper;

@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import MediaViewer from '@/components/MediaViewer'
-import Input from '@/components/form/Input'
-import TokenExplorer, { TokenExplorerCollections } from '@/components/TokenExplorer'
-import JourneyStepWrapper from './JourneyStepWrapper'
-import type { TokenId, TokenSelectionSettings } from '@/@types'
+import { useEffect, useRef, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount';
+import MediaViewer from '@/components/MediaViewer';
+import Input from '@/components/form/Input';
+import TokenExplorer, { TokenExplorerCollections } from '@/components/TokenExplorer';
+import JourneyStepWrapper from './JourneyStepWrapper';
+import type { TokenId, TokenSelectionSettings } from '@/@types';
 
 type AmountType = 'FIXED' | 'PERCENT'
 
@@ -15,58 +15,58 @@ const TokenAmount = (props: {
   next?: () => void
   back?: () => void
 }) => {
-  const { defaultData, callback, next, back } = props
-  const { user } = useAuth()
-  const [data, setData] = useState(defaultData)
+  const { defaultData, callback, next, back } = props;
+  const { user } = useAuth();
+  const [data, setData] = useState(defaultData);
 
   useEffect(() => {
-    if (Object.keys(data).length) callback(data)
+    if (Object.keys(data).length) callback(data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [data]);
 
-  const _ticker = data.tokenName?.ticker || ''
-  const _decimals = data.tokenAmount?.decimals || 0
+  const _ticker = data.tokenName?.ticker || '';
+  const _decimals = data.tokenAmount?.decimals || 0;
 
-  const [balanceOnChain, setBalanceOnChain] = useState(0)
-  const [amountType, setAmountType] = useState<AmountType>('FIXED')
-  const [amountValue, setAmountValue] = useState(0)
-  const mountRef = useRef(false)
+  const [balanceOnChain, setBalanceOnChain] = useState(0);
+  const [amountType, setAmountType] = useState<AmountType>('FIXED');
+  const [amountValue, setAmountValue] = useState(0);
+  const mountRef = useRef(false);
 
   useEffect(() => {
     if (!mountRef.current && user) {
-      const tokenId = defaultData.tokenId || ''
-      const selectedAmountOnChain = defaultData.tokenAmount?.onChain || 0
+      const tokenId = defaultData.tokenId || '';
+      const selectedAmountOnChain = defaultData.tokenAmount?.onChain || 0;
 
       if (tokenId === 'lovelace') {
-        setBalanceOnChain(Number(user.lovelaces || '0'))
+        setBalanceOnChain(Number(user.lovelaces || '0'));
       } else {
-        setBalanceOnChain(user.tokens.find((t) => t.tokenId === tokenId)?.tokenAmount.onChain || 0)
+        setBalanceOnChain(user.tokens.find((t) => t.tokenId === tokenId)?.tokenAmount.onChain || 0);
       }
 
       if (selectedAmountOnChain) {
-        setAmountValue(selectedAmountOnChain)
-        setAmountType('FIXED')
+        setAmountValue(selectedAmountOnChain);
+        setAmountType('FIXED');
       }
 
-      mountRef.current = true
+      mountRef.current = true;
     }
-  }, [user, defaultData])
+  }, [user, defaultData]);
 
   const handleAmountChange = (val: string) => {
-    let v = Number(val)
+    let v = Number(val);
 
     if (!isNaN(v)) {
-      if (amountType === 'FIXED') v = formatTokenAmount.toChain(v, _decimals)
-      v = Math.floor(v)
+      if (amountType === 'FIXED') v = formatTokenAmount.toChain(v, _decimals);
+      v = Math.floor(v);
 
       // verify the amount is between the min and max ranges (with the help of available balance)
       if (amountType === 'FIXED') {
-        const min = 0
-        const max = formatTokenAmount.toChain(formatTokenAmount.fromChain(balanceOnChain || 0, _decimals), _decimals)
+        const min = 0;
+        const max = formatTokenAmount.toChain(formatTokenAmount.fromChain(balanceOnChain || 0, _decimals), _decimals);
 
-        v = v < min ? min : v > max ? max : v
+        v = v < min ? min : v > max ? max : v;
 
-        setAmountValue(v)
+        setAmountValue(v);
 
         setData((prev) => ({
           ...prev,
@@ -75,16 +75,16 @@ const TokenAmount = (props: {
             display: formatTokenAmount.fromChain(v, _decimals),
             decimals: _decimals,
           },
-        }))
+        }));
       } else if (amountType === 'PERCENT') {
-        const min = 0
-        const max = 100
+        const min = 0;
+        const max = 100;
 
-        v = v < min ? min : v > max ? max : v
+        v = v < min ? min : v > max ? max : v;
 
-        setAmountValue(v)
+        setAmountValue(v);
 
-        v = formatTokenAmount.toChain(formatTokenAmount.fromChain(balanceOnChain * (v / 100), _decimals), _decimals)
+        v = formatTokenAmount.toChain(formatTokenAmount.fromChain(balanceOnChain * (v / 100), _decimals), _decimals);
 
         setData((prev) => ({
           ...prev,
@@ -93,10 +93,10 @@ const TokenAmount = (props: {
             display: formatTokenAmount.fromChain(v, _decimals),
             decimals: _decimals,
           },
-        }))
+        }));
       }
     }
-  }
+  };
 
   return (
     <JourneyStepWrapper disableNext={!data.tokenAmount?.onChain} next={next} back={back}>
@@ -107,8 +107,8 @@ const TokenAmount = (props: {
       <div className='flex items-center justify-center'>
         <div
           onClick={() => {
-            setAmountType(() => 'FIXED')
-            setAmountValue(0)
+            setAmountType(() => 'FIXED');
+            setAmountValue(0);
             setData((prev) => ({
               ...prev,
               tokenAmount: {
@@ -116,7 +116,7 @@ const TokenAmount = (props: {
                 display: 0,
                 decimals: _decimals,
               },
-            }))
+            }));
           }}
           className={
             'group cursor-pointer my-2 p-4 border rounded-lg ' + (amountType === 'FIXED' ? 'text-white' : 'text-zinc-400 border-transparent')
@@ -130,8 +130,8 @@ const TokenAmount = (props: {
 
         <div
           onClick={() => {
-            setAmountType(() => 'PERCENT')
-            setAmountValue(0)
+            setAmountType(() => 'PERCENT');
+            setAmountValue(0);
             setData((prev) => ({
               ...prev,
               tokenAmount: {
@@ -139,7 +139,7 @@ const TokenAmount = (props: {
                 display: 0,
                 decimals: _decimals,
               },
-            }))
+            }));
           }}
           className={
             'group cursor-pointer my-2 p-4 border rounded-lg ' + (amountType === 'PERCENT' ? 'text-white' : 'text-zinc-400 border-transparent')
@@ -164,8 +164,8 @@ const TokenAmount = (props: {
         {_ticker ? <>&nbsp;${_ticker}</> : ''}
       </p>
     </JourneyStepWrapper>
-  )
-}
+  );
+};
 
 const TokenSelector = (props: {
   defaultData: Partial<TokenSelectionSettings> | TokenId[]
@@ -180,21 +180,21 @@ const TokenSelector = (props: {
   forceCollections?: TokenExplorerCollections
   forceTitle?: string
 }) => {
-  const { defaultData, callback, next, back, multiSelect, withAda, withAmount, onlyFungible, onlyNonFungible, forceCollections, forceTitle } = props
+  const { defaultData, callback, next, back, multiSelect, withAda, withAmount, onlyFungible, onlyNonFungible, forceCollections, forceTitle } = props;
 
-  const [data, setData] = useState<Partial<TokenSelectionSettings>>(multiSelect ? {} : (defaultData as TokenSelectionSettings))
-  const [dataForMultiSelect, setDataForMultiSelect] = useState<TokenId[]>(multiSelect ? (defaultData as TokenId[]) : [])
+  const [data, setData] = useState<Partial<TokenSelectionSettings>>(multiSelect ? {} : (defaultData as TokenSelectionSettings));
+  const [dataForMultiSelect, setDataForMultiSelect] = useState<TokenId[]>(multiSelect ? (defaultData as TokenId[]) : []);
 
   useEffect(() => {
     if (multiSelect) {
-      if (dataForMultiSelect.length) callback(dataForMultiSelect)
+      if (dataForMultiSelect.length) callback(dataForMultiSelect);
     } else {
-      if (Object.keys(data).length) callback(data)
+      if (Object.keys(data).length) callback(data);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [multiSelect, data, dataForMultiSelect])
+  }, [multiSelect, data, dataForMultiSelect]);
 
-  const [selectAmount, setSelectAmount] = useState(false)
+  const [selectAmount, setSelectAmount] = useState(false);
 
   if (selectAmount) {
     return (
@@ -204,7 +204,7 @@ const TokenSelector = (props: {
         next={next}
         back={back}
       />
-    )
+    );
   }
 
   return (
@@ -212,8 +212,8 @@ const TokenSelector = (props: {
       disableNext={(!multiSelect && !data.tokenId) || (multiSelect && !dataForMultiSelect.length)}
       back={back}
       next={() => {
-        if (withAmount) setSelectAmount(true)
-        else if (next) next()
+        if (withAmount) setSelectAmount(true);
+        else if (next) next();
       }}
     >
       <h6 className='text-xl text-center'>
@@ -230,21 +230,21 @@ const TokenSelector = (props: {
         callback={(payload) => {
           if (multiSelect) {
             setDataForMultiSelect((prev) => {
-              const mutated = [...prev]
+              const mutated = [...prev];
 
-              const tId = payload['tokenId']
-              const idx = mutated.findIndex((str) => str === tId)
+              const tId = payload['tokenId'];
+              const idx = mutated.findIndex((str) => str === tId);
 
               if (idx !== -1) {
-                mutated.splice(idx, 1)
+                mutated.splice(idx, 1);
               } else {
-                mutated.push(tId)
+                mutated.push(tId);
               }
 
-              return mutated
-            })
+              return mutated;
+            });
           } else {
-            const { isFungible } = payload
+            const { isFungible } = payload;
 
             setData({
               thumb: payload['image']['ipfs'] || payload['image']['url'],
@@ -255,15 +255,15 @@ const TokenSelector = (props: {
                 display: withAmount && isFungible ? 0 : payload['tokenAmount']['display'],
                 decimals: payload['tokenAmount']['decimals'],
               },
-            })
+            });
 
-            if (withAmount) setTimeout(() => setSelectAmount(true), 0)
-            else if (next) setTimeout(() => next(), 0)
+            if (withAmount) setTimeout(() => setSelectAmount(true), 0);
+            else if (next) setTimeout(() => next(), 0);
           }
         }}
       />
     </JourneyStepWrapper>
-  )
-}
+  );
+};
 
-export default TokenSelector
+export default TokenSelector;

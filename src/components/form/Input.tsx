@@ -6,7 +6,7 @@ const Input: (props: {
   readOnly?: boolean
   error?: boolean
 }) => JSX.Element = (props) => {
-  const { value, setValue, placeholder, disabled, readOnly, error } = props
+  const { value, setValue, placeholder, disabled, readOnly, error } = props;
 
   return (
     <div className='w-[calc(100%-0.5rem)] m-1'>
@@ -24,7 +24,7 @@ const Input: (props: {
         }
       />
     </div>
-  )
-}
+  );
+};
 
-export default Input
+export default Input;

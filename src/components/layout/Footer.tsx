@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { MeshBadge } from '@meshsdk/react'
-import MediaViewer from '@/components/MediaViewer'
+import Link from 'next/link';
+import { MeshBadge } from '@meshsdk/react';
+import MediaViewer from '@/components/MediaViewer';
 
 const Item = ({ url, logo, label }: { url: string; logo: string; label: string }) => {
   return (
@@ -8,8 +8,8 @@ const Item = ({ url, logo, label }: { url: string; logo: string; label: string }
       <MediaViewer mediaType='IMAGE' src={logo} size='h-[28px] w-[28px]' />
       <span className='text-sm'>{label}</span>
     </Link>
-  )
-}
+  );
+};
 
 const Footer = () => {
   return (
@@ -22,7 +22,7 @@ const Footer = () => {
         <Item label='Blockfrost' url='https://blockfrost.io' logo='https://blockfrost.io/images/b-logo.svg' />
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

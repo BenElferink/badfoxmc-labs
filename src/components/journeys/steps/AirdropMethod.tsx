@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
-import JourneyStepWrapper from './JourneyStepWrapper'
-import type { AirdropSettings } from '@/@types'
-import toast from 'react-hot-toast'
+import { useEffect, useState } from 'react';
+import JourneyStepWrapper from './JourneyStepWrapper';
+import type { AirdropSettings } from '@/@types';
+import toast from 'react-hot-toast';
 
 const AirdropMethod = (props: {
   defaultData: Partial<AirdropSettings>
@@ -9,13 +9,13 @@ const AirdropMethod = (props: {
   next?: () => void
   back?: () => void
 }) => {
-  const { defaultData, callback, next, back } = props
-  const [data, setData] = useState(defaultData)
+  const { defaultData, callback, next, back } = props;
+  const [data, setData] = useState(defaultData);
 
   useEffect(() => {
-    if (Object.keys(data).length) callback(data)
+    if (Object.keys(data).length) callback(data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [data]);
 
   return (
     <JourneyStepWrapper disableNext={false} next={next} back={back}>
@@ -66,7 +66,7 @@ const AirdropMethod = (props: {
         </p>
       </div>
     </JourneyStepWrapper>
-  )
-}
+  );
+};
 
-export default AirdropMethod
+export default AirdropMethod;

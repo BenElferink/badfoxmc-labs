@@ -1,14 +1,14 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { AppWallet, BlockfrostProvider } from '@meshsdk/core'
-import type { Address } from '@/@types'
-import { API_KEYS } from '@/constants'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { AppWallet, BlockfrostProvider } from '@meshsdk/core';
+import type { Address } from '@/@types';
+import { API_KEYS } from '@/constants';
 
 export const config = {
   maxDuration: 300,
   api: {
     responseLimit: false,
   },
-}
+};
 
 export interface WalletGenerateResponse {
   address: Address['address']
@@ -16,14 +16,14 @@ export interface WalletGenerateResponse {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<WalletGenerateResponse>) => {
-  const { method } = req
+  const { method } = req;
 
   try {
     switch (method) {
       case 'GET': {
-        const mnemonic = AppWallet.brew()
+        const mnemonic = AppWallet.brew();
 
-        const provider = new BlockfrostProvider(API_KEYS['BLOCKFROST_API_KEY'])
+        const provider = new BlockfrostProvider(API_KEYS['BLOCKFROST_API_KEY']);
         const wallet = new AppWallet({
           networkId: 1,
           fetcher: provider,
@@ -32,26 +32,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<WalletGenerateR
             type: 'mnemonic',
             words: mnemonic,
           },
-        })
+        });
 
-        const address = wallet.getPaymentAddress()
+        const address = wallet.getPaymentAddress();
 
         return res.status(200).json({
           address,
           mnemonic,
-        })
+        });
       }
 
       default: {
-        res.setHeader('Allow', 'GET')
-        return res.status(405).end()
+        res.setHeader('Allow', 'GET');
+        return res.status(405).end();
       }
     }
   } catch (error: any) {
-    console.error(error)
+    console.error(error);
 
-    return res.status(500).end()
+    return res.status(500).end();
   }
-}
+};
 
-export default handler
+export default handler;

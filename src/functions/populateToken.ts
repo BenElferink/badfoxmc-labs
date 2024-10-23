@@ -1,16 +1,16 @@
-import blockfrost from '@/utils/blockfrost'
-import splitTokenId from './resolvers/splitTokenId'
-import resolveTokenRegisteredMetadata from './resolvers/resolveTokenRegisteredMetadata'
-import formatHex from './formatters/formatHex'
-import formatTokenAmount from './formatters/formatTokenAmount'
-import formatIpfsReference from './formatters/formatIpfsReference'
-import numbersFromString from './formatters/numbersFromString'
-import type { ApiPopulatedToken, TokenId } from '@/@types'
-import { DECIMALS, POPULATED_LOVELACE } from '@/constants'
+import blockfrost from '@/utils/blockfrost';
+import splitTokenId from './resolvers/splitTokenId';
+import resolveTokenRegisteredMetadata from './resolvers/resolveTokenRegisteredMetadata';
+import formatHex from './formatters/formatHex';
+import formatTokenAmount from './formatters/formatTokenAmount';
+import formatIpfsReference from './formatters/formatIpfsReference';
+import numbersFromString from './formatters/numbersFromString';
+import type { ApiPopulatedToken, TokenId } from '@/@types';
+import { DECIMALS, POPULATED_LOVELACE } from '@/constants';
 
 const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: boolean; quantity?: string }): Promise<ApiPopulatedToken> => {
   if (tokenId === 'lovelace') {
-    const lovelaces = options?.quantity ? Number(options.quantity) : 0
+    const lovelaces = options?.quantity ? Number(options.quantity) : 0;
 
     const payload = {
       ...POPULATED_LOVELACE,
@@ -19,12 +19,12 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
         display: formatTokenAmount.fromChain(lovelaces, DECIMALS['ADA']),
         decimals: DECIMALS['ADA'],
       },
-    }
+    };
 
-    return payload
+    return payload;
   }
 
-  const populateMintTx = options?.populateMintTx || false
+  const populateMintTx = options?.populateMintTx || false;
 
   const {
     policy_id: policyId,
@@ -35,22 +35,22 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
     onchain_metadata,
     metadata,
     initial_mint_tx_hash,
-  } = await blockfrost.assetsById(tokenId)
+  } = await blockfrost.assetsById(tokenId);
 
-  const tokenAmountOnChain = Number(quantity)
-  let tokenAmountDecimals = 0
+  const tokenAmountOnChain = Number(quantity);
+  let tokenAmountDecimals = 0;
 
-  const tokenNameOnChain = formatHex.fromHex(asset_name || splitTokenId(tokenId, policyId).tokenName)
-  const tokenNameDisplay = onchain_metadata?.name?.toString() || metadata?.name?.toString() || ''
-  let tokenNameTicker = ''
+  const tokenNameOnChain = formatHex.fromHex(asset_name || splitTokenId(tokenId, policyId).tokenName);
+  const tokenNameDisplay = onchain_metadata?.name?.toString() || metadata?.name?.toString() || '';
+  let tokenNameTicker = '';
 
-  const isFungible = tokenAmountOnChain > 1
+  const isFungible = tokenAmountOnChain > 1;
 
   if (isFungible) {
-    const { decimals, ticker } = await resolveTokenRegisteredMetadata(tokenId, metadata)
+    const { decimals, ticker } = await resolveTokenRegisteredMetadata(tokenId, metadata);
 
-    tokenAmountDecimals = decimals
-    tokenNameTicker = ticker
+    tokenAmountDecimals = decimals;
+    tokenNameTicker = ticker;
   }
 
   const thumb = onchain_metadata?.image
@@ -59,7 +59,7 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
       : onchain_metadata.image.toString()
     : metadata?.logo
     ? `data:image/png;base64,${metadata?.logo}`
-    : ''
+    : '';
 
   const image =
     thumb.indexOf('data:') === 0 || thumb.indexOf('https:') === 0
@@ -67,7 +67,7 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
           ipfs: '',
           url: thumb,
         }
-      : formatIpfsReference(thumb.replaceAll(',', ''))
+      : formatIpfsReference(thumb.replaceAll(',', ''));
 
   const files = (
     !!onchain_metadata?.files
@@ -80,7 +80,7 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
   ).map((file) => ({
     ...file,
     src: formatIpfsReference(Array.isArray(file.src) ? file.src.join('') : file.src.toString()).ipfs,
-  }))
+  }));
 
   const forbiddenAttributeKeys = [
     'project',
@@ -103,31 +103,31 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
     'youtube',
     'instagram',
     'telegram',
-  ]
+  ];
 
-  const attributes: ApiPopulatedToken['attributes'] = {}
+  const attributes: ApiPopulatedToken['attributes'] = {};
 
   Object.entries(onchain_metadata?.attributes || onchain_metadata || metadata || {}).forEach(([key, val]) => {
-    const keyLower = key.toLowerCase()
+    const keyLower = key.toLowerCase();
 
     if (!forbiddenAttributeKeys.includes(keyLower)) {
       if (onchain_metadata_standard === 'CIP68v1') {
-        attributes[keyLower] = formatHex.fromHex(val?.toString() || 'X').slice(1)
+        attributes[keyLower] = formatHex.fromHex(val?.toString() || 'X').slice(1);
       } else {
         if (typeof val === 'object' && !Array.isArray(val)) {
           Object.entries(val).forEach(([subKey, subVal]) => {
-            const subKeyLower = subKey.toLowerCase()
+            const subKeyLower = subKey.toLowerCase();
 
             if (!forbiddenAttributeKeys.includes(subKeyLower)) {
-              attributes[subKeyLower] = subVal?.toString()
+              attributes[subKeyLower] = subVal?.toString();
             }
-          })
+          });
         } else {
-          attributes[keyLower] = val?.toString()
+          attributes[keyLower] = val?.toString();
         }
       }
     }
-  })
+  });
 
   const payload: ApiPopulatedToken = {
     tokenId,
@@ -150,23 +150,23 @@ const populateToken = async (tokenId: TokenId, options?: { populateMintTx?: bool
     image,
     files,
     attributes,
-  }
+  };
 
   if (populateMintTx) {
-    const tx = await blockfrost.txs(payload.mintTransactionId)
+    const tx = await blockfrost.txs(payload.mintTransactionId);
 
-    payload.mintBlockHeight = tx.block_height
+    payload.mintBlockHeight = tx.block_height;
   } else {
-    payload.mintBlockHeight = undefined
-    delete payload.mintBlockHeight
+    payload.mintBlockHeight = undefined;
+    delete payload.mintBlockHeight;
   }
 
   if (!payload.serialNumber) {
-    payload.serialNumber = undefined
-    delete payload.serialNumber
+    payload.serialNumber = undefined;
+    delete payload.serialNumber;
   }
 
-  return payload
-}
+  return payload;
+};
 
-export default populateToken
+export default populateToken;

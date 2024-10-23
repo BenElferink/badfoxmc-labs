@@ -8,7 +8,7 @@ const Page = () => {
         className='mt-[5%] max-w-[70vw] max-h-[70vh] drop-shadow-[0_0_1px_rgba(255,255,255,1)]'
       />
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;

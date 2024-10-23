@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import MediaViewer from './MediaViewer'
-import TextFrown from './TextFrown'
-import Loader from './Loader'
-import Input from './form/Input'
-import type { ApiPopulatedToken, TokenId } from '@/@types'
-import { DECIMALS, POPULATED_LOVELACE } from '@/constants'
+import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount';
+import MediaViewer from './MediaViewer';
+import TextFrown from './TextFrown';
+import Loader from './Loader';
+import Input from './form/Input';
+import type { ApiPopulatedToken, TokenId } from '@/@types';
+import { DECIMALS, POPULATED_LOVELACE } from '@/constants';
 
 export type TokenExplorerCollections = {
   policyId: string
@@ -30,18 +30,18 @@ const TokenExplorer = (props: {
     onlyNonFungible = false,
     showTokenAmounts = false,
     forceCollections,
-  } = props
+  } = props;
 
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [collections, setCollections] = useState<TokenExplorerCollections>(!!forceCollections ? [...forceCollections] : [])
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [collections, setCollections] = useState<TokenExplorerCollections>(!!forceCollections ? [...forceCollections] : []);
 
   const getCollections = useCallback(async () => {
-    if (!user || loading) return
-    setLoading(true)
+    if (!user || loading) return;
+    setLoading(true);
 
     try {
-      const payload: TokenExplorerCollections = []
+      const payload: TokenExplorerCollections = [];
 
       if (withAda && user?.lovelaces) {
         const adaBalance = {
@@ -51,42 +51,42 @@ const TokenExplorer = (props: {
             display: formatTokenAmount.fromChain(user.lovelaces, DECIMALS['ADA']),
             decimals: DECIMALS['ADA'],
           },
-        }
+        };
 
         payload.push({
           policyId: adaBalance.policyId,
           tokens: [adaBalance],
-        })
+        });
       }
 
       user.tokens?.forEach((t) => {
-        const idx = payload.findIndex((item) => item.policyId === t.policyId)
+        const idx = payload.findIndex((item) => item.policyId === t.policyId);
 
         if (idx !== -1) {
-          payload[idx].tokens.push(t)
+          payload[idx].tokens.push(t);
         } else {
           payload.push({
             policyId: t.policyId,
             tokens: [t],
-          })
+          });
         }
-      })
+      });
 
-      setCollections(payload.sort((a, b) => (b.policyId === 'lovelace' ? 1 : a.policyId.localeCompare(b.policyId))))
+      setCollections(payload.sort((a, b) => (b.policyId === 'lovelace' ? 1 : a.policyId.localeCompare(b.policyId))));
     } catch (error: any) {
-      console.error(error)
+      console.error(error);
       // const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, withAda])
+  }, [user, withAda]);
 
   useEffect(() => {
-    if (!forceCollections) getCollections()
-  }, [forceCollections, getCollections])
+    if (!forceCollections) getCollections();
+  }, [forceCollections, getCollections]);
 
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState('');
 
   return (
     <div className='flex flex-col items-center'>
@@ -106,23 +106,23 @@ const TokenExplorer = (props: {
             coll.tokens.map((t) => {
               // if (onlyFungible && (!t.isFungible || t.tokenAmount.onChain <= 1)) {
               if (onlyFungible && !t.isFungible) {
-                return null
+                return null;
               }
 
               if (onlyNonFungible && t.isFungible) {
-                return null
+                return null;
               }
 
-              const s = search.toLowerCase()
+              const s = search.toLowerCase();
               const thisTokenIsInSearch =
                 coll.policyId.indexOf(s) !== -1 ||
                 t.tokenId.indexOf(s) !== -1 ||
                 t.tokenName?.ticker.toLowerCase().indexOf(s) !== -1 ||
                 t.tokenName?.display.toLowerCase().indexOf(s) !== -1 ||
-                t.tokenName?.onChain.toLowerCase().indexOf(s) !== -1
+                t.tokenName?.onChain.toLowerCase().indexOf(s) !== -1;
 
               if (!thisTokenIsInSearch) {
-                return null
+                return null;
               }
 
               return (
@@ -162,13 +162,13 @@ const TokenExplorer = (props: {
                     {t.tokenName?.ticker || t.tokenName?.display || t.tokenName?.onChain}
                   </p>
                 </button>
-              )
+              );
             })
           )
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TokenExplorer
+export default TokenExplorer;

@@ -1,8 +1,8 @@
-import { ArrowPathIcon, CreditCardIcon, HomeIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid'
-import LinkList from '@/components/LinkList'
+import { ArrowPathIcon, CreditCardIcon, HomeIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import LinkList from '@/components/LinkList';
 
 const Sidebar = (props: { open: boolean }) => {
-  const { open } = props
+  const { open } = props;
 
   return (
     <aside
@@ -55,7 +55,7 @@ const Sidebar = (props: { open: boolean }) => {
         />
       </div>
     </aside>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

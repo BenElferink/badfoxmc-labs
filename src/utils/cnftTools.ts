@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 interface FetchedExternal {
   assetID: string // '1'
@@ -26,52 +26,52 @@ export interface RankedToken {
 }
 
 class CnftTools {
-  baseUrl: string
+  baseUrl: string;
 
   constructor() {
-    this.baseUrl = 'https://api.cnft.tools/api'
+    this.baseUrl = 'https://api.cnft.tools/api';
   }
 
   getPolicyRanks = (policyId: string): Promise<PolicyRanked | null> => {
-    const uri = `${this.baseUrl}/rankings/${policyId}`
+    const uri = `${this.baseUrl}/rankings/${policyId}`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Fetching policy ranks:', policyId)
+        console.log('Fetching policy ranks:', policyId);
 
         const { data } = await axios.get<PolicyRanked>(uri, {
           headers: {
             'Accept-Encoding': 'application/json',
           },
-        })
+        });
 
-        console.log('Fetched policy ranks')
+        console.log('Fetched policy ranks');
 
-        return resolve(data)
+        return resolve(data);
       } catch (error: any) {
         if (error?.response?.data?.error === 'Policy ID not found') {
-          return resolve(null)
+          return resolve(null);
         }
 
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 
   getTokens = (policyId: string): Promise<RankedToken[] | null> => {
-    const uri = `${this.baseUrl}/external/${policyId}`
+    const uri = `${this.baseUrl}/external/${policyId}`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Fetching tokens from cnft.tools:', policyId)
+        console.log('Fetching tokens from cnft.tools:', policyId);
 
         const { data } = await axios.get<FetchedExternal[]>(uri, {
           headers: {
             'Accept-Encoding': 'application/json',
           },
-        })
+        });
 
-        console.log('Fetched tokens from cnft.tools:', data.length)
+        console.log('Fetched tokens from cnft.tools:', data.length);
 
         const excludeKeysFromAttributes = [
           'assetID',
@@ -82,38 +82,38 @@ class CnftTools {
           'rarityRank',
           'ownerStakeKey',
           'onSale',
-        ]
+        ];
 
         const payload = data
           .map((item) => {
-            const attributes: Record<string, string> = {}
+            const attributes: Record<string, string> = {};
 
             Object.entries(item).forEach(([key, val]) => {
               if (!excludeKeysFromAttributes.includes(key)) {
-                attributes[key] = val
+                attributes[key] = val;
               }
-            })
+            });
 
             return {
               assetId: `${policyId}${item.encodedName}`,
               rank: Number(item.rarityRank),
               attributes,
-            }
+            };
           })
-          .sort((a, b) => a.rank - b.rank)
+          .sort((a, b) => a.rank - b.rank);
 
-        return resolve(payload)
+        return resolve(payload);
       } catch (error: any) {
         if (error?.response?.data?.error === 'Policy ID not found') {
-          return resolve(null)
+          return resolve(null);
         }
 
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 }
 
-const cnftTools = new CnftTools()
+const cnftTools = new CnftTools();
 
-export default cnftTools
+export default cnftTools;

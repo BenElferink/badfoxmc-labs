@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import Modal from '../Modal'
-import AirdropMethod from './steps/AirdropMethod'
-import AirdropSnapshot from './steps/AirdropSnapshot'
-import AirdropCustomList from './steps/AirdropCustomList'
-import AirdropPayout from './steps/AirdropPayout'
-import TokenSelector from './steps/TokenSelector'
-import HolderPolicies from './steps/HolderPolicies'
-import HolderStakePools from './steps/HolderStakePools'
-import HolderBlacklist from './steps/HolderBlacklist'
-import type { PayoutHolder, AirdropSettings } from '@/@types'
+import { useState } from 'react';
+import Modal from '../Modal';
+import AirdropMethod from './steps/AirdropMethod';
+import AirdropSnapshot from './steps/AirdropSnapshot';
+import AirdropCustomList from './steps/AirdropCustomList';
+import AirdropPayout from './steps/AirdropPayout';
+import TokenSelector from './steps/TokenSelector';
+import HolderPolicies from './steps/HolderPolicies';
+import HolderStakePools from './steps/HolderStakePools';
+import HolderBlacklist from './steps/HolderBlacklist';
+import type { PayoutHolder, AirdropSettings } from '@/@types';
 
 const defaultSettings: AirdropSettings = {
   tokenId: '',
@@ -33,24 +33,24 @@ const defaultSettings: AirdropSettings = {
 
   withDelegators: false,
   stakePools: [],
-}
+};
 
 const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
-  const { open, onClose } = props
+  const { open, onClose } = props;
 
-  const [step, setStep] = useState(1)
-  const [settings, setSettings] = useState<Partial<AirdropSettings>>(defaultSettings)
-  const [payoutHolders, setPayoutHolders] = useState<PayoutHolder[]>([])
+  const [step, setStep] = useState(1);
+  const [settings, setSettings] = useState<Partial<AirdropSettings>>(defaultSettings);
+  const [payoutHolders, setPayoutHolders] = useState<PayoutHolder[]>([]);
 
   const handleClose = () => {
-    setStep(1)
-    setSettings(defaultSettings)
-    setPayoutHolders([])
-    onClose()
-  }
+    setStep(1);
+    setSettings(defaultSettings);
+    setPayoutHolders([]);
+    onClose();
+  };
 
-  const increment = () => setStep((prev) => prev + 1)
-  const decrement = () => setStep((prev) => prev - 1)
+  const increment = () => setStep((prev) => prev + 1);
+  const decrement = () => setStep((prev) => prev - 1);
 
   return (
     <Modal withConnected open={open} onClose={handleClose}>
@@ -156,7 +156,7 @@ const AirdropJourney = (props: { open: boolean; onClose: () => void }) => {
         />
       ) : null}
     </Modal>
-  )
-}
+  );
+};
 
-export default AirdropJourney
+export default AirdropJourney;

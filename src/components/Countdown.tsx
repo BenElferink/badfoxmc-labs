@@ -1,10 +1,10 @@
-import { useTimer } from 'react-timer-hook'
+import { useTimer } from 'react-timer-hook';
 
 const Countdown = ({ timestamp, callbackTimeExpired }: { timestamp: number; callbackTimeExpired?: () => void }) => {
   const timer = useTimer({
     expiryTimestamp: new Date(timestamp),
     onExpire: () => (callbackTimeExpired ? callbackTimeExpired() : null),
-  })
+  });
 
   return (
     <table className='mx-auto'>
@@ -20,7 +20,7 @@ const Countdown = ({ timestamp, callbackTimeExpired }: { timestamp: number; call
         </tr>
       </tbody>
     </table>
-  )
-}
+  );
+};
 
-export default Countdown
+export default Countdown;

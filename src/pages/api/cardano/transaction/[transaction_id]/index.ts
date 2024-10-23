@@ -1,49 +1,49 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import blockfrost from '@/utils/blockfrost'
-import type { ApiTransaction, ApiUtxo } from '@/@types'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import blockfrost from '@/utils/blockfrost';
+import type { ApiTransaction, ApiUtxo } from '@/@types';
 
 export const config = {
   maxDuration: 300,
   api: {
     responseLimit: false,
   },
-}
+};
 
 export interface TransactionResponse extends ApiTransaction {}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<TransactionResponse>) => {
-  const { method, query } = req
+  const { method, query } = req;
 
-  const transactionId = query.transaction_id?.toString()
-  const withUtxos = !!query.with_utxos && query.with_utxos == 'true'
+  const transactionId = query.transaction_id?.toString();
+  const withUtxos = !!query.with_utxos && query.with_utxos == 'true';
 
   if (!transactionId) {
-    return res.status(400).end()
+    return res.status(400).end();
   }
 
   try {
     switch (method) {
       case 'GET': {
-        const tx = await blockfrost.txs(transactionId)
+        const tx = await blockfrost.txs(transactionId);
 
         const payload: ApiTransaction = {
           transactionId,
           block: tx.block,
           blockHeight: tx.block_height,
-        }
+        };
 
         if (withUtxos) {
-          const txUtxos = await blockfrost.txsUtxos(transactionId)
-          const utxos: ApiUtxo[] = []
+          const txUtxos = await blockfrost.txsUtxos(transactionId);
+          const utxos: ApiUtxo[] = [];
 
           for (const input of txUtxos.inputs) {
-            const fromAddress = input.address
+            const fromAddress = input.address;
 
             for (const output of txUtxos.outputs) {
-              const toAddress = output.address
+              const toAddress = output.address;
 
               if (toAddress !== fromAddress) {
-                const tokens: ApiUtxo['tokens'] = []
+                const tokens: ApiUtxo['tokens'] = [];
 
                 output.amount.forEach(({ unit, quantity }) => {
                   if (unit !== 'lovelace' && !!input.amount.find((inp) => inp.unit === unit)) {
@@ -52,9 +52,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TransactionResp
                       tokenAmount: {
                         onChain: Number(quantity),
                       },
-                    })
+                    });
                   }
-                })
+                });
 
                 if (tokens.length) {
                   utxos.push({
@@ -63,32 +63,32 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<TransactionResp
                       to: toAddress,
                     },
                     tokens,
-                  })
+                  });
                 }
               }
             }
           }
 
-          payload.utxos = utxos
+          payload.utxos = utxos;
         }
 
-        return res.status(200).json(payload)
+        return res.status(200).json(payload);
       }
 
       default: {
-        res.setHeader('Allow', 'GET')
-        return res.status(405).end()
+        res.setHeader('Allow', 'GET');
+        return res.status(405).end();
       }
     }
   } catch (error: any) {
-    console.error(error)
+    console.error(error);
 
     if (['The requested component has not been found.'].includes(error?.message)) {
-      return res.status(404).end(`${error.message} ${transactionId}`)
+      return res.status(404).end(`${error.message} ${transactionId}`);
     }
 
-    return res.status(500).end()
+    return res.status(500).end();
   }
-}
+};
 
-export default handler
+export default handler;

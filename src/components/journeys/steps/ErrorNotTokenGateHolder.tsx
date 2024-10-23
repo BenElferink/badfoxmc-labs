@@ -1,7 +1,7 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import TextFrown from '@/components/TextFrown'
-import { POLICY_IDS } from '@/constants'
+import Image from 'next/image';
+import Link from 'next/link';
+import TextFrown from '@/components/TextFrown';
+import { POLICY_IDS } from '@/constants';
 
 const ErrorNotTokenGateHolder = () => {
   return (
@@ -21,7 +21,7 @@ const ErrorNotTokenGateHolder = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ErrorNotTokenGateHolder
+export default ErrorNotTokenGateHolder;

@@ -1,7 +1,7 @@
-import axios from 'axios'
-import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
-import type { ActivityType, Address, ApiMarketToken, ApiPolicyMarketDetails, PolicyId, StakeKey, TokenId, TransactionId } from '@/@types'
-import { DECIMALS } from '@/constants'
+import axios from 'axios';
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount';
+import type { ActivityType, Address, ApiMarketToken, ApiPolicyMarketDetails, PolicyId, StakeKey, TokenId, TransactionId } from '@/@types';
+import { DECIMALS } from '@/constants';
 
 interface FetchedListingOrSale {
   asset_id: TokenId
@@ -141,15 +141,15 @@ interface FetchedCollectionDetails {
 }
 
 class JpgStore {
-  baseUrl: string
-  headers: Record<string, string>
+  baseUrl: string;
+  headers: Record<string, string>;
 
   constructor() {
-    this.baseUrl = 'https://server.jpgstoreapis.com'
+    this.baseUrl = 'https://server.jpgstoreapis.com';
     this.headers = {
       'Accept-Encoding': 'application/json',
       'X-Jpgstore-Csrf-Protection': '1',
-    }
+    };
   }
 
   private formatListingOrSale = (activityType: ActivityType, items: FetchedListingOrSale[]): ApiMarketToken[] => {
@@ -162,29 +162,29 @@ class JpgStore {
         marketplace: 'jpg.store',
         activityType,
         listingType: listing_type === 'SINGLE_ASSET' ? 'SINGLE' : listing_type === 'BUNDLE' ? 'BUNDLE' : 'UNKNOWN',
-      }
+      };
 
       if (payload.listingType === 'BUNDLE') {
-        payload.bundledTokens = bundled_assets?.map(({ asset_id }) => asset_id) || []
+        payload.bundledTokens = bundled_assets?.map(({ asset_id }) => asset_id) || [];
       }
 
-      return payload
-    })
-  }
+      return payload;
+    });
+  };
 
   getListings = (policyId: PolicyId, options: { withAll?: boolean } = {}): Promise<ApiMarketToken[]> => {
-    const withAll = options.withAll ?? false
-    const uri = `${this.baseUrl}/policy/${policyId}/listings`
+    const withAll = options.withAll ?? false;
+    const uri = `${this.baseUrl}/policy/${policyId}/listings`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Fetching listings', policyId)
+        console.log('Fetching listings', policyId);
 
-        let cursor = null
-        const fetchedItems: FetchedListingOrSale[] = []
+        let cursor = null;
+        const fetchedItems: FetchedListingOrSale[] = [];
 
         for (let i = 0; true; i++) {
-          if (!cursor && i > 0) break
+          if (!cursor && i > 0) break;
 
           // @ts-ignore
           const { data } = await axios.get<{ nextPageCursor: string | null; listings: FetchedListingOrSale[] }>(
@@ -192,72 +192,72 @@ class JpgStore {
             {
               headers: this.headers,
             }
-          )
+          );
 
-          if (!data.listings.length) break
+          if (!data.listings.length) break;
 
-          fetchedItems.push(...data.listings)
-          cursor = data.nextPageCursor
+          fetchedItems.push(...data.listings);
+          cursor = data.nextPageCursor;
 
-          if (!withAll) break
+          if (!withAll) break;
         }
 
-        console.log('Fetched listings', fetchedItems.length)
+        console.log('Fetched listings', fetchedItems.length);
 
-        const payload = this.formatListingOrSale('LIST', fetchedItems).sort((a, b) => a.price - b.price)
+        const payload = this.formatListingOrSale('LIST', fetchedItems).sort((a, b) => a.price - b.price);
 
-        return resolve(payload)
+        return resolve(payload);
       } catch (error) {
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 
   getRecents = (policyId: PolicyId, options: { sold?: boolean; page?: number } = {}): Promise<ApiMarketToken[]> => {
-    const sold = options.sold ?? false
-    const activityType = sold ? 'SELL' : 'LIST'
+    const sold = options.sold ?? false;
+    const activityType = sold ? 'SELL' : 'LIST';
 
-    const pathType = sold ? 'sales' : 'listings'
-    const page = 1
+    const pathType = sold ? 'sales' : 'listings';
+    const page = 1;
 
-    const uri = `${this.baseUrl}/policy/${policyId}/${pathType}${sold ? `?page=${page}` : ''}`
+    const uri = `${this.baseUrl}/policy/${policyId}/${pathType}${sold ? `?page=${page}` : ''}`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(`Fetching recent ${pathType} at page ${page}`, policyId)
+        console.log(`Fetching recent ${pathType} at page ${page}`, policyId);
 
         const { data } = await axios.get<FetchedListingOrSale[]>(uri, {
           headers: this.headers,
-        })
+        });
 
         // @ts-ignore (data["listings"] exists only for pathType = "/listings")
-        const fetchedItems = !sold ? data?.listings : data
+        const fetchedItems = !sold ? data?.listings : data;
 
-        console.log(`Fetched recent ${pathType}`, fetchedItems.length)
+        console.log(`Fetched recent ${pathType}`, fetchedItems.length);
 
-        const payload = this.formatListingOrSale(activityType, fetchedItems).sort((a, b) => b.date.getTime() - a.date.getTime())
+        const payload = this.formatListingOrSale(activityType, fetchedItems).sort((a, b) => b.date.getTime() - a.date.getTime());
 
-        return resolve(payload)
+        return resolve(payload);
       } catch (error) {
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 
   getToken = (tokenId: TokenId): Promise<ApiMarketToken[]> => {
-    const uri = `${this.baseUrl}/token/${tokenId}`
+    const uri = `${this.baseUrl}/token/${tokenId}`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Fetching token', tokenId)
+        console.log('Fetching token', tokenId);
 
         const { data } = await axios.get<FetchedToken>(uri, {
           headers: this.headers,
-        })
+        });
 
-        console.log('Fetched token', data.display_name)
+        console.log('Fetched token', data.display_name);
 
-        const listing = data.listings[0]
+        const listing = data.listings[0];
 
         if (listing) {
           const payload: ApiMarketToken = {
@@ -268,37 +268,37 @@ class JpgStore {
             marketplace: 'jpg.store',
             activityType: listing.active_transaction_obj.action,
             listingType: listing.bundled_assets?.length ? 'BUNDLE' : 'SINGLE',
-          }
+          };
 
           if (payload.listingType === 'BUNDLE') {
-            payload.bundledTokens = listing.bundled_assets?.map((item) => item.asset_id) || []
+            payload.bundledTokens = listing.bundled_assets?.map((item) => item.asset_id) || [];
           }
 
-          return resolve([payload])
+          return resolve([payload]);
         } else {
-          return resolve([])
+          return resolve([]);
         }
       } catch (error) {
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 
   getTokenActivity = (tokenId: TokenId): Promise<ApiMarketToken[]> => {
-    const uri = `${this.baseUrl}/token/${tokenId}/tx-history?limit=50&offset=0`
+    const uri = `${this.baseUrl}/token/${tokenId}/tx-history?limit=50&offset=0`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Fetching token activity', tokenId)
+        console.log('Fetching token activity', tokenId);
 
         const { data } = await axios.get<{
           count: number
           txs: FetchedTokenActivity[]
         }>(uri, {
           headers: this.headers,
-        })
+        });
 
-        console.log('Fetched token activity', data.txs.length)
+        console.log('Fetched token activity', data.txs.length);
 
         const payload = data.txs
           .map(({ amount_lovelace, action, bundled_assets_count, confirmed_at, signer_address }) => {
@@ -310,37 +310,37 @@ class JpgStore {
               marketplace: 'jpg.store',
               activityType: action,
               listingType: Number(bundled_assets_count) > 1 ? 'BUNDLE' : 'SINGLE',
-            }
+            };
 
             if (item.listingType === 'BUNDLE') {
-              item.bundledTokens = []
+              item.bundledTokens = [];
             }
 
-            return item
+            return item;
           })
-          .sort((a, b) => b.date.getTime() - a.date.getTime())
+          .sort((a, b) => b.date.getTime() - a.date.getTime());
 
-        return resolve(payload)
+        return resolve(payload);
       } catch (error) {
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 
   getCollectionDetails = (policyId: PolicyId): Promise<ApiPolicyMarketDetails> => {
-    const uri = `${this.baseUrl}/collection/${policyId}/detail`
+    const uri = `${this.baseUrl}/collection/${policyId}/detail`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Fetching collection', policyId)
+        console.log('Fetching collection', policyId);
 
         const {
           data: { collection, stats },
         } = await axios.get<FetchedCollectionDetails>(uri, {
           headers: this.headers,
-        })
+        });
 
-        console.log('Fetched collection', collection.display_name)
+        console.log('Fetched collection', collection.display_name);
 
         const payload: ApiPolicyMarketDetails = {
           policyId,
@@ -349,16 +349,16 @@ class JpgStore {
           pfpUrl: collection.hero_image,
           bannerUrl: collection.banner_image,
           floorPrice: Number(formatTokenAmount.fromChain(collection.floor || stats.jpg_floor_lovelace, DECIMALS['ADA'])),
-        }
+        };
 
-        return resolve(payload)
+        return resolve(payload);
       } catch (error) {
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 }
 
-const jpgStore = new JpgStore()
+const jpgStore = new JpgStore();
 
-export default jpgStore
+export default jpgStore;

@@ -1,13 +1,13 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import blockfrost from '@/utils/blockfrost'
-import { firestore } from '@/utils/firebase'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import blockfrost from '@/utils/blockfrost';
+import { firestore } from '@/utils/firebase';
 
 export const config = {
   maxDuration: 300,
   api: {
     responseLimit: false,
   },
-}
+};
 
 export interface EpochResponse {
   epoch: number
@@ -18,43 +18,43 @@ export interface EpochResponse {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<EpochResponse>) => {
-  const { method } = req
+  const { method } = req;
 
   try {
     switch (method) {
       case 'GET': {
-        let epoch = 0
-        let startTime: string | number = 0
-        let endTime: string | number = 0
-        const nowTime = Date.now()
+        let epoch = 0;
+        let startTime: string | number = 0;
+        let endTime: string | number = 0;
+        const nowTime = Date.now();
 
-        const collection = firestore.collection('epochs')
-        const { empty, docs } = await collection.where('endTime', '>=', nowTime).get()
+        const collection = firestore.collection('epochs');
+        const { empty, docs } = await collection.where('endTime', '>=', nowTime).get();
 
         if (empty) {
-          const { epoch: epochNumber, start_time, end_time } = await blockfrost.epochsLatest()
+          const { epoch: epochNumber, start_time, end_time } = await blockfrost.epochsLatest();
 
-          epoch = epochNumber
+          epoch = epochNumber;
 
-          startTime = String(start_time)
-          while (startTime.length < 13) startTime = `${startTime}0`
-          startTime = Number(startTime)
+          startTime = String(start_time);
+          while (startTime.length < 13) startTime = `${startTime}0`;
+          startTime = Number(startTime);
 
-          endTime = String(end_time)
-          while (endTime.length < 13) endTime = `${endTime}0`
-          endTime = Number(endTime)
+          endTime = String(end_time);
+          while (endTime.length < 13) endTime = `${endTime}0`;
+          endTime = Number(endTime);
 
           await collection.add({
             epoch,
             startTime,
             endTime,
-          })
+          });
         } else {
-          const data = docs[0].data()
+          const data = docs[0].data();
 
-          epoch = data.epoch as number
-          startTime = data.startTime as number
-          endTime = data.endTime as number
+          epoch = data.epoch as number;
+          startTime = data.startTime as number;
+          endTime = data.endTime as number;
         }
 
         const payload = {
@@ -63,21 +63,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<EpochResponse>)
           endTime,
           nowTime,
           percent: (100 / (endTime - startTime)) * (nowTime - startTime),
-        }
+        };
 
-        return res.status(200).json(payload)
+        return res.status(200).json(payload);
       }
 
       default: {
-        res.setHeader('Allow', 'GET')
-        return res.status(405).end()
+        res.setHeader('Allow', 'GET');
+        return res.status(405).end();
       }
     }
   } catch (error: any) {
-    console.error(error)
+    console.error(error);
 
-    return res.status(500).end()
+    return res.status(500).end();
   }
-}
+};
 
-export default handler
+export default handler;

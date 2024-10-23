@@ -1,7 +1,6 @@
-import firebase from 'firebase/compat/app'
-import 'firebase/compat/firestore'
-import 'firebase/compat/storage'
-import { API_KEYS } from '../constants'
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+import { API_KEYS } from '../constants';
 
 if (!firebase.apps.length) {
   firebase.initializeApp({
@@ -11,10 +10,9 @@ if (!firebase.apps.length) {
     messagingSenderId: API_KEYS['FIREBASE_MESSAGING_SENDER_ID'],
     projectId: API_KEYS['FIREBASE_PROJECT_ID'],
     storageBucket: API_KEYS['FIREBASE_STORAGE_BUCKET'],
-  })
+  });
 }
 
-const firestore = firebase.firestore()
-const storage = firebase.storage()
+const firestore = firebase.firestore();
 
-export { firebase, firestore, storage }
+export { firestore };

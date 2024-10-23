@@ -1,30 +1,30 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { PlusCircleIcon } from '@heroicons/react/24/solid'
-import api from '@/utils/api'
-import JourneyStepWrapper from './JourneyStepWrapper'
-import Input from '@/components/form/Input'
-import Button from '@/components/form/Button'
-import TrashButton from '@/components/form/TrashButton'
-import type { HolderSettings } from '@/@types'
+import Link from 'next/link';
+import Image from 'next/image';
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { PlusCircleIcon } from '@heroicons/react/24/solid';
+import api from '@/utils/api';
+import JourneyStepWrapper from './JourneyStepWrapper';
+import Input from '@/components/form/Input';
+import Button from '@/components/form/Button';
+import TrashButton from '@/components/form/TrashButton';
+import type { HolderSettings } from '@/@types';
 
 const INIT_TRAIT_POINTS = {
   category: '',
   trait: '',
   amount: 0,
-}
+};
 const INIT_RANK_POINTS = {
   minRange: 0,
   maxRange: 0,
   amount: 0,
-}
+};
 const INIT_WHALE_POINTS = {
   shouldStack: false,
   groupSize: 0,
   amount: 0,
-}
+};
 const INIT_HOLDER_SETTINGS = {
   policyId: '',
   weight: 1,
@@ -34,7 +34,7 @@ const INIT_HOLDER_SETTINGS = {
   rankOptions: [{ ...INIT_RANK_POINTS }],
   withWhales: false,
   whaleOptions: [{ ...INIT_WHALE_POINTS }],
-}
+};
 
 const HolderPolicies = (props: {
   defaultData: Partial<HolderSettings>
@@ -42,51 +42,51 @@ const HolderPolicies = (props: {
   next?: () => void
   back?: () => void
 }) => {
-  const { defaultData, callback, next, back } = props
+  const { defaultData, callback, next, back } = props;
   const [formData, setFormData] = useState({
     holderPolicies: defaultData['holderPolicies']?.length ? defaultData['holderPolicies'] : [{ ...INIT_HOLDER_SETTINGS }],
-  })
+  });
 
-  const [loading, setLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({})
+  const [loading, setLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ [value: string]: boolean }>({});
 
   return (
     <JourneyStepWrapper
       disableNext={loading || !formData['holderPolicies']?.filter(({ policyId }) => !!policyId).length}
       disableBack={loading}
       next={async () => {
-        setLoading(true)
-        let allowNext = true
+        setLoading(true);
+        let allowNext = true;
 
         if (formData['holderPolicies'].length) {
-          toast.loading('Validating')
+          toast.loading('Validating');
 
           for await (const { policyId } of formData['holderPolicies']) {
             try {
-              if (!!policyId) await api.policy.getData(policyId)
+              if (!!policyId) await api.policy.getData(policyId);
 
-              setFormErrors((prev) => ({ ...prev, [policyId]: false }))
+              setFormErrors((prev) => ({ ...prev, [policyId]: false }));
             } catch (error) {
-              allowNext = false
+              allowNext = false;
 
-              setFormErrors((prev) => ({ ...prev, [policyId]: true }))
+              setFormErrors((prev) => ({ ...prev, [policyId]: true }));
             }
           }
 
-          toast.dismiss()
-          if (!allowNext) toast.error('Bad Value(s)')
+          toast.dismiss();
+          if (!allowNext) toast.error('Bad Value(s)');
         }
 
         const filtered = formData['holderPolicies']
           .filter((obj) => !!obj.policyId)
           .map((obj) => {
             const traitOptions =
-              obj.withTraits && obj.traitOptions?.length ? obj.traitOptions.filter((obj) => !!obj.category && !!obj.trait && !!obj.amount) : []
+              obj.withTraits && obj.traitOptions?.length ? obj.traitOptions.filter((obj) => !!obj.category && !!obj.trait && !!obj.amount) : [];
 
             const rankOptions =
-              obj.withRanks && obj.rankOptions?.length ? obj.rankOptions.filter((obj) => !!obj.minRange && !!obj.maxRange && !!obj.amount) : []
+              obj.withRanks && obj.rankOptions?.length ? obj.rankOptions.filter((obj) => !!obj.minRange && !!obj.maxRange && !!obj.amount) : [];
 
-            const whaleOptions = obj.withWhales && obj.whaleOptions?.length ? obj.whaleOptions.filter((obj) => !!obj.groupSize && !!obj.amount) : []
+            const whaleOptions = obj.withWhales && obj.whaleOptions?.length ? obj.whaleOptions.filter((obj) => !!obj.groupSize && !!obj.amount) : [];
 
             return {
               ...obj,
@@ -96,15 +96,15 @@ const HolderPolicies = (props: {
               rankOptions,
               withWhales: !!whaleOptions.length,
               whaleOptions,
-            }
-          })
+            };
+          });
 
         callback({
           holderPolicies: filtered,
-        })
+        });
 
-        setLoading(false)
-        if (allowNext && next) setTimeout(() => next(), 0)
+        setLoading(false);
+        if (allowNext && next) setTimeout(() => next(), 0);
       }}
       back={back}
     >
@@ -136,16 +136,16 @@ const HolderPolicies = (props: {
                   value={policyId}
                   setValue={(v) =>
                     setFormData((prev) => {
-                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                       // @ts-ignore
                       payload['holderPolicies'][policyIdx] = {
                         // @ts-ignore
                         ...payload['holderPolicies'][policyIdx],
                         policyId: v,
-                      }
+                      };
 
-                      return payload
+                      return payload;
                     })
                   }
                 />
@@ -155,12 +155,12 @@ const HolderPolicies = (props: {
                   <TrashButton
                     onClick={() => {
                       setFormData((prev) => {
-                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
-                        payload['holderPolicies'].splice(policyIdx, 1)
+                        payload['holderPolicies'].splice(policyIdx, 1);
 
-                        return payload
-                      })
+                        return payload;
+                      });
                     }}
                   />
                 ) : null}
@@ -179,15 +179,15 @@ const HolderPolicies = (props: {
                       checked={withTraits}
                       onChange={(e) =>
                         setFormData((prev) => {
-                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
                             withTraits: !withTraits,
                             traitOptions: [{ ...INIT_TRAIT_POINTS }],
-                          }
+                          };
 
-                          return payload
+                          return payload;
                         })
                       }
                       className='disabled:opacity-50'
@@ -206,15 +206,15 @@ const HolderPolicies = (props: {
                       checked={withRanks}
                       onChange={(e) =>
                         setFormData((prev) => {
-                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
                             withRanks: !withRanks,
                             rankOptions: [{ ...INIT_RANK_POINTS }],
-                          }
+                          };
 
-                          return payload
+                          return payload;
                         })
                       }
                       className='disabled:opacity-50'
@@ -233,15 +233,15 @@ const HolderPolicies = (props: {
                       checked={withWhales}
                       onChange={(e) =>
                         setFormData((prev) => {
-                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                          const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                           payload['holderPolicies'][policyIdx] = {
                             ...payload['holderPolicies'][policyIdx],
                             withWhales: !withWhales,
                             whaleOptions: [{ ...INIT_WHALE_POINTS }],
-                          }
+                          };
 
-                          return payload
+                          return payload;
                         })
                       }
                       className='disabled:opacity-50'
@@ -257,19 +257,19 @@ const HolderPolicies = (props: {
                     value={weight}
                     setValue={(v) =>
                       setFormData((prev) => {
-                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                        const n = Number(v)
+                        const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                        const n = Number(v);
 
-                        if (isNaN(n) || n < 0) return payload
+                        if (isNaN(n) || n < 0) return payload;
 
                         // @ts-ignore
                         payload['holderPolicies'][policyIdx] = {
                           // @ts-ignore
                           ...payload['holderPolicies'][policyIdx],
                           weight: n,
-                        }
+                        };
 
-                        return payload
+                        return payload;
                       })
                     }
                   />
@@ -291,17 +291,17 @@ const HolderPolicies = (props: {
                         value={category || ''}
                         setValue={(v) =>
                           setFormData((prev) => {
-                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                            const arr = [...traitOptions]
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                            const arr = [...traitOptions];
 
-                            arr[rewardingTraitsIdx].category = v
+                            arr[rewardingTraitsIdx].category = v;
 
                             payload['holderPolicies'][policyIdx] = {
                               ...payload['holderPolicies'][policyIdx],
                               traitOptions: arr,
-                            }
+                            };
 
-                            return payload
+                            return payload;
                           })
                         }
                       />
@@ -311,17 +311,17 @@ const HolderPolicies = (props: {
                         value={trait || ''}
                         setValue={(v) =>
                           setFormData((prev) => {
-                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                            const arr = [...traitOptions]
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                            const arr = [...traitOptions];
 
-                            arr[rewardingTraitsIdx].trait = v
+                            arr[rewardingTraitsIdx].trait = v;
 
                             payload['holderPolicies'][policyIdx] = {
                               ...payload['holderPolicies'][policyIdx],
                               traitOptions: arr,
-                            }
+                            };
 
-                            return payload
+                            return payload;
                           })
                         }
                       />
@@ -331,20 +331,20 @@ const HolderPolicies = (props: {
                         value={amount || ''}
                         setValue={(v) =>
                           setFormData((prev) => {
-                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                            const arr = [...traitOptions]
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                            const arr = [...traitOptions];
 
-                            const n = Number(v)
-                            if (isNaN(n) || n < 0) return payload
+                            const n = Number(v);
+                            if (isNaN(n) || n < 0) return payload;
 
-                            arr[rewardingTraitsIdx].amount = n
+                            arr[rewardingTraitsIdx].amount = n;
 
                             payload['holderPolicies'][policyIdx] = {
                               ...payload['holderPolicies'][policyIdx],
                               traitOptions: arr,
-                            }
+                            };
 
-                            return payload
+                            return payload;
                           })
                         }
                       />
@@ -353,14 +353,14 @@ const HolderPolicies = (props: {
                         <TrashButton
                           onClick={() =>
                             setFormData((prev) => {
-                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                               payload['holderPolicies'][policyIdx] = {
                                 ...payload['holderPolicies'][policyIdx],
                                 traitOptions: traitOptions.filter((_item, _idx) => _idx !== rewardingTraitsIdx),
-                              }
+                              };
 
-                              return payload
+                              return payload;
                             })
                           }
                         />
@@ -375,11 +375,11 @@ const HolderPolicies = (props: {
                   disabled={!!formData['holderPolicies'][policyIdx].traitOptions?.filter((obj) => !obj.category || !obj.trait || !obj.amount).length}
                   onClick={() =>
                     setFormData((prev) => {
-                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
-                      payload['holderPolicies'][policyIdx].traitOptions?.push({ ...INIT_TRAIT_POINTS })
+                      payload['holderPolicies'][policyIdx].traitOptions?.push({ ...INIT_TRAIT_POINTS });
 
-                      return payload
+                      return payload;
                     })
                   }
                 />
@@ -397,20 +397,20 @@ const HolderPolicies = (props: {
                         value={minRange || ''}
                         setValue={(v) =>
                           setFormData((prev) => {
-                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                            const arr = [...rankOptions]
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                            const arr = [...rankOptions];
 
-                            const n = Number(v)
-                            if (isNaN(n) || n < 0) return payload
+                            const n = Number(v);
+                            if (isNaN(n) || n < 0) return payload;
 
-                            arr[rewardingRanksIdx].minRange = n
+                            arr[rewardingRanksIdx].minRange = n;
 
                             payload['holderPolicies'][policyIdx] = {
                               ...payload['holderPolicies'][policyIdx],
                               rankOptions: arr,
-                            }
+                            };
 
-                            return payload
+                            return payload;
                           })
                         }
                       />
@@ -420,20 +420,20 @@ const HolderPolicies = (props: {
                         value={maxRange || ''}
                         setValue={(v) =>
                           setFormData((prev) => {
-                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                            const arr = [...rankOptions]
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                            const arr = [...rankOptions];
 
-                            const n = Number(v)
-                            if (isNaN(n) || n < 0) return payload
+                            const n = Number(v);
+                            if (isNaN(n) || n < 0) return payload;
 
-                            arr[rewardingRanksIdx].maxRange = n
+                            arr[rewardingRanksIdx].maxRange = n;
 
                             payload['holderPolicies'][policyIdx] = {
                               ...payload['holderPolicies'][policyIdx],
                               rankOptions: arr,
-                            }
+                            };
 
-                            return payload
+                            return payload;
                           })
                         }
                       />
@@ -443,20 +443,20 @@ const HolderPolicies = (props: {
                         value={amount || ''}
                         setValue={(v) =>
                           setFormData((prev) => {
-                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                            const arr = [...rankOptions]
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                            const arr = [...rankOptions];
 
-                            const n = Number(v)
-                            if (isNaN(n) || n < 0) return payload
+                            const n = Number(v);
+                            if (isNaN(n) || n < 0) return payload;
 
-                            arr[rewardingRanksIdx].amount = n
+                            arr[rewardingRanksIdx].amount = n;
 
                             payload['holderPolicies'][policyIdx] = {
                               ...payload['holderPolicies'][policyIdx],
                               rankOptions: arr,
-                            }
+                            };
 
-                            return payload
+                            return payload;
                           })
                         }
                       />
@@ -465,14 +465,14 @@ const HolderPolicies = (props: {
                         <TrashButton
                           onClick={() =>
                             setFormData((prev) => {
-                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                               payload['holderPolicies'][policyIdx] = {
                                 ...payload['holderPolicies'][policyIdx],
                                 rankOptions: rankOptions.filter((_item, _idx) => _idx !== rewardingRanksIdx),
-                              }
+                              };
 
-                              return payload
+                              return payload;
                             })
                           }
                         />
@@ -489,11 +489,11 @@ const HolderPolicies = (props: {
                   }
                   onClick={() =>
                     setFormData((prev) => {
-                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
-                      payload['holderPolicies'][policyIdx].rankOptions?.push({ ...INIT_RANK_POINTS })
+                      payload['holderPolicies'][policyIdx].rankOptions?.push({ ...INIT_RANK_POINTS });
 
-                      return payload
+                      return payload;
                     })
                   }
                 />
@@ -520,17 +520,17 @@ const HolderPolicies = (props: {
                           checked={shouldStack}
                           onChange={(e) =>
                             setFormData((prev) => {
-                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                              const arr = [...whaleOptions]
+                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                              const arr = [...whaleOptions];
 
-                              arr[rewardingWhalesIdx].shouldStack = !shouldStack
+                              arr[rewardingWhalesIdx].shouldStack = !shouldStack;
 
                               payload['holderPolicies'][policyIdx] = {
                                 ...payload['holderPolicies'][policyIdx],
                                 whaleOptions: arr,
-                              }
+                              };
 
-                              return payload
+                              return payload;
                             })
                           }
                           className='disabled:opacity-50'
@@ -544,20 +544,20 @@ const HolderPolicies = (props: {
                         value={groupSize || ''}
                         setValue={(v) =>
                           setFormData((prev) => {
-                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                            const arr = [...whaleOptions]
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                            const arr = [...whaleOptions];
 
-                            const n = Number(v)
-                            if (isNaN(n) || n < 0) return payload
+                            const n = Number(v);
+                            if (isNaN(n) || n < 0) return payload;
 
-                            arr[rewardingWhalesIdx].groupSize = n
+                            arr[rewardingWhalesIdx].groupSize = n;
 
                             payload['holderPolicies'][policyIdx] = {
                               ...payload['holderPolicies'][policyIdx],
                               whaleOptions: arr,
-                            }
+                            };
 
-                            return payload
+                            return payload;
                           })
                         }
                       />
@@ -567,20 +567,20 @@ const HolderPolicies = (props: {
                         value={amount || ''}
                         setValue={(v) =>
                           setFormData((prev) => {
-                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
-                            const arr = [...whaleOptions]
+                            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
+                            const arr = [...whaleOptions];
 
-                            const n = Number(v)
-                            if (isNaN(n) || n < 0) return payload
+                            const n = Number(v);
+                            if (isNaN(n) || n < 0) return payload;
 
-                            arr[rewardingWhalesIdx].amount = n
+                            arr[rewardingWhalesIdx].amount = n;
 
                             payload['holderPolicies'][policyIdx] = {
                               ...payload['holderPolicies'][policyIdx],
                               whaleOptions: arr,
-                            }
+                            };
 
-                            return payload
+                            return payload;
                           })
                         }
                       />
@@ -589,14 +589,14 @@ const HolderPolicies = (props: {
                         <TrashButton
                           onClick={() =>
                             setFormData((prev) => {
-                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                              const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
                               payload['holderPolicies'][policyIdx] = {
                                 ...payload['holderPolicies'][policyIdx],
                                 whaleOptions: whaleOptions.filter((_item, _idx) => _idx !== rewardingWhalesIdx),
-                              }
+                              };
 
-                              return payload
+                              return payload;
                             })
                           }
                         />
@@ -611,11 +611,11 @@ const HolderPolicies = (props: {
                   disabled={!!formData['holderPolicies'][policyIdx].whaleOptions?.filter((obj) => !obj.groupSize || !obj.amount).length}
                   onClick={() =>
                     setFormData((prev) => {
-                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+                      const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
-                      payload['holderPolicies'][policyIdx].whaleOptions?.push({ ...INIT_WHALE_POINTS })
+                      payload['holderPolicies'][policyIdx].whaleOptions?.push({ ...INIT_WHALE_POINTS });
 
-                      return payload
+                      return payload;
                     })
                   }
                 />
@@ -633,16 +633,16 @@ const HolderPolicies = (props: {
         disabled={!formData.holderPolicies?.filter((obj) => !!obj.policyId).length}
         onClick={() =>
           setFormData((prev) => {
-            const payload: HolderSettings = JSON.parse(JSON.stringify(prev))
+            const payload: HolderSettings = JSON.parse(JSON.stringify(prev));
 
-            payload['holderPolicies'].push({ ...INIT_HOLDER_SETTINGS })
+            payload['holderPolicies'].push({ ...INIT_HOLDER_SETTINGS });
 
-            return payload
+            return payload;
           })
         }
       />
     </JourneyStepWrapper>
-  )
-}
+  );
+};
 
-export default HolderPolicies
+export default HolderPolicies;

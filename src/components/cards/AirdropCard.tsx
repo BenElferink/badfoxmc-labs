@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
-import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle'
-import getExplorerUrl from '@/functions/formatters/getExplorerUrl'
-import MediaViewer from '../MediaViewer'
-import type { Airdrop } from '@/@types'
+import Link from 'next/link';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
+import truncateStringInMiddle from '@/functions/formatters/truncateStringInMiddle';
+import getExplorerUrl from '@/functions/formatters/getExplorerUrl';
+import MediaViewer from '../MediaViewer';
+import type { Airdrop } from '@/@types';
 
 const AirdropCard = (props: {
   stakeKey: Airdrop['stakeKey']
@@ -11,7 +11,7 @@ const AirdropCard = (props: {
   tokenName: Airdrop['tokenName']
   tokenAmount: Airdrop['tokenAmount']
 }) => {
-  const { stakeKey, thumb, tokenName, tokenAmount } = props
+  const { stakeKey, thumb, tokenName, tokenAmount } = props;
 
   return (
     <div className='m-1 p-0.5 rounded-lg bg-gradient-to-b from-purple-700 via-blue-700 to-green-700'>
@@ -39,7 +39,7 @@ const AirdropCard = (props: {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AirdropCard
+export default AirdropCard;

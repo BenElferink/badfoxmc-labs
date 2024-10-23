@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef } from 'react';
 
 const TextArea: (props: {
   value?: string
@@ -8,8 +8,8 @@ const TextArea: (props: {
   readOnly?: boolean
   error?: boolean
 }) => JSX.Element = (props) => {
-  const { value, setValue, placeholder, disabled, readOnly, error } = props
-  const ref = useRef<HTMLTextAreaElement>(null)
+  const { value, setValue, placeholder, disabled, readOnly, error } = props;
+  const ref = useRef<HTMLTextAreaElement>(null);
 
   return (
     <div className='w-[calc(100%-0.5rem)] m-1'>
@@ -18,13 +18,13 @@ const TextArea: (props: {
         value={value ?? ''}
         onChange={(e) => {
           if (!!setValue) {
-            setValue(e.target.value)
+            setValue(e.target.value);
           }
 
           if (ref.current) {
             // The following auto-resizes the textarea to the number of rows typed
-            ref.current.style.height = 'auto'
-            ref.current.style.height = `${ref.current.scrollHeight}px`
+            ref.current.style.height = 'auto';
+            ref.current.style.height = `${ref.current.scrollHeight}px`;
           }
         }}
         placeholder={placeholder}
@@ -38,7 +38,7 @@ const TextArea: (props: {
         }
       />
     </div>
-  )
-}
+  );
+};
 
-export default TextArea
+export default TextArea;

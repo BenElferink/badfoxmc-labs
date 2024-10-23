@@ -1,6 +1,6 @@
-import Image from 'next/image'
-import { Bars3Icon } from '@heroicons/react/24/solid'
-import Auth from '@/components/Auth'
+import Image from 'next/image';
+import { Bars3Icon } from '@heroicons/react/24/solid';
+import Auth from '@/components/Auth';
 
 const Header = ({ clickMenu }: { clickMenu: () => void }) => {
   return (
@@ -20,7 +20,7 @@ const Header = ({ clickMenu }: { clickMenu: () => void }) => {
         <Auth />
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

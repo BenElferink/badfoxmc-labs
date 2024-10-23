@@ -1,15 +1,15 @@
-import type { PropsWithChildren } from 'react'
-import { XMarkIcon } from '@heroicons/react/24/solid'
-import { useWallet } from '@meshsdk/react'
-import { useAuth } from '@/contexts/AuthContext'
-import Loader from './Loader'
-import ErrorNotConnected from './journeys/steps/ErrorNotConnected'
-import ErrorNotTokenGateHolder from './journeys/steps/ErrorNotTokenGateHolder'
+import type { PropsWithChildren } from 'react';
+import { XMarkIcon } from '@heroicons/react/24/solid';
+import { useWallet } from '@meshsdk/react';
+import { useAuth } from '@/contexts/AuthContext';
+import Loader from './Loader';
+import ErrorNotConnected from './journeys/steps/ErrorNotConnected';
+import ErrorNotTokenGateHolder from './journeys/steps/ErrorNotTokenGateHolder';
 
 const Modal = (props: PropsWithChildren<{ open: boolean; onClose: () => void; withConnected?: boolean; withTokenGate?: boolean }>) => {
-  const { children, open, onClose, withConnected, withTokenGate } = props
-  const { connected } = useWallet()
-  const { user } = useAuth()
+  const { children, open, onClose, withConnected, withTokenGate } = props;
+  const { connected } = useWallet();
+  const { user } = useAuth();
 
   return (
     <div
@@ -38,7 +38,7 @@ const Modal = (props: PropsWithChildren<{ open: boolean; onClose: () => void; wi
         </section>
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-export default Modal
+export default Modal;

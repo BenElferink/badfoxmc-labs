@@ -1,11 +1,11 @@
-import { Address, StakeKey } from '@/@types'
-import axios from 'axios'
+import { Address, StakeKey } from '@/@types';
+import axios from 'axios';
 
 class AdaHandle {
-  baseUrl: string
+  baseUrl: string;
 
   constructor() {
-    this.baseUrl = 'https://api.handle.me'
+    this.baseUrl = 'https://api.handle.me';
   }
 
   resolveHolderFromHandle = (
@@ -14,11 +14,11 @@ class AdaHandle {
     holder: StakeKey | Address['address']
     address: Address['address']
   }> => {
-    const uri = `${this.baseUrl}/handles/${handle.replace('$', '')}`
+    const uri = `${this.baseUrl}/handles/${handle.replace('$', '')}`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Resolving handle:', handle)
+        console.log('Resolving handle:', handle);
 
         const { data } = await axios.get<{
           hex: string
@@ -50,35 +50,35 @@ class AdaHandle {
           headers: {
             'Accept-Encoding': 'application/json',
           },
-        })
+        });
 
         const payload = {
           holder: data.holder,
           address: data.resolved_addresses.ada,
-        }
+        };
 
-        console.log('Resolved handle:', payload)
+        console.log('Resolved handle:', payload);
 
-        return resolve(payload)
+        return resolve(payload);
       } catch (error: any) {
         if (error?.response?.status === 404) {
           return resolve({
             holder: '',
             address: '',
-          })
+          });
         }
 
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 
   resolveHandleFromHolder = (stakeKey: StakeKey): Promise<string> => {
-    const uri = `${this.baseUrl}/holders/${stakeKey}`
+    const uri = `${this.baseUrl}/holders/${stakeKey}`;
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Resolving wallet handle:', stakeKey)
+        console.log('Resolving wallet handle:', stakeKey);
 
         const { data } = await axios.get<{
           total_handles: number
@@ -91,35 +91,35 @@ class AdaHandle {
           headers: {
             'Accept-Encoding': 'application/json',
           },
-        })
+        });
 
-        let handle = data.default_handle || ''
+        let handle = data.default_handle || '';
 
         if (handle) {
-          const { holder } = await this.resolveHolderFromHandle(handle)
+          const { holder } = await this.resolveHolderFromHandle(handle);
 
           if (holder !== stakeKey) {
-            console.log('Resolved with incorrect wallet handle:', handle)
-            return resolve('') 
+            console.log('Resolved with incorrect wallet handle:', handle);
+            return resolve(''); 
           }
 
-          handle = `$${handle}`
+          handle = `$${handle}`;
         }
 
-        console.log('Resolved wallet handle:', handle)
+        console.log('Resolved wallet handle:', handle);
 
-        return resolve(handle)
+        return resolve(handle);
       } catch (error: any) {
         if (error?.response?.status === 404) {
-          return resolve('')
+          return resolve('');
         }
 
-        return reject(error)
+        return reject(error);
       }
-    })
-  }
+    });
+  };
 }
 
-const adaHandle = new AdaHandle()
+const adaHandle = new AdaHandle();
 
-export default adaHandle
+export default adaHandle;

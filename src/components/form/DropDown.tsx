@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid'
+import { useMemo, useState } from 'react';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
 
 const DropDown = (props: {
   label?: string
@@ -12,10 +12,10 @@ const DropDown = (props: {
   disabled?: boolean
   error?: boolean
 }) => {
-  const { label, items, value, setValue, disabled, error } = props
-  const [open, setOpen] = useState(false)
+  const { label, items, value, setValue, disabled, error } = props;
+  const [open, setOpen] = useState(false);
 
-  const selected = useMemo(() => items.find((item) => item.value === value), [items, value])
+  const selected = useMemo(() => items.find((item) => item.value === value), [items, value]);
 
   return (
     <div className='w-[calc(100%-0.5rem)] m-1 relative'>
@@ -47,8 +47,8 @@ const DropDown = (props: {
             key={`select-${item.value.toString()}`}
             type='button'
             onClick={() => {
-              setValue(item.value)
-              setOpen(false)
+              setValue(item.value);
+              setOpen(false);
             }}
             className={
               'w-full p-4 text-center rounded-lg border border-transparent hover:border-zinc-400 hover:bg-zinc-600 ' +
@@ -60,7 +60,7 @@ const DropDown = (props: {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DropDown
+export default DropDown;

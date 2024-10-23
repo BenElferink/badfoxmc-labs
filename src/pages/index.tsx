@@ -1,14 +1,14 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { LoaderIcon } from 'react-hot-toast'
-import api from '@/utils/api'
-import poolPm from '@/utils/poolPm'
-import { useData } from '@/contexts/DataContext'
-import Countdown from '@/components/Countdown'
-import { AIRDROP_DESCRIPTION } from './airdrops'
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { LoaderIcon } from 'react-hot-toast';
+import api from '@/utils/api';
+import poolPm from '@/utils/poolPm';
+import { useData } from '@/contexts/DataContext';
+import Countdown from '@/components/Countdown';
+import { AIRDROP_DESCRIPTION } from './airdrops';
 
 const ChainLoadBar = ({ label, percent }: { label: string; percent: number }) => {
-  const borderColor = 'border-zinc-800'
+  const borderColor = 'border-zinc-800';
   // percent === 0
   //   ? 'border-zinc-800'
   //   : percent <= 25
@@ -27,7 +27,7 @@ const ChainLoadBar = ({ label, percent }: { label: string; percent: number }) =>
       ? 'bg-yellow-600/50'
       : percent <= 75
       ? 'bg-orange-600/50'
-      : 'bg-red-600/50'
+      : 'bg-red-600/50';
   const txtColor =
     percent === 0
       ? 'text-zinc-200'
@@ -37,7 +37,7 @@ const ChainLoadBar = ({ label, percent }: { label: string; percent: number }) =>
       ? 'text-yellow-200'
       : percent <= 75
       ? 'text-orange-200'
-      : 'text-red-200'
+      : 'text-red-200';
 
   return (
     <div className='mt-2'>
@@ -51,57 +51,57 @@ const ChainLoadBar = ({ label, percent }: { label: string; percent: number }) =>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const Page = () => {
-  const { airdrops, fetchAirdrops } = useData()
+  const { airdrops, fetchAirdrops } = useData();
 
   useEffect(() => {
     ;(async () => {
-      if (!airdrops.length) await fetchAirdrops()
-    })()
+      if (!airdrops.length) await fetchAirdrops();
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
-  const [epochInfo, setEpochInfo] = useState({ epoch: 0, startTime: 0, endTime: 0, nowTime: 0, percent: 0 })
-  const [chainLoad, setChainLoad] = useState({ load5m: 0, load1h: 0, load24h: 0 })
+  const [epochInfo, setEpochInfo] = useState({ epoch: 0, startTime: 0, endTime: 0, nowTime: 0, percent: 0 });
+  const [chainLoad, setChainLoad] = useState({ load5m: 0, load1h: 0, load24h: 0 });
 
   useEffect(() => {
     const fetchEpoch = () => {
       api.epoch
         .getData()
         .then((data) => setEpochInfo(data))
-        .catch((error) => console.error(error))
-    }
+        .catch((error) => console.error(error));
+    };
     const incrementEpoch = () => {
       setEpochInfo((prev) => {
-        if (!prev.epoch) return prev
+        if (!prev.epoch) return prev;
 
-        const nowTime = prev.nowTime + 1000
-        const percent = (100 / (prev.endTime - prev.startTime)) * (nowTime - prev.startTime)
+        const nowTime = prev.nowTime + 1000;
+        const percent = (100 / (prev.endTime - prev.startTime)) * (nowTime - prev.startTime);
 
-        return { ...prev, nowTime, percent }
-      })
-    }
+        return { ...prev, nowTime, percent };
+      });
+    };
     const fetchChainLoad = () => {
       poolPm
         .getChainLoad()
         .then((data) => setChainLoad(data))
-        .catch((error) => console.error(error))
-    }
+        .catch((error) => console.error(error));
+    };
 
-    fetchEpoch()
-    fetchChainLoad()
+    fetchEpoch();
+    fetchChainLoad();
 
-    const epochInterval = setInterval(incrementEpoch, 1000) // 1 second
-    const chainInterval = setInterval(fetchChainLoad, 10 * 1000) // 10 seconds
+    const epochInterval = setInterval(incrementEpoch, 1000); // 1 second
+    const chainInterval = setInterval(fetchChainLoad, 10 * 1000); // 10 seconds
 
     return () => {
-      clearInterval(epochInterval)
-      clearInterval(chainInterval)
-    }
-  }, [])
+      clearInterval(epochInterval);
+      clearInterval(chainInterval);
+    };
+  }, []);
 
   return (
     <div className='w-full flex flex-col items-center'>
@@ -143,7 +143,7 @@ const Page = () => {
         </div>
       </Link>
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;
