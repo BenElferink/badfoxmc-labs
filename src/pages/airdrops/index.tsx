@@ -14,7 +14,7 @@ interface AirdropTimeline {
 }
 
 export const AIRDROP_DESCRIPTION =
-  "The airdrop tool utilizes Cardano's Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) amongst holders of given Policy ID(s).";
+  "The airdrop tool utilizes Cardano's Extended UTXO model to distribute rewards (ADA and Fungible-Tokens) to your community. You can run airdrops to your holders, delegators, or a custom list of addresses.";
 
 const Page = () => {
   const { airdrops, fetchAirdrops } = useData();
