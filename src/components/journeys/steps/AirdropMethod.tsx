@@ -45,7 +45,7 @@ const AirdropMethod = (props: {
           <input type='radio' name='airdropMethod' onChange={() => {}} checked={data['airdropMethod'] === 'delegator-snapshot'} />
           <span className='ml-2 text-lg'>Delegator Snapshot</span>
         </label>
-        <p className='mt-1 text-sm group-hover:text-white'>You&apos;ll be asked to provide Stake Pool IDs and some other relevant information.</p>
+        <p className='mt-1 text-sm group-hover:text-white'>You&apos;ll be asked to provide Stake Pool IDs.</p>
       </div>
 
       <div
