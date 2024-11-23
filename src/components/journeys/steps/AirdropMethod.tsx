@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
-import JourneyStepWrapper from './JourneyStepWrapper';
-import type { AirdropSettings } from '@/@types';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react'
+import JourneyStepWrapper from './JourneyStepWrapper'
+import type { AirdropSettings } from '@/@types'
 
 const AirdropMethod = (props: {
   defaultData: Partial<AirdropSettings>
@@ -9,13 +8,13 @@ const AirdropMethod = (props: {
   next?: () => void
   back?: () => void
 }) => {
-  const { defaultData, callback, next, back } = props;
-  const [data, setData] = useState(defaultData);
+  const { defaultData, callback, next, back } = props
+  const [data, setData] = useState(defaultData)
 
   useEffect(() => {
-    if (Object.keys(data).length) callback(data);
+    if (Object.keys(data).length) callback(data)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data])
 
   return (
     <JourneyStepWrapper disableNext={false} next={next} back={back}>
@@ -36,8 +35,7 @@ const AirdropMethod = (props: {
       </div>
 
       <div
-        // onClick={() => setData(() => ({ airdropMethod: 'delegator-snapshot' }))}
-        onClick={() => toast.error('Coming soon!')}
+        onClick={() => setData(() => ({ airdropMethod: 'delegator-snapshot' }))}
         className={
           'group cursor-pointer my-4 p-4 border rounded-lg ' +
           (data['airdropMethod'] === 'delegator-snapshot' ? 'text-white' : 'text-zinc-400 border-transparent')
@@ -66,7 +64,7 @@ const AirdropMethod = (props: {
         </p>
       </div>
     </JourneyStepWrapper>
-  );
-};
+  )
+}
 
-export default AirdropMethod;
+export default AirdropMethod
