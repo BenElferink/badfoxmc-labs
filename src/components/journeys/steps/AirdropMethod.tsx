@@ -18,7 +18,7 @@ const AirdropMethod = (props: {
 
   return (
     <JourneyStepWrapper disableNext={false} next={next} back={back}>
-      <h6 className='mb-6 text-xl text-center'>How should holders get their airdrop?</h6>
+      <h6 className='mb-6 text-xl text-center'>How should wallets get their airdrop?</h6>
 
       <div
         onClick={() => setData(() => ({ airdropMethod: 'holder-snapshot' }))}
