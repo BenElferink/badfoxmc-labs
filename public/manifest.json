@@ -1,7 +1,7 @@
 {
-  "short_name": "Bad Labs",
-  "name": "Bad Labs",
-  "description": "Web3 tools for Cardano",
+  "short_name": "Cardano Tools",
+  "name": "Cardano Tools",
+  "description": "DeFi tools for the Cardano Blockchain",
   "icons": [
     {
       "src": "favicon.ico",

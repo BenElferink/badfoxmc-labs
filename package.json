@@ -1,9 +1,16 @@
 {
-  "name": "bad-labs",
+  "name": "cardano-tools",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://labs.badfoxmc.com",
-  "author": "Ben Elferink <ben.elferink@icloud.com> (https://www.linkedin.com/in/ben-elferink-37ba251b9)",
+  "homepage": "/",
+  "author": "Ben Elferink <ben.elferink@icloud.com> (https://github.com/BenElferink)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BenElferink/cardano-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BenElferink/cardano-tools/issues"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,29 +19,29 @@
     "lint-fix": "next lint --fix"
   },
   "dependencies": {
-    "@blockfrost/blockfrost-js": "^5.5.0",
-    "@heroicons/react": "^2.1.5",
-    "@meshsdk/core": "^1.7.9",
-    "@meshsdk/react": "^1.7.9",
-    "axios": "^1.7.7",
-    "firebase": "^11.0.1",
-    "next": "15.0.1",
-    "postcss": "8.4.47",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "@blockfrost/blockfrost-js": "^5.7.0",
+    "@heroicons/react": "^2.2.0",
+    "@meshsdk/core": "^1.7.31",
+    "@meshsdk/react": "^1.7.31",
+    "axios": "^1.7.9",
+    "firebase": "^11.0.2",
+    "next": "15.0.4",
+    "postcss": "8.4.49",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "react-hot-toast": "^2.4.1",
     "react-timer-hook": "^3.0.8",
-    "tailwindcss": "3.4.14",
-    "wavesurfer.js": "^7.8.7",
+    "tailwindcss": "3.4.16",
+    "wavesurfer.js": "^7.8.10",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@types/node": "^22.7.9",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.1",
     "autoprefixer": "^10.4.20",
-    "eslint": "^9.13.0",
-    "eslint-config-next": "^15.0.1",
-    "typescript": "^5.6.3"
+    "eslint": "^9.16.0",
+    "eslint-config-next": "^15.0.4",
+    "typescript": "^5.7.2"
   }
 }
