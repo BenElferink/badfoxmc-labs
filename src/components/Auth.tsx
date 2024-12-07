@@ -27,7 +27,7 @@ const Auth = () => {
       if (lsValue) connect(lsValue);
     } else {
       if (connected) {
-        localStorage.setItem(LS_KEYS['WALLET_PROVIDER'], name);
+        localStorage.setItem(LS_KEYS['WALLET_PROVIDER'], name || '');
         toggleConnectModal(false);
       } else {
         localStorage.removeItem(LS_KEYS['WALLET_PROVIDER']);
