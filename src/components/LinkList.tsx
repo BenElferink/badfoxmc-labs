@@ -1,10 +1,10 @@
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { FC, useState } from 'react'
 
 export interface LinkListItem {
   label: string
-  Icon?: (props: { className: string }) => JSX.Element
+  Icon?: FC<{ className: string }>
   tags?: string[]
 
   path?: string
@@ -14,8 +14,8 @@ export interface LinkListItem {
 }
 
 const SingleLink = (props: LinkListItem) => {
-  const { label, Icon, tags, path } = props;
-  const router = useRouter();
+  const { label, Icon, tags, path } = props
+  const router = useRouter()
 
   return (
     <Link
@@ -34,11 +34,11 @@ const SingleLink = (props: LinkListItem) => {
         </span>
       ))}
     </Link>
-  );
-};
+  )
+}
 
 const SingleButton = (props: LinkListItem) => {
-  const { label, Icon, tags, onClick } = props;
+  const { label, Icon, tags, onClick } = props
 
   return (
     <button onClick={() => (onClick ? onClick() : null)} className='w-full p-2 flex items-center rounded-lg hover:bg-zinc-700'>
@@ -54,12 +54,12 @@ const SingleButton = (props: LinkListItem) => {
         </span>
       ))}
     </button>
-  );
-};
+  )
+}
 
 const DropdownLinks = (props: LinkListItem) => {
-  const { label, Icon, tags, path, onClick, nested } = props;
-  const [open, setOpen] = useState(false);
+  const { label, Icon, tags, path, onClick, nested } = props
+  const [open, setOpen] = useState(false)
 
   return (
     <div className='w-full'>
@@ -75,16 +75,16 @@ const DropdownLinks = (props: LinkListItem) => {
         </ul>
       ) : null}
     </div>
-  );
-};
+  )
+}
 
 const LinkList = (props: { items: LinkListItem[] }) => {
-  const { items } = props;
+  const { items } = props
 
   return (
     <ul className='space-y-2'>
       {items.map((item) => {
-        const { label, path, onClick, nested } = item;
+        const { label, path, onClick, nested } = item
 
         return (
           <li key={`nav-${label}`}>
@@ -98,10 +98,10 @@ const LinkList = (props: { items: LinkListItem[] }) => {
               <SingleButton {...item} />
             )}
           </li>
-        );
+        )
       })}
     </ul>
-  );
-};
+  )
+}
 
-export default LinkList;
+export default LinkList

@@ -1,6 +1,6 @@
-import { ForwardRefExoticComponent, RefAttributes, SVGProps } from 'react';
+import { FC, ForwardRefExoticComponent, RefAttributes, SVGProps } from 'react'
 
-const Button: (props: {
+const Button: FC<{
   label?: string
   icon?: ForwardRefExoticComponent<
     Omit<SVGProps<SVGSVGElement>, 'ref'> & {
@@ -10,8 +10,8 @@ const Button: (props: {
   >
   onClick?: () => void
   disabled?: boolean
-}) => JSX.Element = (props) => {
-  const { label = 'Click', icon: Icon, onClick, disabled } = props;
+}> = (props) => {
+  const { label = 'Click', icon: Icon, onClick, disabled } = props
 
   return (
     <button
@@ -23,7 +23,7 @@ const Button: (props: {
       {Icon ? <Icon className='w-8 h-8 mr-2' /> : null}
       {label}
     </button>
-  );
-};
+  )
+}
 
-export default Button;
+export default Button

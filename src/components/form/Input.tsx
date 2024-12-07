@@ -1,12 +1,14 @@
-const Input: (props: {
+import { FC } from 'react'
+
+const Input: FC<{
   value?: string | number
   setValue?: (value: string) => void
   placeholder?: string
   disabled?: boolean
   readOnly?: boolean
   error?: boolean
-}) => JSX.Element = (props) => {
-  const { value, setValue, placeholder, disabled, readOnly, error } = props;
+}> = (props) => {
+  const { value, setValue, placeholder, disabled, readOnly, error } = props
 
   return (
     <div className='w-[calc(100%-0.5rem)] m-1'>
@@ -24,7 +26,7 @@ const Input: (props: {
         }
       />
     </div>
-  );
-};
+  )
+}
 
-export default Input;
+export default Input
