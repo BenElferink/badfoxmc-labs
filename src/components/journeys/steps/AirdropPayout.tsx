@@ -140,7 +140,9 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
 
           await txConfirmation(txHash)
 
-          recipients.push(...batch.map(({ stakeKey, payout }) => ({ stakeKey, txHash, quantity: payout })))
+          recipients.push(
+            ...batch.filter(({ forceLovelace }) => !forceLovelace).map(({ stakeKey, payout }) => ({ stakeKey, txHash, quantity: payout }))
+          )
 
           setProcessedPayoutHolders((prev) =>
             prev.map((item) =>
