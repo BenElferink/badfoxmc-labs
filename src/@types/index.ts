@@ -220,4 +220,9 @@ export interface Airdrop extends TokenSelectionSettings {
   id?: string
   stakeKey: StakeKey
   timestamp: number
+  recipients?: {
+    stakeKey: StakeKey
+    txHash: string
+    quantity: number
+  }[]
 }

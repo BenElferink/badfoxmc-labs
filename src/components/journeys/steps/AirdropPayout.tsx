@@ -1,30 +1,30 @@
-import Link from 'next/link';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { utils, writeFileXLSX } from 'xlsx';
-import { useWallet } from '@meshsdk/react';
-import { Transaction } from '@meshsdk/core';
-import { ArrowTopRightOnSquareIcon, CheckBadgeIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid';
-import { firestore } from '@/utils/firebase';
-import formatTokenAmount from '@/functions/formatters/formatTokenAmount';
-import txConfirmation from '@/functions/txConfirmation';
-import getExplorerUrl from '@/functions/formatters/getExplorerUrl';
-import Loader from '@/components/Loader';
-import Button from '@/components/form/Button';
-import ProgressBar from '@/components/ProgressBar';
-import JourneyStepWrapper from './JourneyStepWrapper';
-import type { Airdrop, PayoutHolder, AirdropSettings } from '@/@types';
-import { DECIMALS, SYMBOLS, WALLETS } from '@/constants';
+import Link from 'next/link'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { utils, writeFileXLSX } from 'xlsx'
+import { useWallet } from '@meshsdk/react'
+import { Transaction } from '@meshsdk/core'
+import { ArrowTopRightOnSquareIcon, CheckBadgeIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid'
+import { firestore } from '@/utils/firebase'
+import formatTokenAmount from '@/functions/formatters/formatTokenAmount'
+import txConfirmation from '@/functions/txConfirmation'
+import getExplorerUrl from '@/functions/formatters/getExplorerUrl'
+import Loader from '@/components/Loader'
+import Button from '@/components/form/Button'
+import ProgressBar from '@/components/ProgressBar'
+import JourneyStepWrapper from './JourneyStepWrapper'
+import type { Airdrop, PayoutHolder, AirdropSettings, StakeKey } from '@/@types'
+import { DECIMALS, SYMBOLS, WALLETS } from '@/constants'
 
 const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: AirdropSettings; next?: () => void; back?: () => void }) => {
-  const { payoutHolders, settings, next, back } = props;
-  const { wallet } = useWallet();
+  const { payoutHolders, settings, next, back } = props
+  const { wallet } = useWallet()
 
-  const ticker = settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain;
-  const totalAmount = useMemo(() => payoutHolders.reduce((prev, curr) => prev + curr.payout, 0), []);
-  const devFee = useMemo(() => formatTokenAmount.toChain(Math.max(1, payoutHolders.length * 0.5), DECIMALS['ADA']), []);
-  const devPayed = useRef(false);
+  const ticker = settings.tokenName.ticker || settings.tokenName.display || settings.tokenName.onChain
+  const totalAmount = useMemo(() => payoutHolders.reduce((prev, curr) => prev + curr.payout, 0), [])
+  const devFee = useMemo(() => formatTokenAmount.toChain(Math.max(1, payoutHolders.length * 0.5), DECIMALS['ADA']), [])
+  const devPayed = useRef(false)
 
-  const [processedPayoutHolders, setProcessedPayoutHolders] = useState([...payoutHolders]);
+  const [processedPayoutHolders, setProcessedPayoutHolders] = useState([...payoutHolders])
   const [progress, setProgress] = useState({
     msg: '',
     loading: false,
@@ -35,78 +35,84 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
       current: 0,
       max: 0,
     },
-  });
+  })
 
   const runPayout = useCallback(
     async (difference?: number): Promise<any> => {
-      setProgress((prev) => ({ ...prev, loading: true, error: false }));
+      setProgress((prev) => ({ ...prev, loading: true, error: false }))
 
       if (!difference) {
-        setProgress((prev) => ({ ...prev, loading: true, msg: 'Batching TXs...' }));
+        setProgress((prev) => ({ ...prev, loading: true, msg: 'Batching TXs...' }))
       }
 
       if (settings.tokenId !== 'lovelace') {
-        const minAdaPerHolder = 1.2;
-        const adaNeeded = Math.ceil(processedPayoutHolders.length / minAdaPerHolder);
-        const adaInWallet = formatTokenAmount.fromChain((await wallet.getLovelace()) || 0, DECIMALS['ADA']);
+        const minAdaPerHolder = 1.2
+        const adaNeeded = Math.ceil(processedPayoutHolders.length / minAdaPerHolder)
+        const adaInWallet = formatTokenAmount.fromChain((await wallet.getLovelace()) || 0, DECIMALS['ADA'])
 
         if (adaInWallet < adaNeeded) {
           setProgress((prev) => ({
             ...prev,
             loading: false,
             msg: `Insufficient ADA! Please acquire at least ${adaNeeded} ADA (not including UTXOs) and try again`,
-          }));
-          return;
+          }))
+          return
         }
       }
 
-      const unpayedWallets = processedPayoutHolders.filter(({ txHash }) => !txHash);
+      const unpayedWallets = processedPayoutHolders.filter(({ txHash }) => !txHash)
       if (!devPayed.current)
         unpayedWallets.unshift({
           stakeKey: WALLETS['STAKE_KEYS']['DEV'],
           address: WALLETS['ADDRESSES']['DEV'],
           payout: devFee,
           forceLovelace: true,
-        });
+        })
 
-      const batchSize = difference ? Math.floor(difference * unpayedWallets.length) : unpayedWallets.length;
-      const batches: PayoutHolder[][] = [];
+      const batchSize = difference ? Math.floor(difference * unpayedWallets.length) : unpayedWallets.length
+      const batches: PayoutHolder[][] = []
 
       for (let i = 0; i < unpayedWallets.length; i += batchSize) {
-        batches.push(unpayedWallets.slice(i, (i / batchSize + 1) * batchSize));
+        batches.push(unpayedWallets.slice(i, (i / batchSize + 1) * batchSize))
       }
 
       try {
         setProgress((prev) => ({
           ...prev,
           batch: { ...prev.batch, current: 0, max: batches.length },
-        }));
+        }))
+
+        const recipients: {
+          stakeKey: StakeKey
+          txHash: string
+          quantity: number
+        }[] = []
 
         for await (const batch of batches) {
           setProgress((prev) => ({
             ...prev,
             msg: 'Building TX...',
-          }));
+          }))
 
-          const tx = new Transaction({ initiator: wallet });
+          const tx = new Transaction({ initiator: wallet })
 
           for (const { address, payout, forceLovelace } of batch) {
             if (settings.tokenId === 'lovelace' || forceLovelace) {
-              const minLovelaces = formatTokenAmount.toChain(1, DECIMALS['ADA']);
+              const minLovelaces = formatTokenAmount.toChain(1, DECIMALS['ADA'])
 
               if (payout < minLovelaces) {
-                const str1 = 'Cardano requires at least 1 ADA per TX.';
-                const str2 = `This wallet has only ${formatTokenAmount.fromChain(payout, DECIMALS['ADA']).toFixed(2)} ADA assigned to it:`;
-                const str3 = address;
-                const str4 = 'Click OK if you want to increase the payout for this wallet to 1 ADA.';
-                const str5 = 'Click cancel to exclude this wallet from the airdrop.';
-                const str6 = 'Note: accepting will increase the total pool size!';
+                const str1 = 'Cardano requires at least 1 ADA per TX.'
+                const str2 = `This wallet has only ${formatTokenAmount.fromChain(payout, DECIMALS['ADA']).toFixed(2)} ADA assigned to it:`
+                const str3 = address
+                const str4 = 'Click OK if you want to increase the payout for this wallet to 1 ADA.'
+                const str5 = 'Click cancel to exclude this wallet from the airdrop.'
+                const str6 = 'Note: accepting will increase the total pool size!'
 
                 if (window.confirm(`${str1}\n${str2}\n${str3}\n\n${str4}\n${str5}\n${str6}`)) {
-                  tx.sendLovelace({ address }, String(minLovelaces));
+                  tx.sendLovelace({ address }, String(minLovelaces))
                 }
               } else {
-                tx.sendLovelace({ address }, String(payout));
+                tx.sendLovelace({ address }, String(payout))
               }
             } else {
               tx.sendAssets({ address }, [
@@ -114,25 +120,27 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
                   unit: settings.tokenId,
                   quantity: String(payout),
                 },
-              ]);
+              ])
             }
           }
 
           // this may throw an error if TX size is over the limit
-          const unsignedTx = await tx.build();
-          const signedTx = await wallet.signTx(unsignedTx);
-          const txHash = await wallet.submitTx(signedTx);
+          const unsignedTx = await tx.build()
+          const signedTx = await wallet.signTx(unsignedTx)
+          const txHash = await wallet.submitTx(signedTx)
 
-          if (!devPayed.current) devPayed.current = true;
+          if (!devPayed.current) devPayed.current = true
 
           setProgress((prev) => ({
             ...prev,
             batch: { ...prev.batch, current: prev.batch.current + 1, max: batches.length },
             msg: 'Awaiting Network Confirmation...',
             started: true, // "started" here, because we need 1st batch to succeed
-          }));
+          }))
 
-          await txConfirmation(txHash);
+          await txConfirmation(txHash)
+
+          recipients.push(...batch.map(({ stakeKey, payout }) => ({ stakeKey, txHash, quantity: payout })))
 
           setProcessedPayoutHolders((prev) =>
             prev.map((item) =>
@@ -143,20 +151,20 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
                   }
                 : item
             )
-          );
+          )
         }
 
         const countPayouts = () =>
           processedPayoutHolders.reduce((prev, curr) => {
-            if (!curr.payout) return prev;
-            else return prev + curr.payout;
-          }, 0);
+            if (!curr.payout) return prev
+            else return prev + curr.payout
+          }, 0)
 
-        const _dec = settings.tokenAmount.decimals;
-        const _onch = settings.tokenAmount.onChain; // TODO: 
-        const _disp = settings.tokenAmount.display; // TODO: 
-        const tAmountOnChain = formatTokenAmount.fromChain(_onch, _dec) === 1 ? countPayouts() : _onch;
-        const tAmountDisplay = _disp === 1 ? formatTokenAmount.fromChain(countPayouts(), _dec) : _disp;
+        const _dec = settings.tokenAmount.decimals
+        const _onch = settings.tokenAmount.onChain // TODO:
+        const _disp = settings.tokenAmount.display // TODO:
+        const tAmountOnChain = formatTokenAmount.fromChain(_onch, _dec) === 1 ? countPayouts() : _onch
+        const tAmountDisplay = _disp === 1 ? formatTokenAmount.fromChain(countPayouts(), _dec) : _disp
 
         const airdrop: Airdrop = {
           stakeKey: (await wallet.getRewardAddresses())[0],
@@ -170,38 +178,40 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
             display: tAmountDisplay,
           },
           thumb: settings.thumb,
-        };
 
-        const collection = firestore.collection('airdrops');
-        await collection.add(airdrop);
+          recipients,
+        }
 
-        setProgress((prev) => ({ ...prev, loading: false, ended: true, msg: 'Airdrop Done' }));
+        const collection = firestore.collection('airdrops')
+        await collection.add(airdrop)
+
+        setProgress((prev) => ({ ...prev, loading: false, ended: true, msg: 'Airdrop Done' }))
       } catch (error: any) {
-        console.error(error);
-        const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR';
+        console.error(error)
+        const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
 
         if (!!errMsg && errMsg.indexOf('Maximum transaction size') !== -1) {
           // OLD: [Transaction] An error occurred during build: Maximum transaction size of 16384 exceeded. Found: 21861.
           // NEW: txBuildResult error: JsValue("Maximum transaction size of 16384 exceeded. Found: 19226")
-          const splitMessage: string[] = errMsg.split(' ');
-          const [max, curr] = splitMessage.map((str) => Number(str.replace(/[^\d]/g, ''))).filter((num) => num && !isNaN(num));
+          const splitMessage: string[] = errMsg.split(' ')
+          const [max, curr] = splitMessage.map((str) => Number(str.replace(/[^\d]/g, ''))).filter((num) => num && !isNaN(num))
           // [16384, any_number_higher_than_16384]
 
-          const newDifference = (difference || 1) * (max / curr);
+          const newDifference = (difference || 1) * (max / curr)
 
-          setProgress((prev) => ({ ...prev, loading: true, msg: `Trying Batch Size ${String(newDifference)}` }));
-          return await runPayout(newDifference);
+          setProgress((prev) => ({ ...prev, loading: true, msg: `Trying Batch Size ${String(newDifference)}` }))
+          return await runPayout(newDifference)
         } else {
-          setProgress((prev) => ({ ...prev, loading: false, error: true, msg: errMsg }));
+          setProgress((prev) => ({ ...prev, loading: false, error: true, msg: errMsg }))
         }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [processedPayoutHolders, settings, wallet]
-  );
+  )
 
   const downloadReceipt = useCallback(async () => {
-    setProgress((prev) => ({ ...prev, loading: true, msg: 'Downloading...' }));
+    setProgress((prev) => ({ ...prev, loading: true, msg: 'Downloading...' }))
 
     try {
       const ws = utils.json_to_sheet(
@@ -213,23 +223,23 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
           txHash: item.txHash,
         })),
         { header: ['amount', 'tokenName', 'address', 'stakeKey', 'txHash'] }
-      );
+      )
 
-      ws['!cols'] = [{ width: 20 }, { width: 15 }, { width: 100 }, { width: 70 }, { width: 70 }];
+      ws['!cols'] = [{ width: 20 }, { width: 15 }, { width: 100 }, { width: 70 }, { width: 70 }]
 
-      const wb = utils.book_new();
-      utils.book_append_sheet(wb, ws, 'airdrop');
+      const wb = utils.book_new()
+      utils.book_append_sheet(wb, ws, 'airdrop')
 
-      writeFileXLSX(wb, `Airdrop_${new Date().toLocaleDateString()}.xlsx`);
+      writeFileXLSX(wb, `Airdrop_${new Date().toLocaleDateString()}.xlsx`)
 
-      setProgress((prev) => ({ ...prev, loading: false, msg: '' }));
+      setProgress((prev) => ({ ...prev, loading: false, msg: '' }))
     } catch (error: any) {
-      console.error(error);
-      const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR';
+      console.error(error)
+      const errMsg = error?.response?.data || error?.message || error?.toString() || 'UNKNOWN ERROR'
 
-      setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }));
+      setProgress((prev) => ({ ...prev, loading: false, msg: errMsg }))
     }
-  }, [processedPayoutHolders, settings]);
+  }, [processedPayoutHolders, settings])
 
   return (
     <JourneyStepWrapper disableBack={progress.loading || progress.ended} next={next} back={back}>
@@ -315,7 +325,7 @@ const AirdropPayout = (props: { payoutHolders: PayoutHolder[]; settings: Airdrop
         </div>
       ))}
     </JourneyStepWrapper>
-  );
-};
+  )
+}
 
-export default AirdropPayout;
+export default AirdropPayout
